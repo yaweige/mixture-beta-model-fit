@@ -8,7 +8,7 @@ library(betareg)
 library(bulletxtrctr)
 # 1. we are going to first fit the mixture beta distribution for FAU 330===========================
 
-# See the data
+# See the data (data not posted on github, use the ccf directly instead)
 fau330_km <- land_score_km_generator2("./summer/data/")[[1]] 
 
 fau330_km$bullet2
@@ -43,5 +43,16 @@ fau330_km_beta_no_A$flexmix@components
 beta_params(fau330_km_beta_no_A)
 beta_params(fau330_knm_beta_no_A)
 
+fau330_km_no_A_simulated <- simulate_bitamix(fau330_km_beta_no_A)
 
-#
+ggplot(data = fau330_km_no_A_simulated) +
+  geom_line(aes(x = ccf, y = y), color = "green") +
+  geom_line(aes(x = ccf, y = y1), color = "blue") +
+  geom_line(aes(x = ccf, y = y2), color = "red")
+
+fau330_knm_no_A_simulated <- simulate_bitamix(fau330_knm_beta_no_A)
+
+ggplot(data = fau330_knm_no_A_simulated) +
+  geom_line(aes(x = ccf, y = y), color = "green") +
+  geom_line(aes(x = ccf, y = y1), color = "blue") +
+  geom_line(aes(x = ccf, y = y2), color = "red")

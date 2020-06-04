@@ -107,3 +107,25 @@ beta_params <- function(model){
   
   output
 }
+
+# A function to simulate data set
+# example:
+# km_42_simulated <- simulate_bitamix(km_42_leaveAout)
+# 
+# ggplot() + 
+#   geom_line(aes(x = ccf, y = y), data = km_42_simulated, color = "green") + 
+#   geom_line(aes(x = ccf, y = y1), data = km_42_simulated, color = "blue") + 
+#   geom_line(aes(x = ccf, y = y2), data = km_42_simulated, color = "red")
+
+simulate_bitamix <- function(model) {
+  params <- beta_params(model)
+  p1 <- model$flexmix@prior[1]
+  p2 <- model$flexmix@prior[2]
+  # y: the betamix, y1: component 1, y2: component 2
+  simulated <- data.frame(ccf = 1:99/100,
+                          y1 =  dbeta(1:99/100, shape1 = params[[1]][[1]], shape2 = params[[1]][[2]]),
+                          y2 =  dbeta(1:99/100, shape1 = params[[2]][[1]], shape2 = params[[2]][[2]]),
+                          y = p1*dbeta(1:99/100, shape1 = params[[1]][[1]], shape2 = params[[1]][[2]]) +
+                            p2*dbeta(1:99/100, shape1 = params[[2]][[1]], shape2 = params[[2]][[2]]))
+  simulated
+}
