@@ -93,6 +93,8 @@ land_score_knm_generator2 <- function(dir, FAUno = NULL, firstno = NULL, remove 
 }
 
 ## beta mixture params extractor(produce Beta(alpha, beta))
+# note: unlike cv_summary, this function didn't reorder the components according to their means
+# use cv_summary instead if not just want to see the result
 beta_params <- function(model){
   
   output <- lapply(model$flexmix@components, FUN = function(x){
@@ -107,6 +109,34 @@ beta_params <- function(model){
   
   output
 }
+
+# summarize a list of betamixture models(reorder the components here by their means)
+# example:km_bi_summary <- cv_summary(km_bi_list)
+cv_summary <- function(x) {
+  information_list <- lapply(x, FUN = function(x) {
+    prior <- x$flexmix@prior
+    params <- beta_params(x)
+    mu_phi_params <- x$flexmix@components
+    
+    # order the components according to their mean: from small to large
+    order <- order(unlist(lapply(params, FUN = function(x) x[[1]]/(x[[1]]+x[[2]]))))
+    prior <- prior[order]
+    params <- params[order]
+    mu_phi_params <- mu_phi_params[order]
+    names(params) <- NULL
+    names(mu_phi_params) <- NULL
+    
+    # simlify the structure(this is updated on June 5/2020)
+    mu_phi_params <- lapply(1:length(mu_phi_params), FUN = function(i){
+      output <- mu_phi_params[[i]][[1]]@parameters
+    })
+    
+    
+    output <- list(prior=prior, params=params, order=order, mu_phi_params=mu_phi_params)
+  })
+  information_list
+}
+
 
 # A function to simulate data set
 # example:
