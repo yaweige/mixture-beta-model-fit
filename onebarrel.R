@@ -117,8 +117,12 @@ summary_suspect_knm <- summary_simulated(fau330_knm_beta_A, nrun = 99, n_each_ru
 # This failed because no proper starting values, but report as error "no convergence", when there is good starting values but no convergence, report a warning
 summary_suspect_km_66_fail <- summary_suspect_km[[66]]
 
-summary_suspect_km <- summary_simulated(fau330_km_beta_A, nrun = 1, n_each_run = 18)
+summary_suspect_km[[66]] <- summary_simulated(fau330_km_beta_A, nrun = 1, n_each_run = 18)
 
+# saveRDS(summary_test_km, file = "summary_test_km.rds")
+# saveRDS(summary_test_knm, file = "summary_test_knm.rds")
+# saveRDS(summary_suspect_km, file = "summary_suspect_km.rds")
+# saveRDS(summary_suspect_knm, file = "summary_suspect_knm.rds")
 # Now it's ready to investigate
 
 # To me, intuitively
@@ -164,13 +168,50 @@ summary_test_knm_data <- extract_params(summary_test_knm)
 summary_suspect_km_data <- extract_params(summary_suspect_km)
 summary_suspect_knm_data <- extract_params(summary_suspect_knm)
 
-# The 95% confidence interval for aplha (expect to be extremely wide)
+# The 95% Bootstrap condifence interval
 
-# The 95% confidence interval for beta (expect to be extremely wide)
+bootstrap_intervals <- function(model, summary_x_x_data){
+  param1 <-  cv_summary(list(model))[[1]]
+  p1 <- param1$prior[[1]]
+  c1_alpha <- param1$params[[1]]$alpha
+  c1_beta <- param1$params[[1]]$beta
+  c1_mu <- plogis(param1$mu_phi_params[[1]]$mean)
+  c1_phi <- exp(param1$mu_phi_params[[1]]$precision)
+  
+  c2_alpha <- param1$params[[2]]$alpha
+  c2_beta <- param1$params[[2]]$beta
+  c2_mu <- plogis(param1$mu_phi_params[[2]]$mean)
+  c2_phi <- exp(param1$mu_phi_params[[2]]$precision)
+  
+  estimated <- c(p1, c1_alpha, c1_beta, c1_mu, c2_alpha, c2_beta, c2_mu, c2_phi)
+  
+  bootstrap_sample_5percent <- lapply(summary_x_x_data, FUN = function(x){
+    output <- x[order(x)]
+    output[5]
+  }) %>% unlist()
+  
+  bootstrap_sample_95percent <- lapply(summary_x_x_data, FUN = function(x){
+    output <- x[order(x)]
+    output[95]
+  }) %>% unlist() 
+  
+  lower <- 2*estimated - bootstrap_sample_95percent
+  upper <- 2*estimated - bootstrap_sample_5percent
+  
+  output <- matrix(c(lower, upper), byrow = T, nrow = 2)
+  colnames(output) <- c("p1", "c1_alpha", "c1_beta", "c1_mu", "c2_alpha", "c2_beta", "c2_mu", "c2_phi")
+  rownames(output) <- c("95%lower", "95%upper")
+  output
+}
 
-# The 95% confidence interval for mu (expect to be extremely wide)
+# The four models we estimated, bootstrap CI
 
-# The 95% confidence interval for phi (expect to be extremely wide)
+aa <- bootstrap_intervals(fau330_km_beta_no_A, summary_test_km_data)
+bb <- bootstrap_intervals(fau330_knm_beta_no_A, summary_test_knm_data)
+cc <- bootstrap_intervals(fau330_km_beta_A, summary_suspect_km_data)
+dd <- bootstrap_intervals(fau330_knm_beta_A, summary_suspect_knm_data)
 
+bootstrap95_CI <- list(No_A_km = aa, NO_A_knm = bb, A_km = cc, A_knm = dd)
 # 5. Do similar estimations to more single barrel cases (within or out of this FAU330 barrel)==========
+
 
