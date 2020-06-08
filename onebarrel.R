@@ -169,8 +169,11 @@ summary_suspect_km_data <- extract_params(summary_suspect_km)
 summary_suspect_knm_data <- extract_params(summary_suspect_knm)
 
 # The 95% Bootstrap condifence interval
+# lower: 2*estimated-bootstrap[(M+1)*(1-alpha/2)]
+# upper: 2*estimated-bootstrap[(M+1)*(alpha/2)]
 
-bootstrap_intervals <- function(model, summary_x_x_data){
+
+bootstrap_intervals <- function(model, summary_x_x_data, alpha = 0.1){
   param1 <-  cv_summary(list(model))[[1]]
   p1 <- param1$prior[[1]]
   c1_alpha <- param1$params[[1]]$alpha
@@ -185,24 +188,94 @@ bootstrap_intervals <- function(model, summary_x_x_data){
   
   estimated <- c(p1, c1_alpha, c1_beta, c1_mu, c2_alpha, c2_beta, c2_mu, c2_phi)
   
-  bootstrap_sample_5percent <- lapply(summary_x_x_data, FUN = function(x){
+  quantile_position_large <- floor((nrow(summary_x_x_data)+1)*(1-alpha/2))
+  quantile_position_small <- floor((nrow(summary_x_x_data)+1)*(alpha/2))
+  
+  bootstrap_sample_small <- lapply(summary_x_x_data, FUN = function(x){
     output <- x[order(x)]
-    output[5]
+    output[quantile_position_small]
   }) %>% unlist()
   
-  bootstrap_sample_95percent <- lapply(summary_x_x_data, FUN = function(x){
+  bootstrap_sample_large <- lapply(summary_x_x_data, FUN = function(x){
     output <- x[order(x)]
-    output[95]
+    output[quantile_position_large]
   }) %>% unlist() 
   
-  lower <- 2*estimated - bootstrap_sample_95percent
-  upper <- 2*estimated - bootstrap_sample_5percent
+  lower <- 2*estimated - bootstrap_sample_large
+  upper <- 2*estimated - bootstrap_sample_small
   
   output <- matrix(c(lower, upper), byrow = T, nrow = 2)
   colnames(output) <- c("p1", "c1_alpha", "c1_beta", "c1_mu", "c2_alpha", "c2_beta", "c2_mu", "c2_phi")
-  rownames(output) <- c("95%lower", "95%upper")
+  rownames(output) <- paste0((1-alpha)*100, c("%lower", "%upper"))
   output
 }
+
+bootstrap_intervals_diff <- function(model1, model2, sampled_data1, sampled_data2, alpha = 0.1){
+  param1 <-  cv_summary(list(model1))[[1]]
+  m1_p1 <- param1$prior[[1]]
+  m1_c1_alpha <- param1$params[[1]]$alpha
+  m1_c1_beta <- param1$params[[1]]$beta
+  m1_c1_mu <- plogis(param1$mu_phi_params[[1]]$mean)
+  m1_c1_phi <- exp(param1$mu_phi_params[[1]]$precision)
+  
+  m1_c2_alpha <- param1$params[[2]]$alpha
+  m1_c2_beta <- param1$params[[2]]$beta
+  m1_c2_mu <- plogis(param1$mu_phi_params[[2]]$mean)
+  m1_c2_phi <- exp(param1$mu_phi_params[[2]]$precision)
+  
+  m1_estimated <- c(m1_p1, m1_c1_alpha, m1_c1_beta, m1_c1_mu, m1_c2_alpha, m1_c2_beta, m1_c2_mu, m1_c2_phi)
+  
+  param2 <-  cv_summary(list(model2))[[1]]
+  m2_p1 <- param2$prior[[1]]
+  m2_c1_alpha <- param2$params[[1]]$alpha
+  m2_c1_beta <- param2$params[[1]]$beta
+  m2_c1_mu <- plogis(param2$mu_phi_params[[1]]$mean)
+  m2_c1_phi <- exp(param2$mu_phi_params[[1]]$precision)
+  
+  m2_c2_alpha <- param2$params[[2]]$alpha
+  m2_c2_beta <- param2$params[[2]]$beta
+  m2_c2_mu <- plogis(param2$mu_phi_params[[2]]$mean)
+  m2_c2_phi <- exp(param2$mu_phi_params[[2]]$precision)
+  
+  m2_estimated <- c(m2_p1, m2_c1_alpha, m2_c1_beta, m2_c1_mu, m2_c2_alpha, m2_c2_beta, m2_c2_mu, m2_c2_phi)
+  
+  difference <- m1_estimated-m2_estimated
+  
+  if (nrow(sampled_data1) >= nrow(sampled_data2)) {
+    nrow_used <- nrow(sampled_data2)} else {
+      nrow_used <- nrow(sampled_data1)}
+  
+  if (ncol(sampled_data1) != ncol(sampled_data2)) stop("data has different number of columns")
+  
+  sampled_diff <- lapply(1:ncol(sampled_data1), FUN = function(i) {
+    output <- sampled_data1[1:nrow_used, i] - sampled_data2[1:nrow_used, i]
+    output
+  }) %>% as.data.frame()
+  
+  quantile_position_large <- floor((nrow_used+1)*(1-alpha/2))
+  quantile_position_small <- floor((nrow_used+1)*(alpha/2))
+  
+  bootstrap_sample_small <- lapply(sampled_diff, FUN = function(x){
+    output <- x[order(x)]
+    output[quantile_position_small]
+  }) %>% unlist()
+  
+  bootstrap_sample_large <- lapply(sampled_diff, FUN = function(x){
+    output <- x[order(x)]
+    output[quantile_position_large]
+  }) %>% unlist() 
+  
+  
+  
+  lower <- 2*difference - bootstrap_sample_large
+  upper <- 2*difference - bootstrap_sample_small
+  
+  output <- matrix(c(lower, upper), byrow = T, nrow = 2)
+  colnames(output) <- c("p1_diff", "c1_alpha_diff", "c1_beta_diff", "c1_mu_diff", "c2_alpha_diff", "c2_beta_diff", "c2_mu_diff", "c2_phi_diff")
+  rownames(output) <- paste0((1-alpha)*100, c("%lower", "%upper"))
+  output
+}
+
 
 # The four models we estimated, bootstrap CI
 
@@ -211,7 +284,32 @@ bb <- bootstrap_intervals(fau330_knm_beta_no_A, summary_test_knm_data)
 cc <- bootstrap_intervals(fau330_km_beta_A, summary_suspect_km_data)
 dd <- bootstrap_intervals(fau330_knm_beta_A, summary_suspect_knm_data)
 
-bootstrap95_CI <- list(No_A_km = aa, NO_A_knm = bb, A_km = cc, A_knm = dd)
+bootstrap90_CI <- list(No_A_km = aa, NO_A_knm = bb, A_km = cc, A_knm = dd)
+
+# saveRDS(bootstrap90_CI, file = "bootstrap90_CI.rds")
+
+# How to test if two parameters are same or not, should we do a bootstrap interval for that? How?
+# Inference conclusions:
+# 1. Some of the intervals cover beyond the parameter space. (Is there anything wrong? This could be the case if the parameter varies a lot)
+# 2. Should have a closer look of the bootstrap samples, e.g. boxplot
+# 3. How to interpret the interval and test results if it goes beyond the parameter space?(should we cut it or how to report this, or shoud we have larger simulated samples?)
+# 4. Obviously, the mean values are well seperated between KM and KNM
+# 5. p1 are also well seperated except A_km
+
+# we should have a look at the intervals of differences
+# How to construct the difference? If we do every possible pairwise difference, is that close to form a U statistic?
+# Or we do for the corresponding pairs in the simulated list (Do this now)
+
+# bootstrap intervals for difference
+ee <- bootstrap_intervals_diff(fau330_knm_beta_no_A, fau330_knm_beta_A, 
+                               summary_test_knm_data, summary_suspect_knm_data,
+                               alpha = 0.1)
+ff <- bootstrap_intervals_diff(fau330_km_beta_no_A, fau330_km_beta_A, 
+                               summary_test_km_data, summary_suspect_km_data,
+                               alpha = 0.1)
+
+bootstrap90_CI_diff <- list(km_noA_minus_A = ff, knm_noA_minus_A = ee)
+#saveRDS(bootstrap90_CI_diff, file = "bootstrap90_CI_diff.rds")
 # 5. Do similar estimations to more single barrel cases (within or out of this FAU330 barrel)==========
 
 
