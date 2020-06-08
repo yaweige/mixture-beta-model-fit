@@ -310,6 +310,50 @@ ff <- bootstrap_intervals_diff(fau330_km_beta_no_A, fau330_km_beta_A,
 
 bootstrap90_CI_diff <- list(km_noA_minus_A = ff, knm_noA_minus_A = ee)
 #saveRDS(bootstrap90_CI_diff, file = "bootstrap90_CI_diff.rds")
-# 5. Do similar estimations to more single barrel cases (within or out of this FAU330 barrel)==========
+# 5. Redo the above with lager data set run on the server========================================
+
+larger_summary_test_km <- readRDS("./upload/summary_test_km.rds")
+larger_summary_test_knm <- readRDS("./upload/summary_test_knm.rds")
+larger_summary_suspect_km <- readRDS("./upload/summary_suspect_km.rds")
+larger_summary_suspect_knm <- readRDS("./upload/summary_suspect_knm.rds")
+
+
+# Detect the failed cases
+larger_summary_test_km_failed <- lapply(larger_summary_test_km, FUN = is.list) %>% unlist()
+sum(larger_summary_test_km_failed)
+
+larger_summary_test_knm_failed <- lapply(larger_summary_test_knm, FUN = is.list) %>% unlist()
+sum(larger_summary_test_knm_failed)
+
+larger_summary_suspect_km_failed <- lapply(larger_summary_suspect_km, FUN = is.list) %>% unlist()
+sum(larger_summary_test_km_failed)
+
+larger_summary_suspect_knm_failed <- lapply(larger_summary_suspect_knm, FUN = is.list) %>% unlist()
+sum(larger_summary_test_knm_failed)
+
+larger_summary_test_km_data <- extract_params(larger_summary_test_km[larger_summary_test_km_failed])
+larger_summary_test_knm_data <- extract_params(larger_summary_test_knm[larger_summary_test_knm_failed])
+larger_summary_suspect_km_data <- extract_params(larger_summary_suspect_km[larger_summary_suspect_km_failed])
+larger_summary_suspect_knm_data <- extract_params(larger_summary_suspect_knm[larger_summary_suspect_knm_failed])
+gg <- bootstrap_intervals(fau330_km_beta_no_A, larger_summary_test_km_data)
+hh <- bootstrap_intervals(fau330_knm_beta_no_A, larger_summary_test_knm_data)
+ii <- bootstrap_intervals(fau330_km_beta_A, larger_summary_suspect_km_data)
+jj <- bootstrap_intervals(fau330_knm_beta_A, larger_summary_suspect_knm_data)
+
+bootstrap90_CI2 <- list(No_A_km = gg, NO_A_knm = hh, A_km = ii, A_knm = jj)
+bootstrap90_CI2
+#saveRDS(bootstrap90_CI2, file = "bootstrap90_CI2.rds")
+
+kk <- bootstrap_intervals_diff(fau330_knm_beta_no_A, fau330_knm_beta_A, 
+                               larger_summary_test_knm_data, larger_summary_suspect_knm_data,
+                               alpha = 0.1)
+ll <- bootstrap_intervals_diff(fau330_km_beta_no_A, fau330_km_beta_A, 
+                               larger_summary_test_km_data, larger_summary_suspect_km_data,
+                               alpha = 0.1)
+
+bootstrap90_CI_diff2 <- list(km_noA_minus_A = kk, knm_noA_minus_A = ll)
+bootstrap90_CI_diff2 
+#saveRDS(bootstrap90_CI_diff2, file = "bootstrap90_CI_diff2.rds")
+# 6. Do similar estimations to more single barrel cases (within or out of this FAU330 barrel)==========
 
 
