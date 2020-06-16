@@ -764,7 +764,19 @@ bootstrap_full_90_CI_diff_withA</code></pre>
 </div>
 <div id="how-should-we-interpret-the-results-and-whats-next" class="section level2">
 <h2>How should we interpret the results and what’s next?</h2>
-<p>…</p>
+<ol style="list-style-type: decimal">
+<li><p>Among the three estimated KM model, only the full data model has a first component as expected to show in the middle (small mode)</p></li>
+<li><p>Among the three estimated KNM model, the variation among the p1 are large, but the means are not far from the full data model.</p></li>
+<li><p>For the single barrel KM and KNM models for FAU 330, they both tend to be closer to the respective boardary. And the p1 are not stable at all (knm stable but different from full data model). This could be the effect for the specific case.</p></li>
+<li><p>According to phi, the single barrel models have smaller variance, more concentrated.</p></li>
+<li><p>For the bootstrap CIs of the single barrel estimates, it’s clear that many CIs go beyond the parameter space. For alpla, beta, phi, this is expected, since these estimates have large variation, can be very large and can be small, but don’t change the distributional appearance as much as they seem to be. Some times the p1 goes out of the parameter space, which reflects the fact that relative large variation exsits there. But for mu, it performs as expected.</p></li>
+<li><p>For the bootstrap CIs of the single barrel estimates, for mu, without A, twe can distinguish the two compoents, but with A, we can’t.</p></li>
+<li><p>For the bootstrap CIs of the single barrel estimates, from the observation 3, as expected, the p1 has large variation for KM models, however, better performance for the KNM models, but could go beyond the support sometimes (not as stable as it seems to be, doesn’t achieve the nominal coverage).</p></li>
+<li><p>For the bootstrap CIs of the full data barrel estimates, there CIs make much more sense. The p1 are relatively stable, most estimators are well bounded, the two compoents are well separated. The only concern is the c2_mu is larger than 1 for full_km, which just indicates the orginal mu we estimated is large.</p></li>
+<li><p>For the bootstrap CIs of the single barrel difference, it’s hard to say they are the same. This is really case specific result.</p></li>
+<li><p>For the bootstrap CIs of FAU 330 without A - full, they are clearly different.</p></li>
+<li><p>For the bootstrap CIs of FAU 330 with A - full, they are clearly different.</p></li>
+</ol>
 </div>
 
 
