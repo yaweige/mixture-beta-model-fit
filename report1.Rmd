@@ -3,18 +3,25 @@ title: "First Stage Report"
 output: html_document
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+
+```{r setup, echo=FALSE, message=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message=FALSE)
 library(betareg)
 library(dplyr)
 library(kableExtra)
-fau330_km_beta_no_A <- readRDS("fau330_km_beta_no_A.rds")
-fau330_knm_beta_no_A <- readRDS("fau330_knm_beta_no_A.rds")
-fau330_km_beta_A <- readRDS("fau330_km_beta_A.rds")
-fau330_knm_beta_A <- readRDS("fau330_knm_beta_A.rds")
-full_km_model <- readRDS("full_km_model.rds")
-full_knm_model <- readRDS("full_knm_model.rds")
+datapath <- "data"
+```
 
+```{r data, echo = FALSE}
+fau330_km_beta_no_A <- readRDS(file.path(datapath, "fau330_km_beta_no_A.rds"))
+fau330_knm_beta_no_A <- readRDS(file.path(datapath,"fau330_knm_beta_no_A.rds"))
+fau330_km_beta_A <- readRDS(file.path(datapath,"fau330_km_beta_A.rds"))
+fau330_knm_beta_A <- readRDS(file.path(datapath,"fau330_knm_beta_A.rds"))
+full_km_model <- readRDS(file.path(datapath,"full_km_model.rds"))
+full_knm_model <- readRDS(file.path(datapath,"full_knm_model.rds"))
+```
+
+```{r functions, echo = FALSE}
 beta_params <- function(model){
   
   output <- lapply(model$flexmix@components, FUN = function(x){
@@ -149,12 +156,12 @@ Then I did bootstrap inferences as follows:
 The results (90% bootstrap confidence intervals) for the four models of FAU 330 and two models of the full data are shown in the below. (These are not edited to show in a nicer format since the list can label each of the sets of intervals better with a dollar sign, don't how to achieve this in a data.frame)
 
 ```{r}
-bootstrap90_CI <- readRDS("bootstrap90_CI.rds")
+bootstrap90_CI <- readRDS(file.path(datapath,"bootstrap90_CI.rds"))
 bootstrap90_CI
 ```
 
 ```{r}
-bootstrap_full_90_CI <- readRDS("bootstrap_full_90_CI.rds")
+bootstrap_full_90_CI <- readRDS(file.path(datapath,"bootstrap_full_90_CI.rds"))
 bootstrap_full_90_CI
 ```
 
@@ -165,7 +172,7 @@ Besides the individual confidence intervals, we also test if some models are the
 2. Construct bootstrap confidence intervals for the diffence as shown below
 
 ```{r}
-bootstrap90_CI_diff <- readRDS("bootstrap90_CI_diff.rds")
+bootstrap90_CI_diff <- readRDS(file.path(datapath,"bootstrap90_CI_diff.rds"))
 bootstrap90_CI_diff
 ```
 
@@ -173,14 +180,14 @@ bootstrap90_CI_diff
 The following are the comparisons between the distributions for the three known bullets and the full data ones
 
 ```{r}
-bootstrap_full_90_CI_diff <- readRDS("bootstrap_full_90_CI_diff.rds")
+bootstrap_full_90_CI_diff <- readRDS(file.path(datapath,"bootstrap_full_90_CI_diff.rds"))
 bootstrap_full_90_CI_diff
 ```
 
 The following are the comparisons between the distributions for FAU 330 bullet A(compared to other known bullets) and the full data ones
 
 ```{r}
-bootstrap_full_90_CI_diff_withA <- readRDS("bootstrap_full_90_CI_diff_withA.rds")
+bootstrap_full_90_CI_diff_withA <- readRDS(file.path(datapath,"bootstrap_full_90_CI_diff_withA.rds"))
 bootstrap_full_90_CI_diff_withA
 ```
 

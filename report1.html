@@ -1,11 +1,10 @@
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
 
 <head>
 
 <meta charset="utf-8" />
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="generator" content="pandoc" />
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
@@ -278,7 +277,6 @@ code {
 }
 img {
   max-width:100%;
-  height: auto;
 }
 .tabbed-pane {
   padding-top: 12px;
@@ -340,6 +338,7 @@ summary {
   border: none;
   display: inline-block;
   border-radius: 4px;
+  background-color: transparent;
 }
 
 .tabset-dropdown > .nav-tabs.nav-tabs-open > li {
@@ -376,6 +375,7 @@ summary {
 </div>
 
 
+<pre><code>## Warning: package &#39;dplyr&#39; was built under R version 3.6.2</code></pre>
 <div id="the-work-we-have-done" class="section level2">
 <h2>The work we have done</h2>
 <p>Before the summer, we have done the following:</p>
@@ -653,7 +653,7 @@ full_knm_model
 <li><p>Then construct a basic parametric bootstrap intervals for our original estimation based on the bootstrap samples.</p></li>
 </ol>
 <p>The results (90% bootstrap confidence intervals) for the four models of FAU 330 and two models of the full data are shown in the below. (These are not edited to show in a nicer format since the list can label each of the sets of intervals better with a dollar sign, don’t how to achieve this in a data.frame)</p>
-<pre class="r"><code>bootstrap90_CI &lt;- readRDS(&quot;bootstrap90_CI.rds&quot;)
+<pre class="r"><code>bootstrap90_CI &lt;- readRDS(file.path(datapath,&quot;bootstrap90_CI.rds&quot;))
 bootstrap90_CI</code></pre>
 <pre><code>## $No_A_km
 ##                 p1  c1_alpha    c1_beta     c1_mu      c1_phi  c2_alpha
@@ -664,12 +664,12 @@ bootstrap90_CI</code></pre>
 ## 90%upper   13.17891 1.0971785  127.7540
 ## 
 ## $NO_A_knm
-##                  p1 c1_alpha   c1_beta      c1_mu    c1_phi  c2_alpha
-## 90%lower 0.06613965 21.81126  60.21568 0.08111391  83.30776  7.967525
-## 90%upper 0.37521812 74.26763 222.20899 0.26505622 296.42200 23.439058
-##           c2_beta     c2_mu   c2_phi
-## 90%lower 24.23019 0.2664661 32.39984
-## 90%upper 37.45608 0.3720668 60.86466
+##                  p1 c1_alpha   c1_beta      c1_mu    c1_phi  c2_alpha  c2_beta
+## 90%lower 0.06613965 21.81126  60.21568 0.08111391  83.30776  7.967525 24.23019
+## 90%upper 0.37521812 74.26763 222.20899 0.26505622 296.42200 23.439058 37.45608
+##              c2_mu   c2_phi
+## 90%lower 0.2664661 32.39984
+## 90%upper 0.3720668 60.86466
 ## 
 ## $A_km
 ##                 p1   c1_alpha    c1_beta     c1_mu     c1_phi   c2_alpha
@@ -680,13 +680,13 @@ bootstrap90_CI</code></pre>
 ## 90%upper   8.638464 0.8838477   37.75064
 ## 
 ## $A_knm
-##                  p1  c1_alpha   c1_beta     c1_mu    c1_phi  c2_alpha
-## 90%lower -0.3496246 -34.64513 -119.1981 0.0367836 -153.9801 -24.82858
-## 90%upper  0.2050877  93.35503  306.8026 0.2511667  400.0793  16.54667
-##            c2_beta     c2_mu    c2_phi
-## 90%lower -1.195323 0.1965847 -26.00807
-## 90%upper 36.393282 0.2492924  52.85542</code></pre>
-<pre class="r"><code>bootstrap_full_90_CI &lt;- readRDS(&quot;bootstrap_full_90_CI.rds&quot;)
+##                  p1  c1_alpha   c1_beta     c1_mu    c1_phi  c2_alpha   c2_beta
+## 90%lower -0.3496246 -34.64513 -119.1981 0.0367836 -153.9801 -24.82858 -1.195323
+## 90%upper  0.2050877  93.35503  306.8026 0.2511667  400.0793  16.54667 36.393282
+##              c2_mu    c2_phi
+## 90%lower 0.1965847 -26.00807
+## 90%upper 0.2492924  52.85542</code></pre>
+<pre class="r"><code>bootstrap_full_90_CI &lt;- readRDS(file.path(datapath,&quot;bootstrap_full_90_CI.rds&quot;))
 bootstrap_full_90_CI</code></pre>
 <pre><code>## $full_km
 ##                 p1 c1_alpha  c1_beta     c1_mu   c1_phi c2_alpha   c2_beta
@@ -708,7 +708,7 @@ bootstrap_full_90_CI</code></pre>
 <li><p>Since we have 3000 bootstrap samples for every model, if we assume iid(which actually is), we can simply match the pair of sampled models for different original estimated models, and calculate the difference, as a bootstrap sample for the difference(whatever way used to match the pairs as long as not to reuse any of them should get same theorical properties). The difference between the original estimated models is the point estimation for the difference.</p></li>
 <li><p>Construct bootstrap confidence intervals for the diffence as shown below</p></li>
 </ol>
-<pre class="r"><code>bootstrap90_CI_diff &lt;- readRDS(&quot;bootstrap90_CI_diff.rds&quot;)
+<pre class="r"><code>bootstrap90_CI_diff &lt;- readRDS(file.path(datapath,&quot;bootstrap90_CI_diff.rds&quot;))
 bootstrap90_CI_diff</code></pre>
 <pre><code>## $km_noA_minus_A
 ##              p1_diff c1_alpha_diff c1_beta_diff c1_mu_diff c1_phi_diff
@@ -726,7 +726,7 @@ bootstrap90_CI_diff</code></pre>
 ## 90%lower     -260.8735   -122.21329  0.1285148   -389.1996
 ## 90%upper      424.9823     78.74909  0.3805724    524.1036</code></pre>
 <p>The following are the comparisons between the distributions for the three known bullets and the full data ones</p>
-<pre class="r"><code>bootstrap_full_90_CI_diff &lt;- readRDS(&quot;bootstrap_full_90_CI_diff.rds&quot;)
+<pre class="r"><code>bootstrap_full_90_CI_diff &lt;- readRDS(file.path(datapath,&quot;bootstrap_full_90_CI_diff.rds&quot;))
 bootstrap_full_90_CI_diff</code></pre>
 <pre><code>## $km_330_minus_full
 ##            p1_diff c1_alpha_diff c1_beta_diff c1_mu_diff c1_phi_diff
@@ -744,7 +744,7 @@ bootstrap_full_90_CI_diff</code></pre>
 ## 90%lower     -1.914955     9.719195 -0.128730214    7.803136
 ## 90%upper     14.771592    23.385235 -0.001034447   37.983265</code></pre>
 <p>The following are the comparisons between the distributions for FAU 330 bullet A(compared to other known bullets) and the full data ones</p>
-<pre class="r"><code>bootstrap_full_90_CI_diff_withA &lt;- readRDS(&quot;bootstrap_full_90_CI_diff_withA.rds&quot;)
+<pre class="r"><code>bootstrap_full_90_CI_diff_withA &lt;- readRDS(file.path(datapath,&quot;bootstrap_full_90_CI_diff_withA.rds&quot;))
 bootstrap_full_90_CI_diff_withA</code></pre>
 <pre><code>## $km_330withA_minus_full
 ##             p1_diff c1_alpha_diff c1_beta_diff c1_mu_diff c1_phi_diff
