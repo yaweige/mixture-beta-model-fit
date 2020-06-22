@@ -186,7 +186,7 @@ bootstrap_intervals <- function(model, summary_x_x_data, alpha = 0.1){
   c2_mu <- plogis(param1$mu_phi_params[[2]]$mean)
   c2_phi <- exp(param1$mu_phi_params[[2]]$precision)
   
-  estimated <- c(p1, c1_alpha, c1_beta, c1_mu, c2_alpha, c2_beta, c2_mu, c2_phi)
+  estimated <- c(p1, c1_alpha, c1_beta, c1_mu, c1_phi, c2_alpha, c2_beta, c2_mu, c2_phi)
   
   quantile_position_large <- floor((nrow(summary_x_x_data)+1)*(1-alpha/2))
   quantile_position_small <- floor((nrow(summary_x_x_data)+1)*(alpha/2))
@@ -201,11 +201,11 @@ bootstrap_intervals <- function(model, summary_x_x_data, alpha = 0.1){
     output[quantile_position_large]
   }) %>% unlist() 
   
-  lower <- 2*estimated - bootstrap_sample_large
-  upper <- 2*estimated - bootstrap_sample_small
+  lower <- estimated^2/bootstrap_sample_large
+  upper <- estimated^2/bootstrap_sample_small
   
   output <- matrix(c(lower, upper), byrow = T, nrow = 2)
-  colnames(output) <- c("p1", "c1_alpha", "c1_beta", "c1_mu", "c2_alpha", "c2_beta", "c2_mu", "c2_phi")
+  colnames(output) <- c("p1", "c1_alpha", "c1_beta", "c1_mu", "c1_phi",  "c2_alpha", "c2_beta", "c2_mu", "c2_phi")
   rownames(output) <- paste0((1-alpha)*100, c("%lower", "%upper"))
   output
 }

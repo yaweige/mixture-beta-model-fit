@@ -375,7 +375,6 @@ summary {
 </div>
 
 
-<pre><code>## Warning: package &#39;dplyr&#39; was built under R version 3.6.2</code></pre>
 <div id="the-work-we-have-done" class="section level2">
 <h2>The work we have done</h2>
 <p>Before the summer, we have done the following:</p>
@@ -656,53 +655,53 @@ full_knm_model
 <pre class="r"><code>bootstrap90_CI &lt;- readRDS(file.path(datapath,&quot;bootstrap90_CI.rds&quot;))
 bootstrap90_CI</code></pre>
 <pre><code>## $No_A_km
-##                 p1  c1_alpha    c1_beta     c1_mu      c1_phi  c2_alpha
-## 90%lower 0.5326048 -538.9010 -618.68055 0.7778468 -1137.84457 -286.3078
-## 90%upper 1.0601607   51.9235   20.06647 0.9393830    72.16458  114.7949
-##             c2_beta     c2_mu    c2_phi
-## 90%lower -125.47177 0.9702065 -409.2452
-## 90%upper   13.17891 1.0971785  127.7540
+##                 p1  c1_alpha    c1_beta     c1_mu     c1_phi   c2_alpha
+## 90%lower 0.5453819  1.624465  0.2719836 0.7869415   1.614337   9.712947
+## 90%upper 2.0017687 92.256906 27.3028276 1.0601394 117.594662 337.831996
+##             c2_beta     c2_mu     c2_phi
+## 90%lower  0.6542143 0.9842335   9.614022
+## 90%upper 15.0592746 1.1806368 290.347207
 ## 
 ## $NO_A_knm
-##                  p1 c1_alpha   c1_beta      c1_mu    c1_phi  c2_alpha  c2_beta
-## 90%lower 0.06613965 21.81126  60.21568 0.08111391  83.30776  7.967525 24.23019
-## 90%upper 0.37521812 74.26763 222.20899 0.26505622 296.42200 23.439058 37.45608
-##              c2_mu   c2_phi
-## 90%lower 0.2664661 32.39984
-## 90%upper 0.3720668 60.86466
+##                 p1  c1_alpha    c1_beta     c1_mu    c1_phi  c2_alpha  c2_beta
+## 90%lower 0.1726562  27.25958   77.58226 0.1523792  105.4345  9.809633 24.51217
+## 90%upper 0.3937920 336.42377 2051.24412 0.2653453 2139.3327 42.224793 75.88920
+##              c2_mu    c2_phi
+## 90%lower 0.2966161  32.71788
+## 90%upper 0.3729575 117.20814
 ## 
 ## $A_km
-##                 p1   c1_alpha    c1_beta     c1_mu     c1_phi   c2_alpha
-## 90%lower 0.1134834 -162.68652 -213.21937 0.8720531 -375.30903 -338.61880
-## 90%upper 0.7057473   28.45029    7.92698 1.0710643   36.25937   29.40286
-##             c2_beta     c2_mu     c2_phi
-## 90%lower -86.501794 0.6646913 -442.81038
-## 90%upper   8.638464 0.8838477   37.75064
+##                 p1  c1_alpha   c1_beta     c1_mu    c1_phi   c2_alpha
+## 90%lower 0.2691468  1.477005 0.1447473 0.8960723  1.229977  0.8122002
+## 90%upper 0.9280722 51.473138 9.3506113 1.3130528 56.005601 55.8684127
+##             c2_beta     c2_mu    c2_phi
+## 90%lower  0.3302614 0.6741293  1.091327
+## 90%upper 11.8301852 0.9109142 63.140913
 ## 
 ## $A_knm
-##                  p1  c1_alpha   c1_beta     c1_mu    c1_phi  c2_alpha   c2_beta
-## 90%lower -0.3496246 -34.64513 -119.1981 0.0367836 -153.9801 -24.82858 -1.195323
-## 90%upper  0.2050877  93.35503  306.8026 0.2511667  400.0793  16.54667 36.393282
-##              c2_mu    c2_phi
-## 90%lower 0.1965847 -26.00807
-## 90%upper 0.2492924  52.85542</code></pre>
+##                  p1  c1_alpha  c1_beta     c1_mu     c1_phi  c2_alpha  c2_beta
+## 90%lower 0.03721264  18.01265   56.591 0.1289341   74.58053  3.547577 11.48598
+## 90%upper 0.22607559 558.48414 4170.935 0.2519457 4124.24567 17.375320 51.77403
+##             c2_mu   c2_phi
+## 90%lower 0.250065 13.75216
+## 90%upper 0.277403 64.39404</code></pre>
 <pre class="r"><code>bootstrap_full_90_CI &lt;- readRDS(file.path(datapath,&quot;bootstrap_full_90_CI.rds&quot;))
 bootstrap_full_90_CI</code></pre>
 <pre><code>## $full_km
 ##                 p1 c1_alpha  c1_beta     c1_mu   c1_phi c2_alpha   c2_beta
-## 90%lower 0.1790381 5.192372 6.053389 0.4509586 11.30210 11.13035 -12.14457
-## 90%upper 0.4119493 7.508425 8.504538 0.4787378 15.98092 16.88216  -6.53209
+## 90%lower 0.2357406 5.497527 6.360039 0.4514835 11.89460 12.24580 0.8621828
+## 90%upper 0.4245763 7.592709 8.584361 0.4790470 16.13715 16.94112 1.1857746
 ##             c2_mu    c2_phi
-## 90%lower 1.070777 -0.976919
-## 90%upper 1.088500 10.274468
+## 90%lower 1.223811  9.837862
+## 90%upper 1.267752 13.523734
 ## 
 ## $full_knm
 ##                 p1 c1_alpha  c1_beta     c1_mu   c1_phi  c2_alpha  c2_beta
-## 90%lower 0.6341026 10.80363 21.09012 0.3259895 31.89898  7.785418 13.36911
-## 90%upper 0.7877201 13.86118 28.39411 0.3370874 42.22222 11.058663 15.40187
+## 90%lower 0.6349639 11.21603 22.23037 0.3260163 33.44386  7.868474 13.80659
+## 90%upper 0.8193603 13.88017 28.44288 0.3372927 42.28701 11.959820 17.65332
 ##              c2_mu   c2_phi
-## 90%lower 0.3564911 21.16877
-## 90%upper 0.4090309 26.42763</code></pre>
+## 90%lower 0.3680528 21.23796
+## 90%upper 0.4103167 29.43583</code></pre>
 <p>Besides the individual confidence intervals, we also test if some models are the same, e.g. if the km distribution for the three known bullets in FAU 330 without bullet A the same as the km distribution for the comparisons between bullet A and other known bullets. So we construct the bootstrap intervals as following:</p>
 <ol style="list-style-type: decimal">
 <li><p>Since we have 3000 bootstrap samples for every model, if we assume iid(which actually is), we can simply match the pair of sampled models for different original estimated models, and calculate the difference, as a bootstrap sample for the difference(whatever way used to match the pairs as long as not to reuse any of them should get same theorical properties). The difference between the original estimated models is the point estimation for the difference.</p></li>
