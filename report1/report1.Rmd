@@ -9,7 +9,7 @@ knitr::opts_chunk$set(echo = TRUE, message=FALSE)
 library(betareg)
 library(dplyr)
 library(kableExtra)
-datapath <- "data"
+datapath <- "../data"
 ```
 
 ```{r data, echo = FALSE}
