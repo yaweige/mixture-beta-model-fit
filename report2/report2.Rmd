@@ -1,0 +1,91 @@
+---
+title: "report2"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(dplyr)
+library(knitr)
+library(kableExtra)
+rf_roc_result1 <- readRDS("../data/rf_roc_result1.rds")
+rf_roc_result2 <- readRDS("../data/rf_roc_result2.rds")
+
+result1 <- rf_roc_result1 %>% colMeans() %>% matrix(nrow = 5, byrow = T) %>% as.data.frame()
+colnames(result1) <- c("Threshold", "Specificity", "Sensitivity", "AUC")
+rownames(result1) <- c("mm", "bm", "mb", "bb", "direct")
+result1 <- result1 %>% select(Threshold, Sensitivity, Specificity, AUC)
+
+
+result2r1 <- rf_roc_result2 %>% lapply(FUN = function(x) {x$test_sensitivity}) %>% unlist()
+result2r2 <- rf_roc_result2 %>% lapply(FUN = function(x) {x$test_specificity}) %>% unlist()
+
+result2 <- rbind(result2r1, result2r2)
+row.names(result2) <- c("Sensitivity", "Specificity")
+```
+
+## Brief Introduction and Notations
+
+To mimic the real case, I leave bullet A out, use all the other three known bullets to do model fit and cutoff selection. And evaluate the cutoff performance within training data, and the test data (which contains the comparisons between A and others) for each barrel respectively. All data in LAPD sets are "used", but with some failures of finding crosscut, fitting the model (can be improved later). The summary statistics are averages based on 231 barrels, 924 bullets, 35343 training lands, 24948 test lands.
+
+- mm: KM: beta mixture distribution, KNM: beta mixture distribution
+- bm: KM: beta distribution, KNM: beta mixture distribution
+- mb: KM: beta mixture distribution, KNM: beta distribution
+- bb: KM: beta distribution, KNM: beta distribution
+- direct: direct random forest scores were used
+
+## See cutoff performance within training data, for different distributional assumptions for the equal error rates in ROC
+
+```{r}
+result1 %>% round(digits = 3) %>%kable() %>% kable_styling(bootstrap_options = c("striped", "hover"))
+
+```
+
+## See the sensitivity and specificity for left out bullets (Test set)
+
+```{r}
+result2 %>% t %>% round(digits = 3) %>%kable() %>% kable_styling(bootstrap_options = c("striped", "hover"))
+
+```
+
+## Assess the variation
+
+## Obeservations
+
+1. For the first table, the mm outperforms the others
+
+2. For the first table, mm and mb have similar performance
+
+3. For the first table, the sensitivity (same value as specificity) coincides with AUC in terms of performance
+
+4. For the second table, except mm and mb, the sensitivities are almost equal to the specificities
+
+5. For the second table, mm and mb have significantly lower sensitivity than specificity
+
+
+## Questions 
+
+1. For the first table, why does his work? (Is this monotone transformation? Does it just make the value more apart properly? If not what is it?)
+
+2. For the second table, why do it show such patterns? (Estimation cost? different underlying models?)
+
+3. Why some data failed to estimate a distribution? Will this introduce systematic errors? (Failed to find starting values)
+
+4. Will the cutoff selection criteria, discrete data fact affect the result?
+
+5. Will the way we aggregate table 2 affect the result?
+
+## Thoughts
+
+1. (HH) Discrete observations role in produce ROC and equal error rate (sensitive?)
+
+2. (HH) Change the equal error rates cutoff selection criteria to accommodate the variability for different models
+
+3. (HH) Use Kullback Leibler distance to see difference between distributions
+
+
+
+
+
+
+
