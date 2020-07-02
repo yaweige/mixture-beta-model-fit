@@ -54,7 +54,16 @@ LAPD data set and the estimated distributions
 
 For the following sections of the paper, we will base our analysis on the LAPD data sets. This is a large data set of … It is the first time a such large data set available to the researcher, which makes it possible for a statistical analysis for the distribution of the RF scores. (More!)
 
-The estimation was done using EM algorithm implemented in “betareg” package in R [reference]. 
+The estimation was done using EM algorithm implemented in “betareg” package in R [reference]. This is a numeric method for calculating maximum likelihood estimators (MLE) when direct computation is not available or hard. Instead of a simpler beta model, we start with the more complex beta mixture model, see how well it fits the data and test if some components are necessary. We estimate two-component beta mixture distribution for both KNM and KM distributions as follows:
+
+(table: report alpha, beta, mean, variance)
+
+(figure: the estimated curve with observations drawn as rugs or boxplots in the bottom)
+
+The estimated distributions are also shown in the figure [figure] with rugs in the bottom shown as the actual observations. As expected, the estimated distributions show the properties we desire for the similarity scores. The majorities of the estimated distributions are apart from each other, while the minority part between the two distributions has some overlap. It’s worth to note that (how the actual observations are distributed compared with the curves). The distributions usually have longer tails than where the observations show up but with small probabilities. And the shapes of the distributions are ideal and potentially flexible enough to capture the empirical distributional information of the observations.
+
+It’s helpful to see how the individual components look like in the beta mixture distributions.
+
 
 
 
