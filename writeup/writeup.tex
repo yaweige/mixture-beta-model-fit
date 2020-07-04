@@ -160,21 +160,35 @@ changes of the underlying distributions.
 
 We can see from the figure {[}figure{]}, which is a typical one we
 usually have for the scores, that the distributions are apart for the
-majorities. In the bullet LEA comparison, we usually have a well
-separated bullet scores but for the land scores, there are usually some
-overlaps {[}Susan{]}. We propose beta distributions for those scores.
-Because the beta distribution is a well-used one in statistics to
-describe a quantity from 0 to 1 which usually a probability for another
-distribution in Bayesian analysis. And it is very flexible to capture
-any unimodal shape in 0 to 1. However, it may not be adequate explain a
-very heavy tail or even a second mode. Thus, we also consider the beta
-mixture distribution which is a more complex distribution than the beta
-distribution. For the beta mixture distribution, we introduce a
+majorities. In the bullet LEA comparison problems, we usually have a
+well separated bullet scores but for the land scores, there are usually
+some overlaps {[}Susan{]}. We propose beta distributions for those
+scores. Because the beta distribution is a well-used one in statistics
+to describe a quantity from 0 to 1 which is usually a probability for
+another distribution in Bayesian analysis. And it is very flexible to
+capture any unimodal shape from 0 to 1. However, it may not be adequate
+to explain a heavy tail or even a second mode. Thus, we consider the
+beta mixture distribution which is a more complex distribution than the
+beta distribution which is a special case of the beta mixture
+distribution. In the beta mixture distribution, we introduce a
 hierarchical structure with a prior probability to combine two beta
-distributions as one. The distributions are stated as follows:
+distributions as one. The distributions are defined below.
 
-(formal definition with notations, assumptions, conditions for beta and
-beta-mix distribution)
+The reported random forest scores are denoted as \(Y_{ij}\) for
+\(j^{th}\) LEA comparison within class \(i\), where \(i = 1\) is KM and
+\(i = 2\) is KNM. \(Y_{ij}\)'s are considered independent and
+identically distributed within each class, i.e.
+
+\begin{align*}
+Y_{1j} \stackrel{iid}{\sim}  Betamix(p_1, \mu_{11}, \phi_{11}, \mu_{12}, \phi_{12})\\
+Y_{2j} \stackrel{iid}{\sim}  Betamix(p_2, \mu_{21}, \phi_{21}, \mu_{22}, \phi_{22})
+\end{align*}
+
+where \(\mu_{ik}\) and \(\phi_{ik}\) are distribution parameters for
+\(i^{th}\) class and \(k^{th}\) component, \(k = 1\) or \(2\). And
+\(p_i\) is the prior probability for the first component in \(i^{th}\)
+class, thus, \(1-p_i\) is the prior probability for the second component
+in \(i^{th}\) class.
 
 \hypertarget{lapd-data-set-and-the-estimated-distributions}{%
 \section{LAPD data set and the estimated
@@ -184,7 +198,7 @@ For the following sections of the paper, we will base our analysis on
 the LAPD data sets. This is a large data set of \ldots{} It is the first
 time such a large data set available to the researcher, which makes it
 possible for a statistical analysis for the distribution of the RF
-scores. (More!)
+scores. (More! And number of land comparisons for different cases)
 
 The estimation was done using EM algorithm implemented in ``betareg''
 package in R {[}reference{]}. This is a numeric method for calculating
