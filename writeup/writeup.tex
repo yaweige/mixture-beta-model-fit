@@ -106,11 +106,12 @@ will also evaluate the error rates based on the estimated distribution
 for the automatic matching algorithm.
 
 In section 2, we will discuss proper distributional forms of the RF
-scores. In section 3, we will introduce the LAPD and the estimated
-distributions. In section 4, the theoretical error rates based on the
-distributions are discussed. In section 5, we evaluate the performance
-of the estimation, stability of the distribution within a changing
-sample size context. In section 6, we will conclude the discussion.
+scores. In section 3, we will introduce the LAPD data set and the
+estimated distributions. In section 4, the theoretical error rates based
+on the distributions are discussed. In section 5, we evaluate the
+performance of the estimation, stability of the distribution within a
+changing sample size context. In section 6, we will conclude the
+discussion.
 
 \hypertarget{the-distributional-forms-of-the-similarity-scores}{%
 \section{The distributional forms of the similarity
@@ -188,7 +189,15 @@ where \(\mu_{ik}\) and \(\phi_{ik}\) are distribution parameters for
 \(i^{th}\) class and \(k^{th}\) component, \(k = 1\) or \(2\). And
 \(p_i\) is the prior probability for the first component in \(i^{th}\)
 class, thus, \(1-p_i\) is the prior probability for the second component
-in \(i^{th}\) class.
+in \(i^{th}\) class. Note that we are using the mean and precision
+parameterization of beta distributions which simplifies the math in
+calculation. It's equivalent to the usual \(\alpha\) and \(\beta\)
+parameterization through the following transformation:
+
+\begin{align*}
+\mu = \frac{\alpha}{\alpha+\beta} \\
+\phi = \alpha + \beta
+\end{align*}
 
 \hypertarget{lapd-data-set-and-the-estimated-distributions}{%
 \section{LAPD data set and the estimated
