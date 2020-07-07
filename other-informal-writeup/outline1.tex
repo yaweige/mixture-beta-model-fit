@@ -59,42 +59,37 @@ The Main results: which have been discussed for a while, need some modification,
   \item conclusions
 \end{itemize}
 
-\textbf {Work to do/Figures wanted/Table wanted/Result wanted}
+\textbf {Work to do/Figures wanted/Tables wanted/Results wanted}
 
+\begin{enumerate}
+  \item Generate RF scores for all data, make histograms.
+  \item Report full data 2-component distributions, and 95\% bootstrap confidence interval.
+  \item Draw the distributions, probably the CIs, probably rugs and other elements.
+  \item Conduct test of sufficiency for single beta w.r.t more complex betamix, could use likelihood ratio? Could use CIs for single parameters? Make tables.
+  \item Calculate some f-divergence statistics, but can we use them as formal tests? Maybe not.
+  \item Decide the final distributional forms for the full data.
+  
+  \bigskip
+  
+  Error rate part:
+  
+  \item Since there are many ways of decide a threshold given similarities scores. I will make use of the one where KM and KNM have equal probability density, which is the way used in NIST CMC paper? But just to keep this simple to help reach our main goals.
+  \item Define and evaluate the error rate.
+  \item Evaluate the individual error rate? Like the one done in the NIST CMC paper? Don’t seem to be needed in our case.
+  \item Should we touch the error rate in bullet level?
+  
+  \bigskip
+  
+  Changing sample size:
+  
+  \item Compare estimation with mean, variance, f-divergence (maybe f-divergence helpful here)
+  \item Also, draw plot like those we did last fall
+  \item Report error rates in these cases
+  \item May choose different models (beta) than the full if betamix used previously not suitable here
+  \item Conclude the sample size effect
+  
+\end{enumerate}
 
-1.	Generate RF scores for all data, make histograms.
-
-2.	Report full data 2-component distributions, and 95\% bootstrap confidence interval.
-
-3.	Draw the distributions, probably the CIs, probably rugs and other elements.
-
-4.	Conduct test of sufficiency for single beta w.r.t more complex betamix, could use likelihood ratio? Could use CIs for single parameters? Make tables.
-
-5.	Calculate some f-divergence statistics, but can we use them as formal tests? Maybe not.
-
-6.	Decide the final distributional forms for the full data.
-
-Error rate part:
-
-7.	Since there are many ways of decide a threshold given similarities scores. I will make use of the one where KM and KNM have equal probability density, which is the way used in NIST CMC paper? But just to keep this simple to help reach our main goals.
-
-8.	Define and evaluate the error rate
-
-9.	Evaluate the individual error rate? Like the one done in the NIST CMC paper? Don’t seem to be needed in our case.
-
-10.	Should we touch the error rate in bullet level?
-
-Changing sample size:
-
-11.	Compare estimation with mean, variance, f-divergence (maybe f-divergence helpful here)
-
-12.	Also, draw plot like those we did last fall
-
-13.	Report error rates in these cases
-
-14.	May choose different models (beta) than the full if betamix used previously not suitable here
-
-15.	Conclude the sample size effect
 
 
 \end{document}
