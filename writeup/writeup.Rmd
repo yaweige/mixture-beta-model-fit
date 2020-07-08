@@ -37,6 +37,9 @@ header-includes:
 _Text based on elsarticle sample manuscript, see [http://www.elsevier.com/author-schemas/latex-instructions#elsarticle](http://www.elsevier.com/author-schemas/latex-instructions#elsarticle)_
 
 
+Link for the outline document
+=============================
+[https://github.com/yaweige/mixture-beta-model-fit/blob/master/other-informal-writeup/outline1.pdf](https://github.com/yaweige/mixture-beta-model-fit/blob/master/other-informal-writeup/outline1.pdf)
 
 Introduction and literature review
 ====================================
