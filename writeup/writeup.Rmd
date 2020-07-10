@@ -108,7 +108,20 @@ Estimations with changing sample size
 Conclusion
 ==================================
 
+```{r, include=FALSE}
+library(ggplot2)
+fau330_combined_A_observed <- readRDS("../data/fau330_combined_A_observed.rds")
+fau330_combined_noA_simulated <- readRDS("../data/fau330_combined_noA_simulated.rds")
+```
 
+```{r, fig.cap="Densities from training, rugs from test", out.width="70%", fig.keep="hold", fig.align='center'}
+ggplot() + 
+  geom_line(data = fau330_combined_noA_simulated, 
+            mapping = aes(x = ccf, y = y, color = id)) + 
+  geom_rug(data = fau330_combined_A_observed, 
+           mapping = aes(x = ccf, color = id), alpha = 0.3) +
+  ggtitle("FAU330: rugs with A, densities without A")
+```
 
 
 The following content is help information of the Elsevier template (keep for reference for a while)
