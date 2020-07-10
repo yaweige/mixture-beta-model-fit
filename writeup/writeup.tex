@@ -346,7 +346,7 @@ with changing sample size)
             \DataTypeTok{mapping =} \KeywordTok{aes}\NormalTok{(}\DataTypeTok{x =}\NormalTok{ ccf, }\DataTypeTok{y =}\NormalTok{ y, }\DataTypeTok{color =}\NormalTok{ id)) }\OperatorTok{+}\StringTok{ }
 \StringTok{  }\KeywordTok{geom_rug}\NormalTok{(}\DataTypeTok{data =}\NormalTok{ fau330_combined_A_observed, }
            \DataTypeTok{mapping =} \KeywordTok{aes}\NormalTok{(}\DataTypeTok{x =}\NormalTok{ ccf, }\DataTypeTok{color =}\NormalTok{ id), }\DataTypeTok{alpha =} \FloatTok{0.3}\NormalTok{) }\OperatorTok{+}
-\StringTok{  }\KeywordTok{ggtitle}\NormalTok{(}\StringTok{"FAU330: rugs with A, densities without A"}\NormalTok{)}
+\StringTok{  }\KeywordTok{ggtitle}\NormalTok{(}\StringTok{"FAU330: rugs with A, densities without A (ccf)"}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -356,7 +356,27 @@ with changing sample size)
 
 }
 
-\caption{Densities from training, rugs from test}\label{fig:unnamed-chunk-2}
+\caption{Densities from training, rugs from test (ccf)}\label{fig:unnamed-chunk-2}
+\end{figure}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{ggplot}\NormalTok{() }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{geom_line}\NormalTok{(}\DataTypeTok{data =}\NormalTok{ fau330_combined_noA_rf_simulated, }
+            \DataTypeTok{mapping =} \KeywordTok{aes}\NormalTok{(}\DataTypeTok{x =}\NormalTok{ rfscore, }\DataTypeTok{y =}\NormalTok{ y, }\DataTypeTok{color =}\NormalTok{ id)) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{geom_rug}\NormalTok{(}\DataTypeTok{data =}\NormalTok{ fau330_combined_A_rf_observed, }
+           \DataTypeTok{mapping =} \KeywordTok{aes}\NormalTok{(}\DataTypeTok{x =}\NormalTok{ rfscore, }\DataTypeTok{color =}\NormalTok{ id), }\DataTypeTok{alpha =} \FloatTok{0.3}\NormalTok{) }\OperatorTok{+}
+\StringTok{  }\KeywordTok{ggtitle}\NormalTok{(}\StringTok{"FAU330: rugs with A, densities without A (RF)"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{figure}
+
+{\centering \includegraphics[width=0.7\linewidth]{writeup_files/figure-latex/unnamed-chunk-3-1} 
+
+}
+
+\caption{Densities from training, rugs from test (rfscore)}\label{fig:unnamed-chunk-3}
 \end{figure}
 
 \hypertarget{the-following-content-is-help-information-of-the-elsevier-template-keep-for-reference-for-a-while}{%
