@@ -29,6 +29,8 @@ header-includes:
   -  \usepackage{hyperref}
   -  \usepackage{graphicx}
   -  \usepackage[dvipsnames]{xcolor}
+  -  \usepackage{multirow}
+  -  \usepackage{diagbox}
 ---
 
 \newcommand{\hh}[1]{{\textcolor{orange}{#1}}}
@@ -108,6 +110,34 @@ Estimations with changing sample size
 Conclusion
 ==================================
 
+\begin{tabular}{ |p{1.3cm}||p{3.1cm}|p{0.8cm}|p{0.8cm}|p{1.2cm}|p{1.5cm}|}
+ \hline
+ \multicolumn{6}{|c|}{Full Data KM Distribution Estimation} \\
+ \hline
+ Model & Components & $\mu$ & $\phi$ & logLik & Lack of fit statistic\\
+ \hline
+ \multirow{2}{*}{Betamix} & Comp 1 ($p_1=0.5$)  & 0.77 &   1.79 & \multirow{2}{*}{12090.19} & \\
+ \cline{2-2}
+ & Comp 2 ($p_2=0.5$) &0.77&   1.81 & &\\
+ \hline
+ Beta & \slashbox[3.5cm]{}{} & 0.77 & 1.80 & 12090.17 & 0.024\\
+ \hline
+\end{tabular}
+
+\begin{tabular}{ |p{1.3cm}||p{3.1cm}|p{0.8cm}|p{0.8cm}|p{1.2cm}|p{1.5cm}|}
+ \hline
+ \multicolumn{6}{|c|}{Full Data KNM Distribution Estimation} \\
+ \hline
+ Model & Components & $\mu$ & $\phi$ & logLik & Lack of fit statistic\\
+ \hline
+ \multirow{2}{*}{Betamix} & Comp 1 ($p_1=0.79$)  & 0.34 & 3.68 & \multirow{2}{*}{20305.9} & \\
+ \cline{2-2}
+ & Comp 2 ($p_2=0.21$) &0.54&   16.9 & &\\
+ \hline
+ Beta & \slashbox[3.5cm]{}{} & 0.37 & 3.80 & 18607.3 & 3397.195\\
+ \hline
+\end{tabular}
+
 ```{r, include=FALSE}
 library(ggplot2)
 fau330_combined_A_observed <- readRDS("../data/fau330_combined_A_observed.rds")
@@ -132,6 +162,14 @@ ggplot() +
   geom_rug(data = fau330_combined_A_rf_observed, 
            mapping = aes(x = rfscore, color = id), alpha = 0.3) +
   ggtitle("FAU330: rugs with A, densities without A (RF)")
+```
+
+```{r, fig.cap="rf_full_2components", out.width="70%", fig.keep="hold", fig.align='center'}
+knitr::include_graphics("../code/organized code/figures/rf_full_2components_estimated.png")
+```
+
+```{r, fig.cap="rf_full_2components_combined", out.width="70%", fig.keep="hold", fig.align='center'}
+knitr::include_graphics("../code/organized code/figures/rf_full_beta_estimated.png")
 ```
 
 The following content is help information of the Elsevier template (keep for reference for a while)
