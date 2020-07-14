@@ -1,20 +1,30 @@
 # Run on the server, change the save path and name, run the whole script
 
+# Input=====================
+# the comp data on the server: "/media/Raven/LAPD-processing/data/comp/"
+
+# Output====================
+# the extracted rfscores, to "/media/Raven/LAPD-processing/data/rfscore/"
+
+# Run=======================
 library(randomForest)
 library(bulletxtrctr)
 
 # The path is the folder of all the comparisons, e.g. on the server: "/media/Raven/LAPD-processing/data/comp/"
-rf_km_full <- land_score_km_generator3_RF("~/comp_full_manual_grooves_notMine_updated/")
-rf_knm_full <- land_score_knm_generator3_RF("~/comp_full_manual_grooves_notMine_updated/")
+rf_km_full <- land_score_km_generator3_RF("/media/Raven/LAPD-processing/data/comp/")
+rf_knm_full <- land_score_knm_generator3_RF("/media/Raven/LAPD-processing/data/comp/")
 
-# Choose your path
-saveRDS(rf_km_full, file = "~/some_saved_data/rf_km_full.rds")
-saveRDS(rf_knm_full, file = "~/some_saved_data/rf_knm_full.rds")
+
+# Choose your path, if you would like to save
+saveRDS(rf_km_full, file = "/media/Raven/LAPD-processing/data/rfscore/rf_km_full.rds")
+saveRDS(rf_knm_full, file = "/media/Raven/LAPD-processing/data/rfscore/rf_knm_full.rds")
 
 # we will make use of the following two functions, which are included in the helper function file============
-# If there are any other implicit dependencies, see the help function file
+# If there are any other implicit dependencies, see the help function file (will be posted, should be good for these code)
 
 # this works within a barrel to extract the km land-land RF comparisons
+# except the first argument "dir", other arguments are not well defined
+
 # read in km
 land_score_km_generator3_RF <- function(dir, FAUno = NULL, firstno = NULL, remove = NULL) {
   files <- paste0(dir, list.files(dir))
@@ -60,8 +70,6 @@ land_score_km_generator3_RF <- function(dir, FAUno = NULL, firstno = NULL, remov
   
   output
 }
-
-# onebarrel_km_temp <- land_score_km_generator3_RF(dir = "D:/LAPD-comp/")
 
 # read in knm
 

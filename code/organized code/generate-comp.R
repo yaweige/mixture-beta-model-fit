@@ -15,9 +15,25 @@ library(readr)
 # This is a modified function from ccf_compare to make use of the .csv full groove IDs which are different from those
 # manually generated from Yawei previously
 
-# need to properly label the groove data to be able to directly use
-grooves_manual_lapd1 <- read_csv("grooves-manual-lapd1.csv")
+# Input============================================
+# 1. need to properly label the groove data to be able to directly use
+grooves_manual_lapd1 <- read_csv("/media/Raven/LAPD-processing/data/grooveID/grooves-manual-lapd1.csv")
 
+# Or use the URL and the repo, but the code itself doesn't work for me, not sure where it's wrong
+# grooves_manual_lapd1 <- read.csv("https://github.com/CSAFE-ISU/grooves-manual-id/blob/master/grooves-manual-lapd1.csv")
+
+# 2. To replace the goove locations in the grooves_template to make sure we only changed the IDs not the format
+# Exact which FAU are used here is not important, we just need the format
+grooves_template <- readRDS("/media/Raven/LAPD-processing/data/example groove form/lapd-grooves-FAU-1.rda")
+
+# 3. the LAPD x3p data on the server, used inside the function, we used:
+# "/media/Raven/LAPD/"
+
+# Output======================================
+# 1. It produces results in the "/media/Raven/LAPD-processing/data/comp", unless you changed it
+# 2. It can produce 4(bullets) by 4(bullets) prictures for ccf, but it turned off in default
+
+# Run====================================
 # All of them are complete data? No!
 sum(complete.cases(grooves_manual_lapd1))
 
@@ -31,9 +47,6 @@ grooves_manual_lapd1 <- grooves_manual_lapd1 %>%
 # Note that some FAUs has less/more than 24 lands data (FAU 116, 186, 529, 605) for various reasons
 grooves_manual_lapd1 %>% group_by(FAU) %>% tally() %>% filter(n!=24)
 example <- grooves_manual_lapd1 %>% filter(FAU == 529)
-
-# subset the goove locations in the grooves_template to make sure we only changed the IDs not the format
-grooves_template <- readRDS("~/lapd_manual_grooves/lapd-grooves-FAU-1.rda")
 
 # example <- lapply(1:24, FUN = function(i){
 #   grooves_template[[i]]$groove[1] <- as.numeric(grooves_manual_lapd1[i, "groove_left_manual"])
@@ -119,8 +132,10 @@ work_flow_manual_grooves2 <- function(FAUno) {
     ggtitle(titles) +
     theme(plot.title = element_text(hjust = 0.5)) +
     theme(aspect.ratio = 1)
-  saveRDS(comparisons, file=sprintf("~/temp-see-if-anyother-comp/comp-full-manual-groove-FAU-%s.rds", FAUno))
-  ggsave(filename = sprintf("results-full-manual-grooves-FAU-%s.png", FAUno), path = "~/Pictures/LAPD_full_manual_grooves")
+  # output
+  saveRDS(comparisons, file=sprintf("/media/Raven/LAPD-processing/data/comp/comp-full-manual-groove-FAU-%s.rds", FAUno))
+  # only if you also want to save the pictures
+  # ggsave(filename = sprintf("results-full-manual-grooves-FAU-%s.png", FAUno), path = "~/Pictures/LAPD_full_manual_grooves")
 }
 
 # Have a closer look at FAU 3, 4, 5, 43 which report errors saying "crosscut data must have >0 rows"
