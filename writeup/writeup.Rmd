@@ -58,11 +58,18 @@ In section 2, we will discuss  distributional forms of \hh{XXX what is an RF?} R
 The distributional forms of the similarity scores
 ============================
 
-The quantitative methods used to objectively measure the similarity between LEAs reports various quantities, such as counts, correlations, distances, probabilities and more generally similarity scores [references]. To understand how those quantities reflect the strength of evidence and to study the underlying the error rates in making decisions based on those quantities, distributional forms are usually set up [references]. Particularly, we are focusing on the similarity scores which range from 0 to 1 and the probabilities reported as the likelihood of an actual match. The similarity scores reported in the forensic researches are usually categorized into two categories.  One is that the compared LEAs or other forensic evidences are actual matches, the other is that the compared LEAs or other forensic evidences are not matches. We name the former as known matches (KM) and the latter as known non-matches (KNM), and the corresponding distributions are named as KM distributions and KNM distributions [figures]. However, this kind of classifications can be investigated only in the lab environment where the ground truth is known. When we make any decisions based on any quantitative measurement, we are actually making a distinguish between those two potential distributions. The strength of any identification process is also measured by the disparities of those distributions. However, in practice, we can hardly discriminate those two distributions totally, thus, we are never 100% sure which distribution the observed score comes from. This is where the identification error raises. 
+The quantitative methods used to objectively measure the similarity between LEAs reports various quantities, such as counts, correlations, distances, probabilities and more generally similarity scores [references\]. To understand how those quantities reflect the strength of evidence and to study the underlying the error rates in making decisions based on those quantities, distributional forms are usually set up [references\]. Particularly, we are focusing on the similarity scores which range from 0 to 1 and the probabilities reported as the likelihood of an actual match. The similarity scores reported in the forensic researches are usually categorized into two categories.  One is that the compared LEAs or other forensic evidences are actual matches, the other is that the compared LEAs or other forensic evidences are not matches. We name the former as known matches (KM) and the latter as known non-matches (KNM), and the corresponding distributions are named as KM distributions and KNM distributions [figures]. However, this kind of classifications can be investigated only in the lab environment where the ground truth is known. When we make any decisions based on any quantitative measurement, we are actually making a distinguish between those two potential distributions. The strength of any identification process is also measured by the disparities of those distributions. However, in practice, we can hardly discriminate those two distributions totally, thus, we are never 100% sure which distribution the observed score comes from. This is where the identification error raises. 
 
-For the purpose of illustration, we have a look at the examples (could use Hamby and other sets, not necessarily LAPD) [figure(histogram?)]. Those are RF scores generated from the automatic matching algorithm [references]. The scores from the RF can be explained as probabilities that calculated through the algorithm based on the trained model to quantify the likelihood that a pair of LEAs are actual a match. Or we can think of the RF scores as general similarity scores that quantify the similarities. As the name indicated, the higher RF scores imply higher chances to be a match. For different combination of ammunition and firearms, the scores are distributed differently. It is expected that systematic differences exist there for different cases. So, it is necessary to study the scores under controlled conditions, thus, a threshold for the scores to do classifications varies based on the changes of the underlying distributions.
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.7\textwidth]{../code/organized code/figures/rf_full_2components_combined.png}
+    \caption{Random forest score histograms for full data}
+    \label{rf_full_2components_combined}
+\end{figure}
 
-We can see from the figure [figure], which is a typical one we usually have for the scores, that the distributions are apart for the majorities. In the bullet LEA comparison problems, we usually have a well separated bullet scores but for the land scores, there are usually some overlaps [Susan]. We propose beta distributions for those scores. Because the beta distribution is a well-used one in statistics to describe a quantity from 0 to 1 which is usually a probability for another distribution in Bayesian analysis. And it is very flexible to capture any unimodal shape from 0 to 1. However, it may not be adequate to explain a heavy tail or even a second mode. Thus, we consider the beta mixture distribution which is a more complex distribution than the beta distribution which is a special case of the beta mixture distribution. In the beta mixture distribution, we introduce a hierarchical structure with a prior probability to combine two beta distributions as one. The distributions are defined below.
+For the purpose of illustration, we have a look at the examples (could use Hamby and other sets, not necessarily LAPD) in Figure \ref{rf_full_2components_combined}. Those are RF scores generated from the automatic matching algorithm [references]. The scores from the RF can be explained as probabilities that calculated through the algorithm based on the trained model to quantify the likelihood that a pair of LEAs are actual a match. Or we can think of the RF scores as general similarity scores that quantify the similarities. As the name indicated, the higher RF scores imply higher chances to be a match. For different combination of ammunition and firearms, the scores are distributed differently. It is expected that systematic differences exist there for different cases. So, it is necessary to study the scores under controlled conditions, thus, a threshold for the scores to do classifications varies based on the changes of the underlying distributions.
+
+We can see from the figure Figure \ref{rf_full_2components_combined}, which is a typical one we usually have for the scores, that the distributions are apart for the majorities. In the bullet LEA comparison problems, we usually have a well separated bullet scores but for the land scores, there are usually some overlaps [Susan]. We propose beta distributions for those scores. Because the beta distribution is a well-used one in statistics to describe a quantity from 0 to 1 which is usually a probability for another distribution in Bayesian analysis. And it is very flexible to capture any unimodal shape from 0 to 1. However, it may not be adequate to explain a heavy tail or even a second mode. Thus, we consider the beta mixture distribution which is a more complex distribution than the beta distribution which is a special case of the beta mixture distribution. In the beta mixture distribution, we introduce a hierarchical structure with a prior probability to combine two beta distributions as one. The distributions are defined below.
 
 The reported random forest scores are denoted as $Y_{ij}$ for $j^{th}$ LEA comparison within class $i$, where $i = 1$ is KM and $i = 2$ is KNM. $Y_{ij}$'s are considered independent and identically distributed within each class, i.e.
 
@@ -81,15 +88,58 @@ where $\mu_{ik}$ and $\phi_{ik}$ are distribution parameters for $i^{th}$ class 
 LAPD data set and the estimated distributions
 ==========================================
 
-For the following sections of the paper, we will base our analysis on the LAPD data sets. This is a large data set of … It is the first time such a large data set available to the researcher, which makes it possible for a statistical analysis for the distribution of the RF scores. (More! And number of land comparisons for different cases)
+For the following sections of the paper, we will base our analysis on the LAPD data sets. This is a large data set of … It is the first time such a large data set available to the researchers, which makes it possible for a statistical analysis for the distribution of the RF scores. (More! And number of land comparisons for different cases)
 
-The estimation was done using EM algorithm implemented in “betareg” package in R [reference]. This is a numeric method for calculating maximum likelihood estimators (MLE) when direct computation is not available or hard. Instead of a simpler beta model, we start with the more complex beta mixture model, see how well it fits the data and test if some components are necessary. We estimate two-component beta mixture distribution for both KNM and KM distributions as follows:
+The estimation was done using EM algorithm implemented in “betareg” package in R [reference]. This is a numeric method for calculating maximum likelihood estimators (MLE) when direct computation is not available or hard. Instead of a simpler beta model, we start with the more complex beta mixture model, see how well it fits the data and test if some components are necessary. We estimate two-component beta mixture distribution for both KNM and KM distributions as in Table \ref{Full Data KM Distribution Estimation} and Table \ref{Full Data KNM Distribution Estimation}:
 
-(table: report alpha, beta, mean, variance)
+\begin{table}[h]
+\centering
+\begin{tabular}{ |p{1.3cm}||p{3.1cm}|p{0.8cm}|p{0.8cm}|p{1.2cm}|p{1.5cm}|}
+ \hline
+ \multicolumn{6}{|c|}{Full Data KM Distribution Estimation} \\
+ \hline
+ Model & Components & $\mu$ & $\phi$ & logLik & Lack of fit p-value\\
+ \hline
+ \multirow{2}{*}{Betamix} & Comp 1 ($p_1=0.5$)  & 0.77 &   1.79 & \multirow{2}{*}{12090.19} & \\
+ \cline{2-2}
+ & Comp 2 ($p_2=0.5$) &0.77&   1.81 & &\\
+ \hline
+ Beta & \slashbox[3.5cm]{}{} & 0.77 & 1.80 & 12090.17 & 0.999\\
+ \hline
+\end{tabular}
+\caption{Full Data KM Distribution Estimation}
+\label{Full Data KM Distribution Estimation}
 
-(figure: the estimated curve with observations drawn as rugs or boxplots in the bottom)
+\end{table}
 
-The estimated distributions are also shown in the figure [figure] with rugs in the bottom shown as the actual observations. As expected, the estimated distributions show the properties we desire for the similarity scores. The majorities of the estimated distributions are apart from each other, while the minority part between the two distributions has some overlap. It’s worth to note that (how the actual observations are distributed compared with the curves). The distributions usually have longer tails than points where the observations show up but with small probabilities. And the shapes of the distributions are ideal and potentially flexible enough to capture the empirical distributional information of the observations.
+\begin{table}[h]
+\centering
+\begin{tabular}{ |p{1.3cm}||p{3.1cm}|p{0.8cm}|p{0.8cm}|p{1.2cm}|p{1.5cm}|}
+ \hline
+ \multicolumn{6}{|c|}{Full Data KNM Distribution Estimation} \\
+ \hline
+ Model & Components & $\mu$ & $\phi$ & logLik & Lack of fit p-value\\
+ \hline
+ \multirow{2}{*}{Betamix} & Comp 1 ($p_1=0.79$)  & 0.34 & 3.68 & \multirow{2}{*}{20305.9} & \\
+ \cline{2-2}
+ & Comp 2 ($p_2=0.21$) &0.54&   16.9 & &\\
+ \hline
+ Beta & \slashbox[3.5cm]{}{} & 0.37 & 3.80 & 18607.3 & 0\\
+ \hline
+\end{tabular}
+\caption{Full Data KNM Distribution Estimation}
+\label{Full Data KNM Distribution Estimation}
+
+\end{table}
+
+The estimated distributions are also shown in the Figure \ref{rf_full_2components_estimated} with rugs in the bottom shown as the actual observations. As expected, the estimated distributions show the properties we desire for the similarity scores. The majorities of the estimated distributions are apart from each other, while the minority part between the two distributions has some overlap. It’s worth to note that (how the actual observations are distributed compared with the curves). The distributions usually have longer tails than points where the observations show up but with small probabilities. And the shapes of the distributions are ideal and potentially flexible enough to capture the empirical distributional information of the observations.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.7\textwidth]{../code/organized code/figures/rf_full_2components_estimated.png}
+    \caption{Estimated two-component distributions for full data}
+    \label{rf_full_2components_estimated}
+\end{figure}
 
 It’s also helpful to see how the individual components look like in the beta mixture distributions [figure]. The KNM and KM distributions seem to share a common component while keep the other components far apart from each other. The separated components represent the ideal cases where the bullet land engraved areas preserved the information of source well and result clear distinct separation. The shared components represent the cases where the KM results lower scores because of some degree of tank rash, pitting, breakoff or other damages on the bullets and the KNM results higher score because of the random identification effect. These properties together well explained the observed empirical distribution of similarity scores in our cases. Particularly, the heavier tail of the KM comparisons is explicitly included the form of the model by one of the components.
 
@@ -110,33 +160,6 @@ Estimations with changing sample size
 Conclusion
 ==================================
 
-\begin{tabular}{ |p{1.3cm}||p{3.1cm}|p{0.8cm}|p{0.8cm}|p{1.2cm}|p{1.5cm}|}
- \hline
- \multicolumn{6}{|c|}{Full Data KM Distribution Estimation} \\
- \hline
- Model & Components & $\mu$ & $\phi$ & logLik & Lack of fit statistic\\
- \hline
- \multirow{2}{*}{Betamix} & Comp 1 ($p_1=0.5$)  & 0.77 &   1.79 & \multirow{2}{*}{12090.19} & \\
- \cline{2-2}
- & Comp 2 ($p_2=0.5$) &0.77&   1.81 & &\\
- \hline
- Beta & \slashbox[3.5cm]{}{} & 0.77 & 1.80 & 12090.17 & 0.024\\
- \hline
-\end{tabular}
-
-\begin{tabular}{ |p{1.3cm}||p{3.1cm}|p{0.8cm}|p{0.8cm}|p{1.2cm}|p{1.5cm}|}
- \hline
- \multicolumn{6}{|c|}{Full Data KNM Distribution Estimation} \\
- \hline
- Model & Components & $\mu$ & $\phi$ & logLik & Lack of fit statistic\\
- \hline
- \multirow{2}{*}{Betamix} & Comp 1 ($p_1=0.79$)  & 0.34 & 3.68 & \multirow{2}{*}{20305.9} & \\
- \cline{2-2}
- & Comp 2 ($p_2=0.21$) &0.54&   16.9 & &\\
- \hline
- Beta & \slashbox[3.5cm]{}{} & 0.37 & 3.80 & 18607.3 & 3397.195\\
- \hline
-\end{tabular}
 
 ```{r, include=FALSE}
 library(ggplot2)
@@ -164,9 +187,6 @@ ggplot() +
   ggtitle("FAU330: rugs with A, densities without A (RF)")
 ```
 
-```{r, fig.cap="rf_full_2components", out.width="70%", fig.keep="hold", fig.align='center'}
-knitr::include_graphics("../code/organized code/figures/rf_full_2components_estimated.png")
-```
 
 ```{r, fig.cap="rf_full_2components_combined", out.width="70%", fig.keep="hold", fig.align='center'}
 knitr::include_graphics("../code/organized code/figures/rf_full_beta_estimated.png")
