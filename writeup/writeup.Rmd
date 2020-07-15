@@ -90,7 +90,7 @@ LAPD data set and the estimated distributions
 
 For the following sections of the paper, we will base our analysis on the LAPD data sets. This is a large data set of … It is the first time such a large data set available to the researchers, which makes it possible for a statistical analysis for the distribution of the RF scores. (More! And number of land comparisons for different cases)
 
-The estimation was done using EM algorithm implemented in “betareg” package in R [reference]. This is a numeric method for calculating maximum likelihood estimators (MLE) when direct computation is not available or hard. Instead of a simpler beta model, we start with the more complex beta mixture model, see how well it fits the data and test if some components are necessary. We estimate two-component beta mixture distribution for both KNM and KM distributions as in Table \ref{Full Data KM Distribution Estimation} and Table \ref{Full Data KNM Distribution Estimation}:
+The estimation was done using EM algorithm implemented in “betareg” package in R [reference]. This is a numeric method for calculating maximum likelihood estimators (MLE) when direct computation is not available or hard. Instead of a simpler beta model, we start with the more complex beta mixture model, see how well it fits the data and test if some components are necessary. We estimate two-component beta mixture distribution for both KNM and KM distributions as in Table \ref{Full Data KM Distribution Estimation} and Table \ref{Full Data KNM Distribution Estimation}.
 
 \begin{table}[h]
 \centering
