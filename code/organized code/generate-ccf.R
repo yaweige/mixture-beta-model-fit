@@ -1,9 +1,9 @@
 library(dplyr)
 library(betareg)
 library(ggplot2)
-# Run the following to get the full data
-# ccf_km_full <- land_score_km_generator2("./data/organized data/ccf/ccf_km_full.rds")
-# ccf_knm_full <- land_score_knm_generator2("./data/organized data/ccf/ccf_knm_full.rds")
+# use the following function to get the full data
+# land_score_km_generator2()
+# land_score_knm_generator2()
 
 ccf_km_full <- readRDS("./data/organized data/ccf/ccf_km_full.rds")
 ccf_knm_full <- readRDS("./data/organized data/ccf/ccf_knm_full.rds")
