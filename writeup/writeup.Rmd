@@ -81,7 +81,9 @@ where $\mu_{ik}$ and $\phi_{ik}$ are distribution parameters for $i^{th}$ class 
 LAPD data set and the estimated distributions
 ==========================================
 
-For the following sections of the paper, we will base our analysis on the LAPD data sets. This is a large data set of … It is the first time such a large data set available to the researchers, which makes it possible for a statistical analysis for the distribution of the CCF scores. (More! And number of land comparisons for different cases)
+For the following sections of the paper, we will base our analysis on the LAPD data sets. This is a large data set of … It is the first time such a large data set available to the researchers, which makes it possible for a statistical analysis for the distribution of similarity scores. (More! And number of land comparisons for different cases)
+
+We consider cross correlation functions (CCF) of lands, which is produced by calculating the maximized CCF between two signatures extracted from a pair of bullet LEAs (refer to a paper, could be the random forest one or others).
 
 The estimation was done using Nelder-Mead algorithm in R [reference]. This is a general purpose numeric method which works reasonably well for non-differentiable function. In our case, the non-differentiable objective function is the log likelihood function of the beta mixture distribution. Therefore, we finally found the maximum likelihood estimators (MLE). Instead of a simpler beta model, we start with the more complex two-component beta mixture model, see how well it fits the data and test if some components are necessary. We estimated beta mixture distributions for both KM and KNM as in Table \ref{Full Data KM Distribution Estimation} and Table \ref{Full Data KNM Distribution Estimation}.
 
@@ -107,7 +109,7 @@ The estimation was done using Nelder-Mead algorithm in R [reference]. This is a 
  Beta &  & 0.635 & 6.529 & 5712 & 0&-11404\\
  \hline
 \end{tabular}
-\caption{Full Data KM Distribution Estimation}
+\caption{Parameter estimations for the Beta distribution (1-component beta mixture distribution), 2-component and 3-component distributions for the KM CCF. "2-comp" refers to the 2-component beta mixture distribution, and the same for "3-comp". Column "logLik" is the maximized log likelihood for each distribution. Column "p-value" is the p-value for asymptotic likelihood ratio tests between the current model and one-step more complex model, where 0 indicates that we would reject the hypothesis that the current one is sufficient to decribe the data}
 \label{Full Data KM Distribution Estimation}
 
 \end{table}
@@ -135,18 +137,27 @@ The estimation was done using Nelder-Mead algorithm in R [reference]. This is a 
  Beta &  & 0.404 & 15.801 & 75349 & 0&-150675\\
  \hline
 \end{tabular}
-\caption{Full Data KNM Distribution Estimation}
+\caption{Parameter estimations for the Beta distribution (1-component beta mixture distribution), 2-component and 3-component distributions for the KNM CCF. "2-comp" refers to the 2-component beta mixture distribution, and the same for "3-comp". Column "logLik" is the maximized log likelihood for each distribution. Column "p-value" is the p-value for asymptotic likelihood ratio tests between the current model and one-step more complex model, where 0 indicates that we would reject the hypothesis that the current one is sufficient to decribe the data}
 \label{Full Data KNM Distribution Estimation}
 
 \end{table}
 
-The estimated distributions are also shown in the Figure \ref{rf_full_2components_estimated} with rugs in the bottom shown as the actual observations (rugs not shown for now since the sample sizes are too large, and the observations from the actual data points following in this paragraph is just expectation). As expected, the estimated distributions show the properties we desire for the similarity scores. The majorities of the estimated distributions are apart from each other, while the minority part between the two distributions has some overlap. It’s worth to note that (how the actual observations are distributed compared with the curves). The distributions usually have longer tails than points where the observations show up but with small probabilities. And the shapes of the distributions are ideal and potentially flexible enough to capture the empirical distributional information of the observations.
+The estimated Beta distributions are shown in the Figure \ref{singlebeta} and the estimated two-component distribution are also shown in the Figure \ref{two-component-betamix}. As expected, the estimated distributions show the properties we desire for the similarity scores. The majorities of the estimated distributions are apart from each other, while the minority part between the two distributions has some overlap. It's worth to note that both curves have heavy tails to the farther boundaries and KM curve has heavier tails. We can see the two-component distributions fit the data very well, while the single beta distributions are not as good as the two-component distributions for both KM and KNM. The single beta distribution for KM clearly failed to capture the potential second mode of the histogram indicating it is not sufficient. The single beta distribution for KNM is not too bad but still failed to capture the distributional information for some parts. This indicates that even though beta distributions are flexible for variables in 0 to 1, they are still restricted too much to be able to describe the cases here. The two-component beta mixture distributions look more promising.
+
+
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.7\textwidth]{../code/organized code/generated figures/singlebeta.png}
+    \caption{Estimated two-component distributions for full data}
+    \label{singlebeta}
+\end{figure}
 
 \begin{figure}[h]
     \centering
     \includegraphics[width=0.7\textwidth]{../code/organized code/generated figures/two-component-betamix.png}
     \caption{Estimated two-component distributions for full data}
-    \label{rf_full_2components_estimated}
+    \label{two-component-betamix}
 \end{figure}
 
 (This paragraph doesn't match the current results and we are investigating the estimations for now) It’s also helpful to see how the individual components look like in the beta mixture distributions [figure]. The KNM and KM distributions seem to share a common component while keep the other components far apart from each other. The separated components represent the ideal cases where the bullet land engraved areas preserved the information of source well and result clear distinct separation. The shared components represent the cases where the KM results lower scores because of some degree of tank rash, pitting, breakoff or other damages on the bullets and the KNM results higher score because of the random identification effect. These properties together well explained the observed empirical distribution of similarity scores in our cases. Particularly, the heavier tail of the KM comparisons is explicitly included the form of the model by one of the components.
