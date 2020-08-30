@@ -45,7 +45,7 @@ ccf_knm_full_data %>% dim()
 #three components cases, however, for the same reason, we should not worry too much.
 #If we have components more than 3, we should restrict the parameter space explicitly.
 
-mine_betamix <- function(data, par, k, control){
+mine_betamix <- function(data, par, k, control = NULL, hessian = FALSE){
   beta_likelihood <- function(par, data) {
     a1 <- par[1]
     b1 <- par[2]
@@ -54,7 +54,7 @@ mine_betamix <- function(data, par, k, control){
     
     output <- -sum(log(beta_1))
   }
-
+  
   betamix_likelihood <- function(par = c(0.5, 1, 1, 1, 1), data) {
     p1 <- par[1]
     a1 <- par[2]
@@ -62,10 +62,17 @@ mine_betamix <- function(data, par, k, control){
     a2 <- par[4]
     b2 <- par[5]
     
-    beta_1 <- dbeta(data, shape1 = a1, shape2 = b1)
-    beta_2 <- dbeta(data, shape1 = a2, shape2 = b2)
+    if (p1<=0 | p1>=1 | a1<= 0 | b1 <= 0| a2<=0| b2<=0){
+      output <- Inf
+    } else if ((a1/(a1 + b1))>=(a2/(a2 + b2))) {
+      output <- Inf
+    } else {
+      beta_1 <- dbeta(data, shape1 = a1, shape2 = b1)
+      beta_2 <- dbeta(data, shape1 = a2, shape2 = b2)
+      output <- -sum(log(p1*beta_1 + (1-p1)*beta_2))
+    }
     
-    output <- -sum(log(p1*beta_1 + (1-p1)*beta_2))
+    output
   }
   
   beta_c3_likelihood <- function(par, data) {
@@ -89,17 +96,17 @@ mine_betamix <- function(data, par, k, control){
     output <- optim(par = par, fn = beta_likelihood, 
                     data = data,
                     control = control,
-                    hessian = TRUE)
+                    hessian = hessian)
   } else if (k == 2) {
     output <- optim(par = par, fn = betamix_likelihood, 
                     data = data,
                     control = control,
-                    hessian = TRUE)
+                    hessian = hessian)
   } else if (k == 3) {
     output <- optim(par = par, fn = beta_c3_likelihood, 
                     data = data,
                     control = control,
-                    hessian = TRUE)
+                    hessian = hessian)
   }
   
   output$value <- -output$value
