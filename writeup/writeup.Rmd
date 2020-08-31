@@ -189,6 +189,18 @@ Evaluate the error rates
 
 (report theoretical error rates)
 
+- given the cutoff point where the two distributions have equal density (also a likelihood ratio with value 1, which does an optimal classification under 0-1 loss? or at the point where the probabilities equal to each other instead of the densities)
+
+- Consider four types of error rates (will need a table to illustrate this): false positive error rate, false negative error rate, false identification error rate, false exclusion error rate.
+
+- Given the iid assumption, could we develop a further model for the bullet level distribution and estimate the corresponding error rates?
+
+
+
+
+
+
+
 Estimations with changing sample size
 ================================
 
