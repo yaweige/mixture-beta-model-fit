@@ -38,6 +38,52 @@ header-includes:
 
 _Text based on elsarticle sample manuscript, see [http://www.elsevier.com/author-schemas/latex-instructions#elsarticle](http://www.elsevier.com/author-schemas/latex-instructions#elsarticle)_
 
+```{r setup, warning=FALSE,message=FALSE, echo=FALSE}
+library(dplyr)
+library(ggplot2)
+theme_set(theme_bw())
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+```{r prepare-data}
+# two-component betamix
+myfit1_simulation <- data.frame(ccf = (1:99)/100, 
+                                y1 = dbeta((1:99)/100, shape1 = 7.366, shape2 = 8.450),
+                                y2 = dbeta((1:99)/100, shape1 = 14.026, shape2 = 4.451))
+
+myfit1_simulation <- myfit1_simulation %>% mutate(y = 0.41938*y1 + (1-0.41938)*y2)
+
+myfit2_simulation <- data.frame(ccf = (1:99)/100, 
+                                y1 = dbeta((1:99)/100, shape1 = 11.0696, shape2 = 19.8388),
+                                y2 = dbeta((1:99)/100, shape1 = 6.5794, shape2 = 6.745))
+
+myfit2_simulation <- myfit2_simulation %>% mutate(y = 0.6737*y1 + (1-0.6737)*y2)
+
+myfit1n2_simulation <- bind_rows(myfit1_simulation, myfit2_simulation, .id = "Class")
+
+# single beta
+# one component
+myfit3_simulation <- data.frame(ccf = (1:99)/100, 
+                                y = dbeta((1:99)/100, shape1 = 4.1447, shape2 = 2.384))
+
+myfit4_simulation <- data.frame(ccf = (1:99)/100, 
+                                y = dbeta((1:99)/100, shape1 = 6.38, shape2 = 9.42))
+
+myfit3n4_simulation <- bind_rows(myfit3_simulation, myfit4_simulation, .id = "Class")
+```
+
+```{r prepare-data2}
+ccf_km_full <- readRDS("../data/organized data/ccf/ccf_km_full.rds")
+ccf_knm_full <- readRDS("../data/organized data/ccf/ccf_knm_full.rds")
+
+ccf_km_full_data <- bind_rows(ccf_km_full)
+ccf_knm_full_data <- bind_rows(ccf_knm_full)
+
+# Currently, we removed these lands (some of them are known to be mis-scanned)
+# only 29 knms out of 106080 knms are greater than 0.9, remove those
+ccf_knm_full_data <- ccf_knm_full_data %>% filter(ccf < 0.90)
+```
+
 Introduction
 ====================================
 
@@ -175,34 +221,46 @@ The estimation was done using Nelder-Mead algorithm in R [reference]. This is a 
 
 \end{table}
 
-The estimated beta distributions are shown in the Figure \ref{singlebeta} and the estimated two-component beta mixture distributions are also shown in the Figure \ref{two-component-betamix}. As expected, the estimated distributions show the properties we desire for the similarity scores. The majorities of the estimated distributions are apart from each other, while the minority part between the two distributions has some overlap. It's worth to note that both curves have heavy tails to the farther boundaries and the KM curve has the heavier tail compared to KNM. We can see the two-component distributions fit the data very well, while the single beta distributions are not as good as the two-component distributions for both KM and KNM. The single beta distribution for KM clearly failed to capture the potential second mode of the histogram indicating it is not sufficient. The single beta distribution for KNM is not too bad but still failed to capture the distributional information for some parts. This indicates that even though beta distributions are flexible for variables in 0 to 1, they are still restricted too much to be able to describe the cases here. The two-component beta mixture distributions look more promising.
+The estimated beta distributions are shown in \autoref{fig:singlebeta} and the estimated two-component beta mixture distributions are also shown in \autoref{fig:two-component-betamix}. As expected, the estimated distributions show the properties we desire for the similarity scores. The majorities of the estimated distributions are apart from each other, while the minority part between the two distributions has some overlap. It's worth to note that both curves have heavy tails to the farther boundaries and the KM curve has the heavier tail compared to KNM. We can see the two-component distributions fit the data very well, while the single beta distributions are not as good as the two-component distributions for both KM and KNM. The single beta distribution for KM clearly failed to capture the potential second mode of the histogram indicating it is not sufficient. The single beta distribution for KNM is not too bad but still failed to capture the distributional information for some parts. This indicates that even though beta distributions are flexible for variables in 0 to 1, they are still restricted too much to be able to describe the cases here. The two-component beta mixture distributions look more promising.
 
 
+```{r singlebeta, out.width="70%", fig.align="center", fig.cap="Estimated beta distributions for full data", fig.keep="hold", fig.pos="h"}
+myfit3n4_simulation %>%
+  ggplot(aes(color = Class, fill = Class)) + 
+  geom_line(aes(x = ccf, y = y)) + 
+  geom_histogram(aes(x = ccf, y = ..density..), bins = 20, color = "gray99",
+                 position = "identity", alpha = 0.5, 
+                 data = bind_rows(ccf_km_full_data, ccf_knm_full_data, .id = "Class")) +
+  scale_color_discrete(breaks = c("1", "2"), label = c("KM", "KNM")) + 
+  scale_fill_discrete(breaks = c("1", "2"), label = c("KM", "KNM")) +
+  ylab("density")
+```
 
-\begin{figure}[h]
-    \centering
-    \includegraphics[width=0.5\textwidth]{../code/organized code/generated figures/singlebeta.png}
-    \caption{Estimated beta distributions for full data}
-    \label{singlebeta}
-\end{figure}
 
-\begin{figure}[h]
-    \centering
-    \includegraphics[width=0.5\textwidth]{../code/organized code/generated figures/two-component-betamix.png}
-    \caption{Estimated two-component beta mixture distributions for full data}
-    \label{two-component-betamix}
-\end{figure}
+```{r two-component-betamix, out.width="70%", fig.align="center", fig.cap="Estimated two-component beta mixture distributions for full data", fig.pos="h"}
+myfit1n2_simulation %>%
+  ggplot(aes(color = Class, fill = Class)) + 
+  geom_line(aes(x = ccf, y = y)) + 
+  geom_histogram(aes(x = ccf, y = ..density..), bins = 20, color = "gray99",
+                 position = "identity", alpha = 0.5, 
+                 data = bind_rows(ccf_km_full_data, ccf_knm_full_data, .id = "Class")) +
+  scale_color_discrete(breaks = c("1", "2"), label = c("KM", "KNM")) + 
+  scale_fill_discrete(breaks = c("1", "2"), label = c("KM", "KNM")) +
+  ylab("density")
+```
 
 Three candidate distributions for each of KM and KNM are considered. For the increasing of complexity, we have single beta, two-component beta mixture and three-component beta mixture distributions. And they are also nested in that order. Naturally, we first look at the maximized log-likelihood of each model, and we can do asymptotic log-likelihood ratio chi-square tests for single beta against two-component beta mixture distributions, and two-component against three-component beta mixture distributions. The p-values of those test are shown in the Table \ref{Full Data KM Distribution Estimation} and Table \ref{Full Data KNM Distribution Estimation} as the column "p-value". Surprisingly (or not), we found all those p-values are 0 which strongly suggests a more complex model when there is one. However, considering the size of the data we are using to fit these models, we can expect the statistical significance will be easily achieved since any small difference of the sufficiency will be detected. So we have to take the sample size effect into consideration. As Bayesian information criterion (BIC) is a well used criterion which takes the model complexity, sufficiency and the sample size (by a log function) into account. As shown in the column "BIC" in the tables, the BICs for the single beta distributions are larger than that of the two-component beta mixtures by relatively large proportions. And the BICs for the two-component beta mixture distributions are a little larger than that of the three-component beta mixture distributions for both KM and KNM. Obviously, we would prefer the two-component beta mixture distributions, but we would cast a doubt when it comes to the three-component beta mixture distributions. We still prefer the two-component one instead of the three-component one. The reasons are: 1) these differences of BICs between two and three component distributions are really small in proportion (by 0.3% for KM and 0.017% for KNM), 2) the estimation cost is not accounted, which will be higher for a more complex model, 3) the BICs still don't take the sample size effect fully into account since the log function for sample size goes to flat when the sample sizes are large. By simple calculation, we can see that the log-likelihood increased by a multiplicative factor more than 10 when the sample sizes increased from KM case to KNM case, however, at the same time, the log of sample size only roughly increased from 9 to 11. So we choose the two-component beta mixture distributions for both KM and KNM. And also as we have seen, these distributions have potential good forensic interpretations. 
 
-It’s also helpful to see how the individual components look like in the beta mixture distributions as in Figure \ref{components}. The KNM and KM distributions seem to share a common component while keeping the other components far apart from each other. The separated components represent the ideal cases where the bullet land engraved areas preserved the information of source well and result in clearly distinct separation. The shared components represent the cases where the KM results in lower scores because of some degree of tank rash, pitting, breakoff or other damages on the bullets and the KNM results in higher score because of the random identification effect. According to the estimated prior probabilities, both distributions put less weight on the common component while putting larger weight on the the components characterizing the differences of KM and KNM respectively, which agrees on our expectation that majorities of the distributions are separated while the minorities overlapped. These properties together well explained the observed empirical distribution of similarity scores in our cases. Particularly, the heavier tail of the KM comparisons is explicitly included in the form of the model by one of the components.
+It’s also helpful to see how the individual components look like in the beta mixture distributions as in \autoref{fig:components}. The KNM and KM distributions seem to share a common component while keeping the other components far apart from each other. The separated components represent the ideal cases where the bullet land engraved areas preserved the information of source well and result in clearly distinct separation. The shared components represent the cases where the KM results in lower scores because of some degree of tank rash, pitting, breakoff or other damages on the bullets and the KNM results in higher score because of the random identification effect. According to the estimated prior probabilities, both distributions put less weight on the common component while putting larger weight on the the components characterizing the differences of KM and KNM respectively, which agrees on our expectation that majorities of the distributions are separated while the minorities overlapped. These properties together well explained the observed empirical distribution of similarity scores in our cases. Particularly, the heavier tail of the KM comparisons is explicitly included in the form of the model by one of the components.
 
-\begin{figure}[h]
-    \centering
-    \includegraphics[width=0.5\textwidth]{../code/organized code/generated figures/components.png}
-    \caption{Estimated components}
-    \label{components}
-\end{figure}
+```{r components, out.width="70%", fig.align="center", fig.cap="Estimated-components", fig.keep="hold", fig.pos="h"}
+myfit1n2_simulation %>%
+  ggplot(aes(color = Class)) + 
+  geom_line(aes(x = ccf, y = y1))  +
+  geom_line(aes(x = ccf, y = y2))  +
+  scale_color_discrete(breaks = c("1", "2"), label = c("KM", "KNM")) + 
+  ylab("density")
+```
 
 Evaluate the error rates
 ================================
@@ -215,12 +273,92 @@ Evaluate the error rates
 
 - Given the iid assumption, could we develop a further model for the bullet level distribution and estimate the corresponding error rates?
 
+Estimating the underlying theoretical error rates is a fundamental challenge in the forensic science [@PCAST2016; @PCAST2016addendum]. The estimation process becomes more straightforward after we finished the distribution estimation. There are many types of error rates can be defined. We focused on the four most used ones, i.e. 1) False positive rate (FPR), 2) False negative rate (FNR), 3) False identification rate (FIR), 4) False exclusion rate (FER), as defined in Table \ref{Error rate table}. FPR and FNR are considered source-specific assessment. They are both probabilities given the ground truth to make false conclusions, which is useful especially when we evaluate an algorithm. FIR and FER are considered decision-specific assessment. They are both probabilities given the algorithm decisions to false claim the actual source, which is useful in real cases when jury is presented with the forensic conclusions to make judgment.
+
+The error rates are also affected by the threshold selected to make decisions. For example, if we are very conservative in making identifications, we can set the threshold to be large, say CCF >= 0.9, then the FPR will be .... But at the same time, the FNR will be higher. There are trade-offs between the two error rates. So, to make these error rates comparable and consistent, for the current paper, we refer the threshold as the value where the probability densities of KM and KNM distributions equal with each other. For the two component beta mixture distributions we estimated in last section, this threshold is 0.529.
+
+The four error rates are directly associated with the distributions we estimated as shown in the figures [figures illustrating this idea].
+
+1) False positive rate
+2) False negative rate
+3) Negative predictive value/ False identification rate
+4) False omission rate/ False exclusion rate
+
+\begin{table}[h]
+\centering
+\begin{tabular}{ |p{1.8cm}||p{3.2cm} |p{3.1cm}| p{2.5cm}|}
+ \hline
+ &\multicolumn{2}{c|}{Ground Truth}&  \\
+ \hline
+    & Match & Non-Match&Error Rate\\
+ \hline
+ Identification & Correctly judged as matches, True Positives (TP) & Incorrectly judged as matches, False Positive (FP)&False ~~~~~~~~~~~~~Identification Rate (FP/(TP + FP))\\
+ \hline
+ Elimination & Incorrectly judged as non-matches, False Negative (FN)& Correctly judged as non-matches, True Negative (TN)&False Exclusion Rate (FN/(TN + FN))\\
+ \hline
+ Error Rate & False Negative Rate (FN/(FN+TP)) & False Positive Rate (FP/(FP + TN))&\\
+ \hline
+\end{tabular}
+\caption{xxxx}
+\label{Error rate table}
+
+\end{table}
+
+```{r fnr-fpr, out.width="70%", fig.align="center", fig.cap="False Negative Rate(FNR) and False Positive Rate(FPR)", fig.keep="hold", fig.pos="h"}
+# prepare the polygon
+polydata_fnr <- myfit1n2_simulation %>% 
+  filter(ccf<=0.53, Class == "1") %>%
+  select(ccf, y) %>%
+  bind_rows(data.frame(ccf = 0.53, y = 0))
+polydata_fpr <- myfit1n2_simulation %>% 
+  filter(ccf>=0.53, Class == "2") %>%
+  select(ccf, y) %>%
+  bind_rows(data.frame(ccf = 0.53, y = 0))
+polydata_fnrfpr <- bind_rows(polydata_fnr, polydata_fpr, .id = "Class")
+
+myfit1n2_simulation %>%
+  ggplot() + 
+  geom_polygon(aes(x = ccf, y = y, fill = Class), data = polydata_fnrfpr, alpha = 0.5) +
+  geom_vline(xintercept = 0.529, linetype = 2) +
+  geom_line(aes(x = ccf, y = y, color = Class)) +  
+  geom_text(aes(x = ccf, y = y, label = label), data = data.frame(ccf = 0.72, y = 3, label = "Threshold = 0.529")) + 
+  geom_text(aes(x = ccf, y = y, label = label), data = data.frame(ccf = c(0.375, 0.6), y = c(0.5, 0.45), label = c("FNR", "FPR"))) + 
+  scale_color_discrete(breaks = c("1", "2"), label = c("KM", "KNM")) + 
+  scale_fill_discrete(breaks = c("1", "2"), label = c("KM", "KNM")) +
+  ylab("density")
+```
 
 
+```{r fir-fer, out.width="70%", fig.align="center", fig.cap="False Indentification Rate(FIR) and False Exclusion Rate(FER)", fig.keep="hold", fig.pos="h"}
+# prepare the polygon
+polydata_part3 <- myfit1n2_simulation %>%
+  filter(ccf<=0.53)
 
+polydata_part3[1:53,] <- polydata_part3[1:53,] %>% arrange(desc(ccf))
 
+polydata_part4 <- myfit1n2_simulation %>%
+  filter(ccf>=0.53) 
 
+polydata_part4[1:47,] <- polydata_part4[1:47,] %>% arrange(desc(ccf))
 
+polydata_part34 <- bind_rows(polydata_part3 %>% select(ccf, y), polydata_part4 %>% select(ccf, y), .id = "Class")
+polydata_part34 <- polydata_part34 %>% mutate(Class = as.character(as.numeric(Class) + 2))
+
+polydata <- bind_rows(polydata_fnrfpr, polydata_part34)
+
+polydata %>% 
+  ggplot() + 
+  geom_polygon(aes(x = ccf, y = y, group = Class), alpha = 0.1) +
+  geom_text(aes(x = ccf, y = y, label = label), 
+            data = data.frame(ccf = c(0.375, 0.6, 0.375, 0.75), y = c(0.5, 0.45, 2, 1), label = c("A1", "A2", "A3", "A4"))) + 
+  geom_line(aes(x = ccf, y = y, color = Class), data = myfit1n2_simulation) +
+  geom_vline(xintercept = 0.529, linetype = 2) +
+  geom_text(aes(x = ccf, y = y, label = label), data = data.frame(ccf = 0.72, y = 3, label = "Threshold = 0.529")) + 
+  geom_text(aes(x = ccf, y = y, label = label), 
+            data = data.frame(ccf = c(0.15, 0.15), y = c(3.5, 3.2), label = c("FIR = A2/(A2+A4)", "FER = A1/(A1+A3)")))+
+  scale_color_discrete(breaks = c("1", "2"), label = c("KM", "KNM")) + 
+  ylab("density")
+```
 Estimations with changing sample size
 ================================
 
@@ -262,7 +400,7 @@ knitr::include_graphics("../code/organized code/generated figures/two-component-
 ```
 
 
-
+\clearpage
 
 References {#references .unnumbered}
 ==========
