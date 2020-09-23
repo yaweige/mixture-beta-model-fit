@@ -87,14 +87,15 @@ ccf_knm_full_data <- ccf_knm_full_data %>% filter(ccf < 0.90)
 Introduction
 ====================================
 
-Firearm examination is an important topic in forensic science to help reveal the underlying pattern of firearm evidence. \hh{XXX go into a bit more detail on what you mean by the underlying pattern} Currently, those examinations are executed in forensic labs by Firearms and Toolmark Examiners (FTEs) under the regulation of AFTE [@AFTE1992]. However, this process  is in its in nature based on human decisions and therefore subjective. \hh{XXX Change from passive voice to active, i.e. The PCAST report and the NRC called out this subjectivity and ...} The subjectivity in the conventional firearm evidence identification processes is called to be reduced or to be complemented by more objective procedures by the National Research Council [@Council2009]. The President’s Council of Advisers on Science and Technology (PCAST) also emphasized the importance to establish the scientific validity and reliability of subjective forensic feature-comparison methods by blind empirical test [@PCAST2016]. The PCAST \hh{report} also recognized the importance of developing of objective computer-based algorithms in its following addendum [@PCAST2016addendum]. 
+Firearm examination is an important topic in forensic science to \yg{help identify if two pieces of firearm evidence are from a same source or not by examining the characteristics on the evidence left by the firearms.} \hh{XXX go into a bit more detail on what you mean by the underlying pattern} Currently, those examinations are executed in forensic labs by Firearms and Toolmark Examiners (FTEs) under the regulation of AFTE [@AFTE1992]. However, this process is in its nature based on human decisions and therefore subjective. \yg{The National Research Countcil called out this subjectivity in conventional firearm identification processes to be reduced or to be complemented by more objective procedures} [@Council2009]. The President’s Council of Advisers on Science and Technology (PCAST) also emphasized the importance to establish the scientific validity and reliability of subjective forensic feature-comparison methods by blind empirical test [@PCAST2016]. The PCAST report also recognized the importance of developing of objective computer-based algorithms in its following addendum [@PCAST2016addendum].
 
-In \hh{response to this criticism, subsequent research on } cartridge case comparisons introduced the method of  congruent matching cells (CMC) [@Song2015], which \hh{allows a quantitative assessment of the similarity of two breech face impressions.}
-Error rates were \hh{reported by  [@Song2018; @Zhang2019]  on XXX which studies were used in these papers?} \hh{based on} distributional models \hh{XXX could you expand on those distributional models?}.
+In \hh{response to this criticism, subsequent research on } cartridge case comparisons introduced the method of  congruent matching cells (CMC) [@Song2015], which \hh{allows a quantitative assessment of the similarity of two breech face impressions.} Theoretical error rates of CMC were analyzed by @Song2018 and @Zhang2019 on \yg{the data set of} @Fadul2011 based on \yg{the beta-binomial model and the correlated binomial model}. \hh{XXX could you expand on those distributional models?}.
+
+
 \hh{XXX xiao-hue Tai's paper should be mentioned.}
+
 \hh{XXX mention the data that all of these methods are based on.}
 
-\hh{XXX i'm not sure you need to go into  bullet comparisons}
 In bullet comparisons, an automatic matching algorithm was proposed by Hare [@Hare2016]. The discussion about the degraded land comparison was also made in the following paper [@Hare2017]. The empirical error rates associated with this method based on three test sets are discussed by Vanderplas [@Vanderplas2020]. The most prominent single feature in the random forest proposed by Hare [@Hare2016] is the cross-correlation function [@vorburger2011] according to the empirical studies [@Vanderplas2020; @Hare2016]. Other automated comparison methods or improvement such as Robust LOESS in groove engraved area identification [@Rice2020], Chumbley score method [@Krishnan2019] are also proposed. 
 
 \hh{XXX What does this however refer to?}
@@ -107,32 +108,6 @@ There are two types of distributions we would consider in the bullet comparison 
 In section 2... In section 3...
 
 
-<!-- The firearm examiners are focusing on the same source and different source problems of bullets and cartridge cases which serve as important forensic evidence in the court/to the jurors. \hh{XX this is quite vague - could you try to find a number in the literature on how much evidence in trials is related to firearms or ballistic evidence?} The subjectivity and lack of quantified error rates in the traditional forensic process is called to be reduced or complemented by more objective methods [@Council2009; @PCAST2016].  Some \hh{XX 'some' is too vague - instead cite literature - i.e. something like: in response xxx, yyy, zzz, ... have introduced automatic matching algorithms ...} automatic matching algorithms are developed which usually return a similarity score to quantify the similarity or the probability to be an actual match for a certain comparison. However, this raises questions about how to interpret the reported scores and how these scores are distributed. \hh{XXX more details before this thus - why is it \hh{XXX it? write out your reference} not clear to draw inference?} Thus, it \hh{XXX it? write out your reference} is not all clear how to conduct inference based on these similarity scores. @Song2018 proposed binomial and beta-binomial for the number of matched cells of the CMC method for cartridge case comparisons.  Therefore, @Song2018 provides a way to quantify the theoretical error rate of the algorithm. However, for the bullets LEA comparisons, quantitative measurements for the theoretical error rate have not been established. In this paper, we will evaluate the possible models/distributions for the LEA comparisons scores generated by the random forest proposed by @Hare2016. And then, we will also evaluate the error rates based on the estimated distribution for the automatic matching algorithm. -->
-
-<!-- In section 2, we will discuss  distributional forms of random forest scores produced by the automatic LEA matching algorithm proposed by @Hare2016. In section 3, we will introduce the LAPD data set and the estimated distributions. In section 4, the theoretical error rates based on the distributions are discussed. In section 5, we evaluate the performance of the estimation, stability of the distribution within a changing sample size context. In section 6, we will conclude the discussion. -->
-
-<!-- To combine the following introduction Part2 -->
-<!-- ====================================== -->
-
-<!-- The subjectivity in the conventional forensic evidence identification processes according to the AFTE is called to be reduced or be complemented by more objective procedures [@Council2009]. \hh{Don't use passive voice in the start} The three possible conclusions \hh{XXX which conclusions are you refering to? you need to introduce that before you can refer to them} for a comparison between a known pattern (from tests of the tools or firearms of the suspect) and an unknown pattern (extracted from the crime scene) according to AFTE [@AFTE1992] are identification, elimination and inconclusive. Besides, for some comparisons which are thought to be impossible to do any meaningful judgement, a forth decision will be made to exclude those cases. \hh{XXX Careful: exclusions are based on single pieces of evidence. Only if evidence is considered to carry information, a comparison is done.} The conventional standards established by AFTE were usually carried out by experienced examiners. However, this process in nature is human based and subjective. \hh{the previous sentence explains the foundation, put it earlier.} In recent years, this procedure was called to be changed. \hh{XXX repeat from first sentence.} Especially with the improvement of the technology in measurement tools and higher computational power. (some more general discussions  could be made, such as the power/usefulness of this kind of evidence, the current stage of those procedures, how to cooperate with human judgement) -->
-
-<!-- The identification results of bullets sources are part of the important evidence to jurors. \hh{XXX are there numbers of how often firearms evidence is presented in court? } When the gun fires a bullet, the barrel and the rifling will leave an impression on the bullet surface. For different barrels and rifling, the marks left on the bullets are believed to be unique (@AFTE1992). On the highest level, we can easily distinguish some class characteristics such as numbers of land engraved areas, types of bullets etc. When the bullet from the crime scene is different from the test bullets which are test fired from a suspect gun in terms of the class characteristic, the decision can be made easily as elimination.(what about sub-class characteristic) However, we can never make identification solely based on class characteristics. The bullet forensic researchers compare the individual characteristics, which are usually due to the imperfectness of guns or wear of guns, thus leaves unique marks on the bullets. The bullet examiner in the US labs will put two bullets under the confocal microscope, and try to match the striae on each bullet visually. With technology improvement, researchers are able to get 3D scans of the bullets and develop more advanced comparison algorithms. Hare et al developed a random forest based automatic matching algorithm with some well used features on the Hamby data (@Hare2016). They developed a whole process to start with the 3D scan and go through a sequence of data manipulations to reach the final comparison. Vanderplas et al also applied this method to another three external data sets Hamby set 44, Phoenix PD, Houston FSC (@Vanderplas2020). According to their study, the random forest algorithm is the best while ccf is the most prominent feature. Hare et al extended this approach to include degraded cases and operator effect into consideration (@Hare2017). Rice improved the groove engraved area identification algorithm by using the Robust LOESS (@Rice2020). Krishnan proposed Chumbley score method to match striae on the LEAs (@Krishnan2019). -->
-
-<!-- The automatic identification processes always produce a similarity score (usually in range 0 to 1) or a probability to be an actual match as results(references). This raises questions about how to interpret the reported probabilities and how these probabilities are distributed. In practice, the default cutoff of similarity score above which to be classified as matches is usually 0.5 with intuitive interpretation. However, without knowing how the similarity score is distributed and the classification errors associated with it, a sensible decision is hard to make. Song et al used a beta-binomial distribution to model the CMC cartridge cases classification results (@Song2018). Garton et al illustrated the use of score based likelihood in evaluating the strength of forensic evidence (@Garton2020). -->
-
-<!-- In this paper, we focused on the bullet LEAs, and the results returned from the automatic matching algorithm of Hare et al (@Hare2016). We make use of the LAPD bullets data base (reference or explanation, in a separate section), which provided a large number of samples making the modeling process and evaluating the model possible to us. (The priciple outcome) -->
-
-<!-- \hh{This needs a more general introduction to  firearms examinations to motivate the problem} -->
-
-<!-- \hh{things the intro needs to cover: } -->
-
-<!-- - \hh{define the same-source problem} -->
-<!-- - \hh{cross-correlation function} -->
-<!-- Based on the cross-correlation function we produced through..., -->
-<!-- - \hh{discuss approaches in the literature: (NIST paper) on modelling Beta distribution} -->
-<!-- - \hh{how does this paper expand on the knowledge?} -->
-
-
 The distributional forms of similarity scores
 ============================
 
@@ -142,19 +117,42 @@ The cross-correlation function (CCF) is the most prominent single feature in the
 
 We can see from the Figure ... (a figure of nonparametric fit of the CCF?), which is a typical one we usually have for the similarity scores, that the distributions of KM and KNM are apart for the majorities. In the bullet LEA comparison problems, we usually have a well separated bullet scores but for the land scores, there are usually some overlaps [@Vanderplas2020]. We propose beta distributions for those scores. Because the beta distribution is a well-used distribution in statistics to describe a quantity from 0 to 1 which is usually a probability or proportion quantifying our knowledge for another distribution in Bayesian analysis. And it is very flexible to capture unimodal asymmetric shapes in 0 to 1. However, it may not be adequate to explain a heavy tail or even a second mode. Thus, we further consider the beta mixture distribution which is a more complex distribution than the beta distribution as a special case. In the beta mixture distribution, we introduce a hierarchical structure with a prior probability to combine a few beta distributions as one. The two-component beta mixture distributions are defined below.
 
-The reported similarity scores are denoted as $Y_{ij}$ for $j^{th}$ LEA comparison within class $i$, where $i = 1$ is KM and $i = 2$ is KNM. $Y_{ij}$'s are considered independent and identically distributed within each class, i.e.
+The reported similarity scores are denoted as $Y_{ij}$ for $j^{th}$ LEA comparison within class $i$, where $i = 1$ is KM and $i = 2$ is KNM. $Y_{ij}$'s are considered independent and identically distributed within each class following a k-component beta mixture distribution, i.e.
 
 \begin{align*}
-Y_{1j} \stackrel{iid}{\sim}  Betamix(p_1, \mu_{11}, \phi_{11}, \mu_{12}, \phi_{12})\\
-Y_{2j} \stackrel{iid}{\sim}  Betamix(p_2, \mu_{21}, \phi_{21}, \mu_{22}, \phi_{22})
+Y_{1j} \stackrel{iid}{\sim}  Betamix(p_1, \mu_{1}, \phi_{1})\\
+Y_{2j} \stackrel{iid}{\sim}  Betamix(p_2, \mu_{2}, \phi_{2})
 \end{align*}
 
-where $\mu_{ik}$ and $\phi_{ik}$ are distribution parameters for $i^{th}$ class and $k^{th}$ component, $k = 1$ or $2$. And $p_i$ is the prior probability for the first component in $i^{th}$ class, thus, $1-p_i$ is the prior probability for the second component in $i^{th}$ class. Note that we are using the mean and precision parameterization of beta distributions which simplifies the math in calculation and is more intuitive ($\mu$ is the mean, and the variance is roughly proportional to the reciprocal of $\phi$). It's equivalent to the usual $\alpha$ and $\beta$ parameterization through the following transformation:
+where $p_i$, $\mu_i$ and $\phi_i$ are parameter vectors defined as:
 
 \begin{align*}
-\mu = \frac{\alpha}{\alpha+\beta} \\
-\phi = \alpha + \beta
+&p_i = (p_{i1}, p_{i2}, p_{i3}, ... , p_{ik}),                  &p_{il} \in [0, 1], l = 1, 2, 3, ..., k\\
+&\mu_i = (\mu_{i1}, \mu_{i2}, \mu_{i3}, ... , \mu_{ik}),        &\mu_{il} \in (0, 1), l = 1, 2, 3, ..., k \\
+&\phi_i = (\phi_{i1}, \phi_{i2}, \phi_{i3}, ... , \phi_{ik},    &\phi_{il} \in (0, +\infty), l = 1, 2, 3, ..., k
 \end{align*}
+
+then, the $Betamix(p_i, \mu_i, \phi_i)$ distribution can be explicitly written as:
+
+\begin{align*}
+f(x;p_i, \mu_i, \phi_i) =& p_{i1}f_1(x;\mu_{i1}, \phi_{i1}) + p_{i2}f_2(x;\mu_{i2}, \phi_{i2}) +...+ p_{ik}f_k(x;\mu_{ik}, \phi_{ik})
+\end{align*}
+
+where $f_l(\cdot;\mu_{il}, \phi_{il})$, $l = 1, 2, 3, ..., k$ are beta distributions with probability densities as:
+
+\begin{align*}
+f_l(x;\mu_{il}, \phi_{il}) =  \frac{\Gamma(\phi_{il})}{\Gamma(\mu_{il}\phi_{il})\Gamma((1-\mu_{il})\phi_{il})}x^{\mu_{il}\phi_{il}-1}(1-x)^{(1-\mu_{il})\phi_{il}-1}
+\end{align*}
+
+
+In this definition, $\mu_{il}$ and $\phi_{il}$ are distribution parameters for $i^{th}$ class and $l^{th}$ component. And $p_i$ is the prior probability for components in $i^{th}$ class which is considered as a fixed real value vector. Note that we are using the mean and precision parameterization of beta distributions which simplifies the math in calculation and is more intuitive ($\mu_{il}$ is the mean, and the variance is roughly proportional to the reciprocal of $\phi_{il}$). It's equivalent to the usual $\alpha_{il}$ and $\beta_{il}$ parameterization through the following transformation:
+
+\begin{align*}
+\mu_{il} = \frac{\alpha_{il}}{\alpha_{il}+\beta_{il}} \\
+\phi_{il} = \alpha_{il} + \beta_{il}
+\end{align*}
+
+
 
 LAPD data set and the estimated distributions
 ==========================================
