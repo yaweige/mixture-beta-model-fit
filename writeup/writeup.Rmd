@@ -265,24 +265,9 @@ myfit1n2_simulation %>%
 Evaluate the error rates
 ================================
 
-(report theoretical error rates)
-
-- given the cutoff point where the two distributions have equal density (also a likelihood ratio with value 1, which does an optimal classification under 0-1 loss? or at the point where the probabilities equal to each other instead of the densities)
-
-- Consider four types of error rates (will need a table to illustrate this): false positive error rate, false negative error rate, false identification error rate, false exclusion error rate.
-
 - Given the iid assumption, could we develop a further model for the bullet level distribution and estimate the corresponding error rates?
 
 Estimating the underlying theoretical error rates is a fundamental challenge in the forensic science [@PCAST2016; @PCAST2016addendum]. The estimation process becomes more straightforward after we finished the distribution estimation. There are many types of error rates can be defined. We focused on the four most used ones, i.e. 1) False positive rate (FPR), 2) False negative rate (FNR), 3) False identification rate (FIR), 4) False exclusion rate (FER), as defined in Table \ref{Error rate table}. FPR and FNR are considered source-specific assessment. They are both probabilities given the ground truth to make false conclusions, which is useful especially when we evaluate an algorithm. FIR and FER are considered decision-specific assessment. They are both probabilities given the algorithm decisions to false claim the actual source, which is useful in real cases when jury is presented with the forensic conclusions to make judgment.
-
-The error rates are also affected by the threshold selected to make decisions. For example, if we are very conservative in making identifications, we can set the threshold to be large, say CCF >= 0.9, then the FPR will be .... But at the same time, the FNR will be higher. There are trade-offs between the two error rates. So, to make these error rates comparable and consistent, for the current paper, we refer the threshold as the value where the probability densities of KM and KNM distributions equal with each other. For the two component beta mixture distributions we estimated in last section, this threshold is 0.529.
-
-The four error rates are directly associated with the distributions we estimated as shown in the figures [figures illustrating this idea].
-
-1) False positive rate
-2) False negative rate
-3) Negative predictive value/ False identification rate
-4) False omission rate/ False exclusion rate
 
 \begin{table}[h]
 \centering
@@ -303,6 +288,16 @@ The four error rates are directly associated with the distributions we estimated
 \label{Error rate table}
 
 \end{table}
+
+The error rates are also affected by the threshold selected to make decisions. In an extreme example, if we are very conservative in making identifications, we can set the threshold to be large enough, say CCF >= 0.99, then the FPR will be 0. But at the same time, the FNR will be 1. It's clear that there are trade-offs between the error rates. So, to make these error rates comparable and consistent, for the current paper, we refer the threshold as the value where the probability densities of KM and KNM distributions equal with each other. This is not a bad choice, since it has good statistical meaning that at this value, the likelihood ratio equals 1 and any deviation from 1 would give preference to a certain decision (as if a threshold). For the two component beta mixture distributions we estimated in last section, this threshold is 0.529. In the application of the algorithms, the threshold need to be carefully chosen where the study of associated error rates will in turn be essential guiding that process.
+
+The four theoretical error rates are directly associated with the distributions we estimated as shown in the \autoref{fig:fnr-fpr} and \autoref{fig:fir-fer}. The estimated values of the error rates are reported in Table \ref{estimated-error-rates}. The FPR is 0.148, while the FNR is 0.301 which is much larger. This means for the given threshold value 0.529, the algorithm has probability 0.148 to misclssify an actual different-sourced pair of land engraved areas (LEAs) into identifications. And the algorithm has a probability 0.301 to misclassify an actual same-sourced pair of land engraved areas (LEAs) into eliminations. The fact that FNR is larger than FPR implies that for the current threshold, we are more likely to misclassify an pair of KM LEAs instead of KNM LEAs. This is partly due to the fact the KM distribution is more spread than the KNM distribution. The FPR will decrease rapidly when increasing the threshold, while the FNR will be small only when the threshold is very low at great cost of FPR. And similar pattern can be observed from FIR and FER. However, these error rates are explained in a totally different view. FIR is 0.212 means when the algorithm reports an identification (to the jury in court potentially), the algorithm could have made wrong claim at probability 0.212. As we aforementioned, the FPR and FNR are used to evaluate algorithms overall while the FIR and FER are used to evaluate a certain result reported.
+
+<!-- 1) False positive rate -->
+<!-- 2) False negative rate -->
+<!-- 3) Negative predictive value/ False identification rate -->
+<!-- 4) False omission rate/ False exclusion rate -->
+
 
 ```{r fnr-fpr, out.width="70%", fig.align="center", fig.cap="False Negative Rate(FNR) and False Positive Rate(FPR)", fig.keep="hold", fig.pos="h"}
 # prepare the polygon
@@ -359,6 +354,30 @@ polydata %>%
   scale_color_discrete(breaks = c("1", "2"), label = c("KM", "KNM")) + 
   ylab("density")
 ```
+
+\begin{table}[h]
+\centering
+\begin{tabular}{ |p{4.5cm}|p{3cm}|}
+ \hline
+ Type of Error Rates & Estimated Values\\
+ \hline
+ False positive rate (FPR) & ~~~~~~0.148\\
+ \hline
+ False negative rate (FNR)& ~~~~~~0.301\\
+ \hline
+ False identification rate (FIR)& ~~~~~~0.212\\
+ \hline
+ False exclusion rate (FER)& ~~~~~~0.354\\
+ \hline
+\end{tabular}
+\caption{xxxx}
+\label{estimated-error-rates}
+
+\end{table}
+
+Overall, the error rates are not small enough to give confidence to any conclusions. But remember the current comparison discussed is in the land level. In real cases, we will need to combine the land level conclusions to bullet level ones. And this process of combining multiple pieces of evidence will improve the performance greatly. One of the common ways in computer-based bullet analysis is to calculate the sequential average maximum (SAM) [susan's paper and the original paper of SAM?] of land scores. Next, we are going to making use of the KM and KNM distributions in the land level to explore the error rates of the bullet level.
+
+
 Estimations with changing sample size
 ================================
 
