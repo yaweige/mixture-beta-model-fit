@@ -127,7 +127,7 @@ Y_{2j} \stackrel{iid}{\sim}  Betamix(p_2, \mu_{2}, \phi_{2})
 where $p_i$, $\mu_i$ and $\phi_i$ are parameter vectors defined as:
 
 \begin{align*}
-&p_i = (p_{i1}, p_{i2}, p_{i3}, ... , p_{ik}),                  &p_{il} \in [0, 1], l = 1, 2, 3, ..., k\\
+&p_i = (p_{i1}, p_{i2}, p_{i3}, ... , p_{ik}),                  &p_{il} \in [0, 1], l = 1, 2, 3, ..., k~~ \mbox{and} ~~\sum_{l = 1}^k p_{il} = 1 \\
 &\mu_i = (\mu_{i1}, \mu_{i2}, \mu_{i3}, ... , \mu_{ik}),        &\mu_{il} \in (0, 1), l = 1, 2, 3, ..., k \\
 &\phi_i = (\phi_{i1}, \phi_{i2}, \phi_{i3}, ... , \phi_{ik},    &\phi_{il} \in (0, +\infty), l = 1, 2, 3, ..., k
 \end{align*}
