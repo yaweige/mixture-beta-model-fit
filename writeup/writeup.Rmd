@@ -38,17 +38,64 @@ header-includes:
 
 _Text based on elsarticle sample manuscript, see [http://www.elsevier.com/author-schemas/latex-instructions#elsarticle](http://www.elsevier.com/author-schemas/latex-instructions#elsarticle)_
 
+```{r setup, warning=FALSE,message=FALSE, echo=FALSE}
+library(dplyr)
+library(ggplot2)
+theme_set(theme_bw())
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+```{r prepare-data}
+# two-component betamix
+myfit1_simulation <- data.frame(ccf = (1:99)/100, 
+                                y1 = dbeta((1:99)/100, shape1 = 7.366, shape2 = 8.450),
+                                y2 = dbeta((1:99)/100, shape1 = 14.026, shape2 = 4.451))
+
+myfit1_simulation <- myfit1_simulation %>% mutate(y = 0.41938*y1 + (1-0.41938)*y2)
+
+myfit2_simulation <- data.frame(ccf = (1:99)/100, 
+                                y1 = dbeta((1:99)/100, shape1 = 11.0696, shape2 = 19.8388),
+                                y2 = dbeta((1:99)/100, shape1 = 6.5794, shape2 = 6.745))
+
+myfit2_simulation <- myfit2_simulation %>% mutate(y = 0.6737*y1 + (1-0.6737)*y2)
+
+myfit1n2_simulation <- bind_rows(myfit1_simulation, myfit2_simulation, .id = "Class")
+
+# single beta
+# one component
+myfit3_simulation <- data.frame(ccf = (1:99)/100, 
+                                y = dbeta((1:99)/100, shape1 = 4.1447, shape2 = 2.384))
+
+myfit4_simulation <- data.frame(ccf = (1:99)/100, 
+                                y = dbeta((1:99)/100, shape1 = 6.38, shape2 = 9.42))
+
+myfit3n4_simulation <- bind_rows(myfit3_simulation, myfit4_simulation, .id = "Class")
+```
+
+```{r prepare-data2}
+ccf_km_full <- readRDS("../data/organized data/ccf/ccf_km_full.rds")
+ccf_knm_full <- readRDS("../data/organized data/ccf/ccf_knm_full.rds")
+
+ccf_km_full_data <- bind_rows(ccf_km_full)
+ccf_knm_full_data <- bind_rows(ccf_knm_full)
+
+# Currently, we removed these lands (some of them are known to be mis-scanned)
+# only 29 knms out of 106080 knms are greater than 0.9, remove those
+ccf_knm_full_data <- ccf_knm_full_data %>% filter(ccf < 0.90)
+```
+
 Introduction
 ====================================
 
-Firearm examination is an important topic in forensic science to help reveal the underlying pattern of firearm evidence. \hh{XXX go into a bit more detail on what you mean by the underlying pattern} Currently, those examinations are executed in forensic labs by Firearms and Toolmark Examiners (FTEs) under the regulation of AFTE [@AFTE1992]. However, this process  is in its in nature based on human decisions and therefore subjective. \hh{XXX Change from passive voice to active, i.e. The PCAST report and the NRC called out this subjectivity and ...} The subjectivity in the conventional firearm evidence identification processes is called to be reduced or to be complemented by more objective procedures by the National Research Council [@Council2009]. The President’s Council of Advisers on Science and Technology (PCAST) also emphasized the importance to establish the scientific validity and reliability of subjective forensic feature-comparison methods by blind empirical test [@PCAST2016]. The PCAST \hh{report} also recognized the importance of developing of objective computer-based algorithms in its following addendum [@PCAST2016addendum]. 
+Firearm examination is an important topic in forensic science to \yg{help identify if two pieces of firearm evidence are from a same source or not by examining the characteristics on the evidence left by the firearms.} \hh{XXX go into a bit more detail on what you mean by the underlying pattern} Currently, those examinations are executed in forensic labs by Firearms and Toolmark Examiners (FTEs) under the regulation of AFTE [@AFTE1992]. However, this process is in its nature based on human decisions and therefore subjective. \yg{The National Research Countcil called out this subjectivity in conventional firearm identification processes to be reduced or to be complemented by more objective procedures} [@Council2009]. The President’s Council of Advisers on Science and Technology (PCAST) also emphasized the importance to establish the scientific validity and reliability of subjective forensic feature-comparison methods by blind empirical test [@PCAST2016]. The PCAST report also recognized the importance of developing of objective computer-based algorithms in its following addendum [@PCAST2016addendum].
 
-In \hh{response to this criticism, subsequent research on } cartridge case comparisons introduced the method of  congruent matching cells (CMC) [@Song2015], which \hh{allows a quantitative assessment of the similarity of two breech face impressions.}
-Error rates were \hh{reported by  [@Song2018; @Zhang2019]  on XXX which studies were used in these papers?} \hh{based on} distributional models \hh{XXX could you expand on those distributional models?}.
+In \hh{response to this criticism, subsequent research on } cartridge case comparisons introduced the method of  congruent matching cells (CMC) [@Song2015], which \hh{allows a quantitative assessment of the similarity of two breech face impressions.} Theoretical error rates of CMC were analyzed by @Song2018 and @Zhang2019 on \yg{the data set of} @Fadul2011 based on \yg{the beta-binomial model and the correlated binomial model}. \hh{XXX could you expand on those distributional models?}.
+
+
 \hh{XXX xiao-hue Tai's paper should be mentioned.}
+
 \hh{XXX mention the data that all of these methods are based on.}
 
-\hh{XXX i'm not sure you need to go into  bullet comparisons}
 In bullet comparisons, an automatic matching algorithm was proposed by Hare [@Hare2016]. The discussion about the degraded land comparison was also made in the following paper [@Hare2017]. The empirical error rates associated with this method based on three test sets are discussed by Vanderplas [@Vanderplas2020]. The most prominent single feature in the random forest proposed by Hare [@Hare2016] is the cross-correlation function [@vorburger2011] according to the empirical studies [@Vanderplas2020; @Hare2016]. Other automated comparison methods or improvement such as Robust LOESS in groove engraved area identification [@Rice2020], Chumbley score method [@Krishnan2019] are also proposed. 
 
 \hh{XXX What does this however refer to?}
@@ -73,32 +120,6 @@ There are two types of distributions we would consider in the bullet comparison 
 In section 2... In section 3...
 
 
-<!-- The firearm examiners are focusing on the same source and different source problems of bullets and cartridge cases which serve as important forensic evidence in the court/to the jurors. \hh{XX this is quite vague - could you try to find a number in the literature on how much evidence in trials is related to firearms or ballistic evidence?} The subjectivity and lack of quantified error rates in the traditional forensic process is called to be reduced or complemented by more objective methods [@Council2009; @PCAST2016].  Some \hh{XX 'some' is too vague - instead cite literature - i.e. something like: in response xxx, yyy, zzz, ... have introduced automatic matching algorithms ...} automatic matching algorithms are developed which usually return a similarity score to quantify the similarity or the probability to be an actual match for a certain comparison. However, this raises questions about how to interpret the reported scores and how these scores are distributed. \hh{XXX more details before this thus - why is it \hh{XXX it? write out your reference} not clear to draw inference?} Thus, it \hh{XXX it? write out your reference} is not all clear how to conduct inference based on these similarity scores. @Song2018 proposed binomial and beta-binomial for the number of matched cells of the CMC method for cartridge case comparisons.  Therefore, @Song2018 provides a way to quantify the theoretical error rate of the algorithm. However, for the bullets LEA comparisons, quantitative measurements for the theoretical error rate have not been established. In this paper, we will evaluate the possible models/distributions for the LEA comparisons scores generated by the random forest proposed by @Hare2016. And then, we will also evaluate the error rates based on the estimated distribution for the automatic matching algorithm. -->
-
-<!-- In section 2, we will discuss  distributional forms of random forest scores produced by the automatic LEA matching algorithm proposed by @Hare2016. In section 3, we will introduce the LAPD data set and the estimated distributions. In section 4, the theoretical error rates based on the distributions are discussed. In section 5, we evaluate the performance of the estimation, stability of the distribution within a changing sample size context. In section 6, we will conclude the discussion. -->
-
-<!-- To combine the following introduction Part2 -->
-<!-- ====================================== -->
-
-<!-- The subjectivity in the conventional forensic evidence identification processes according to the AFTE is called to be reduced or be complemented by more objective procedures [@Council2009]. \hh{Don't use passive voice in the start} The three possible conclusions \hh{XXX which conclusions are you refering to? you need to introduce that before you can refer to them} for a comparison between a known pattern (from tests of the tools or firearms of the suspect) and an unknown pattern (extracted from the crime scene) according to AFTE [@AFTE1992] are identification, elimination and inconclusive. Besides, for some comparisons which are thought to be impossible to do any meaningful judgement, a forth decision will be made to exclude those cases. \hh{XXX Careful: exclusions are based on single pieces of evidence. Only if evidence is considered to carry information, a comparison is done.} The conventional standards established by AFTE were usually carried out by experienced examiners. However, this process in nature is human based and subjective. \hh{the previous sentence explains the foundation, put it earlier.} In recent years, this procedure was called to be changed. \hh{XXX repeat from first sentence.} Especially with the improvement of the technology in measurement tools and higher computational power. (some more general discussions  could be made, such as the power/usefulness of this kind of evidence, the current stage of those procedures, how to cooperate with human judgement) -->
-
-<!-- The identification results of bullets sources are part of the important evidence to jurors. \hh{XXX are there numbers of how often firearms evidence is presented in court? } When the gun fires a bullet, the barrel and the rifling will leave an impression on the bullet surface. For different barrels and rifling, the marks left on the bullets are believed to be unique (@AFTE1992). On the highest level, we can easily distinguish some class characteristics such as numbers of land engraved areas, types of bullets etc. When the bullet from the crime scene is different from the test bullets which are test fired from a suspect gun in terms of the class characteristic, the decision can be made easily as elimination.(what about sub-class characteristic) However, we can never make identification solely based on class characteristics. The bullet forensic researchers compare the individual characteristics, which are usually due to the imperfectness of guns or wear of guns, thus leaves unique marks on the bullets. The bullet examiner in the US labs will put two bullets under the confocal microscope, and try to match the striae on each bullet visually. With technology improvement, researchers are able to get 3D scans of the bullets and develop more advanced comparison algorithms. Hare et al developed a random forest based automatic matching algorithm with some well used features on the Hamby data (@Hare2016). They developed a whole process to start with the 3D scan and go through a sequence of data manipulations to reach the final comparison. Vanderplas et al also applied this method to another three external data sets Hamby set 44, Phoenix PD, Houston FSC (@Vanderplas2020). According to their study, the random forest algorithm is the best while ccf is the most prominent feature. Hare et al extended this approach to include degraded cases and operator effect into consideration (@Hare2017). Rice improved the groove engraved area identification algorithm by using the Robust LOESS (@Rice2020). Krishnan proposed Chumbley score method to match striae on the LEAs (@Krishnan2019). -->
-
-<!-- The automatic identification processes always produce a similarity score (usually in range 0 to 1) or a probability to be an actual match as results(references). This raises questions about how to interpret the reported probabilities and how these probabilities are distributed. In practice, the default cutoff of similarity score above which to be classified as matches is usually 0.5 with intuitive interpretation. However, without knowing how the similarity score is distributed and the classification errors associated with it, a sensible decision is hard to make. Song et al used a beta-binomial distribution to model the CMC cartridge cases classification results (@Song2018). Garton et al illustrated the use of score based likelihood in evaluating the strength of forensic evidence (@Garton2020). -->
-
-<!-- In this paper, we focused on the bullet LEAs, and the results returned from the automatic matching algorithm of Hare et al (@Hare2016). We make use of the LAPD bullets data base (reference or explanation, in a separate section), which provided a large number of samples making the modeling process and evaluating the model possible to us. (The priciple outcome) -->
-
-<!-- \hh{This needs a more general introduction to  firearms examinations to motivate the problem} -->
-
-<!-- \hh{things the intro needs to cover: } -->
-
-<!-- - \hh{define the same-source problem} -->
-<!-- - \hh{cross-correlation function} -->
-<!-- Based on the cross-correlation function we produced through..., -->
-<!-- - \hh{discuss approaches in the literature: (NIST paper) on modelling Beta distribution} -->
-<!-- - \hh{how does this paper expand on the knowledge?} -->
-
-
 The distributional forms of similarity scores
 ============================
 
@@ -108,19 +129,42 @@ The cross-correlation function (CCF) is the most prominent single feature in the
 
 We can see from the Figure ... (a figure of nonparametric fit of the CCF?), which is a typical one we usually have for the similarity scores, that the distributions of KM and KNM are apart for the majorities. In the bullet LEA comparison problems, we usually have a well separated bullet scores but for the land scores, there are usually some overlaps [@Vanderplas2020]. We propose beta distributions for those scores. Because the beta distribution is a well-used distribution in statistics to describe a quantity from 0 to 1 which is usually a probability or proportion quantifying our knowledge for another distribution in Bayesian analysis. And it is very flexible to capture unimodal asymmetric shapes in 0 to 1. However, it may not be adequate to explain a heavy tail or even a second mode. Thus, we further consider the beta mixture distribution which is a more complex distribution than the beta distribution as a special case. In the beta mixture distribution, we introduce a hierarchical structure with a prior probability to combine a few beta distributions as one. The two-component beta mixture distributions are defined below.
 
-The reported similarity scores are denoted as $Y_{ij}$ for $j^{th}$ LEA comparison within class $i$, where $i = 1$ is KM and $i = 2$ is KNM. $Y_{ij}$'s are considered independent and identically distributed within each class, i.e.
+The reported similarity scores are denoted as $Y_{ij}$ for $j^{th}$ LEA comparison within class $i$, where $i = 1$ is KM and $i = 2$ is KNM. $Y_{ij}$'s are considered independent and identically distributed within each class following a k-component beta mixture distribution, i.e.
 
 \begin{align*}
-Y_{1j} \stackrel{iid}{\sim}  Betamix(p_1, \mu_{11}, \phi_{11}, \mu_{12}, \phi_{12})\\
-Y_{2j} \stackrel{iid}{\sim}  Betamix(p_2, \mu_{21}, \phi_{21}, \mu_{22}, \phi_{22})
+Y_{1j} \stackrel{iid}{\sim}  Betamix(p_1, \mu_{1}, \phi_{1})\\
+Y_{2j} \stackrel{iid}{\sim}  Betamix(p_2, \mu_{2}, \phi_{2})
 \end{align*}
 
-where $\mu_{ik}$ and $\phi_{ik}$ are distribution parameters for $i^{th}$ class and $k^{th}$ component, $k = 1$ or $2$. And $p_i$ is the prior probability for the first component in $i^{th}$ class, thus, $1-p_i$ is the prior probability for the second component in $i^{th}$ class. Note that we are using the mean and precision parameterization of beta distributions which simplifies the math in calculation and is more intuitive ($\mu$ is the mean, and the variance is roughly proportional to the reciprocal of $\phi$). It's equivalent to the usual $\alpha$ and $\beta$ parameterization through the following transformation:
+where $p_i$, $\mu_i$ and $\phi_i$ are parameter vectors defined as:
 
 \begin{align*}
-\mu = \frac{\alpha}{\alpha+\beta} \\
-\phi = \alpha + \beta
+&p_i = (p_{i1}, p_{i2}, p_{i3}, ... , p_{ik}),                  &p_{il} \in [0, 1], l = 1, 2, 3, ..., k\\
+&\mu_i = (\mu_{i1}, \mu_{i2}, \mu_{i3}, ... , \mu_{ik}),        &\mu_{il} \in (0, 1), l = 1, 2, 3, ..., k \\
+&\phi_i = (\phi_{i1}, \phi_{i2}, \phi_{i3}, ... , \phi_{ik},    &\phi_{il} \in (0, +\infty), l = 1, 2, 3, ..., k
 \end{align*}
+
+then, the $Betamix(p_i, \mu_i, \phi_i)$ distribution can be explicitly written as:
+
+\begin{align*}
+f(x;p_i, \mu_i, \phi_i) =& p_{i1}f_1(x;\mu_{i1}, \phi_{i1}) + p_{i2}f_2(x;\mu_{i2}, \phi_{i2}) +...+ p_{ik}f_k(x;\mu_{ik}, \phi_{ik})
+\end{align*}
+
+where $f_l(\cdot;\mu_{il}, \phi_{il})$, $l = 1, 2, 3, ..., k$ are beta distributions with probability densities as:
+
+\begin{align*}
+f_l(x;\mu_{il}, \phi_{il}) =  \frac{\Gamma(\phi_{il})}{\Gamma(\mu_{il}\phi_{il})\Gamma((1-\mu_{il})\phi_{il})}x^{\mu_{il}\phi_{il}-1}(1-x)^{(1-\mu_{il})\phi_{il}-1}
+\end{align*}
+
+
+In this definition, $\mu_{il}$ and $\phi_{il}$ are distribution parameters for $i^{th}$ class and $l^{th}$ component. And $p_i$ is the prior probability for components in $i^{th}$ class which is considered as a fixed real value vector. Note that we are using the mean and precision parameterization of beta distributions which simplifies the math in calculation and is more intuitive ($\mu_{il}$ is the mean, and the variance is roughly proportional to the reciprocal of $\phi_{il}$). It's equivalent to the usual $\alpha_{il}$ and $\beta_{il}$ parameterization through the following transformation:
+
+\begin{align*}
+\mu_{il} = \frac{\alpha_{il}}{\alpha_{il}+\beta_{il}} \\
+\phi_{il} = \alpha_{il} + \beta_{il}
+\end{align*}
+
+
 
 LAPD data set and the estimated distributions
 ==========================================
@@ -187,34 +231,46 @@ The estimation was done using Nelder-Mead algorithm in R [reference]. This is a 
 
 \end{table}
 
-The estimated beta distributions are shown in the Figure \ref{singlebeta} and the estimated two-component beta mixture distributions are also shown in the Figure \ref{two-component-betamix}. As expected, the estimated distributions show the properties we desire for the similarity scores. The majorities of the estimated distributions are apart from each other, while the minority part between the two distributions has some overlap. It's worth to note that both curves have heavy tails to the farther boundaries and the KM curve has the heavier tail compared to KNM. We can see the two-component distributions fit the data very well, while the single beta distributions are not as good as the two-component distributions for both KM and KNM. The single beta distribution for KM clearly failed to capture the potential second mode of the histogram indicating it is not sufficient. The single beta distribution for KNM is not too bad but still failed to capture the distributional information for some parts. This indicates that even though beta distributions are flexible for variables in 0 to 1, they are still restricted too much to be able to describe the cases here. The two-component beta mixture distributions look more promising.
+The estimated beta distributions are shown in \autoref{fig:singlebeta} and the estimated two-component beta mixture distributions are also shown in \autoref{fig:two-component-betamix}. As expected, the estimated distributions show the properties we desire for the similarity scores. The majorities of the estimated distributions are apart from each other, while the minority part between the two distributions has some overlap. It's worth to note that both curves have heavy tails to the farther boundaries and the KM curve has the heavier tail compared to KNM. We can see the two-component distributions fit the data very well, while the single beta distributions are not as good as the two-component distributions for both KM and KNM. The single beta distribution for KM clearly failed to capture the potential second mode of the histogram indicating it is not sufficient. The single beta distribution for KNM is not too bad but still failed to capture the distributional information for some parts. This indicates that even though beta distributions are flexible for variables in 0 to 1, they are still restricted too much to be able to describe the cases here. The two-component beta mixture distributions look more promising.
 
 
+```{r singlebeta, out.width="70%", fig.align="center", fig.cap="Estimated beta distributions for full data", fig.keep="hold", fig.pos="h"}
+myfit3n4_simulation %>%
+  ggplot(aes(color = Class, fill = Class)) + 
+  geom_line(aes(x = ccf, y = y)) + 
+  geom_histogram(aes(x = ccf, y = ..density..), bins = 20, color = "gray99",
+                 position = "identity", alpha = 0.5, 
+                 data = bind_rows(ccf_km_full_data, ccf_knm_full_data, .id = "Class")) +
+  scale_color_discrete(breaks = c("1", "2"), label = c("KM", "KNM")) + 
+  scale_fill_discrete(breaks = c("1", "2"), label = c("KM", "KNM")) +
+  ylab("density")
+```
 
-\begin{figure}[h]
-    \centering
-    \includegraphics[width=0.5\textwidth]{../code/organized code/generated figures/singlebeta.png}
-    \caption{Estimated beta distributions for full data}
-    \label{singlebeta}
-\end{figure}
 
-\begin{figure}[h]
-    \centering
-    \includegraphics[width=0.5\textwidth]{../code/organized code/generated figures/two-component-betamix.png}
-    \caption{Estimated two-component beta mixture distributions for full data}
-    \label{two-component-betamix}
-\end{figure}
+```{r two-component-betamix, out.width="70%", fig.align="center", fig.cap="Estimated two-component beta mixture distributions for full data", fig.pos="h"}
+myfit1n2_simulation %>%
+  ggplot(aes(color = Class, fill = Class)) + 
+  geom_line(aes(x = ccf, y = y)) + 
+  geom_histogram(aes(x = ccf, y = ..density..), bins = 20, color = "gray99",
+                 position = "identity", alpha = 0.5, 
+                 data = bind_rows(ccf_km_full_data, ccf_knm_full_data, .id = "Class")) +
+  scale_color_discrete(breaks = c("1", "2"), label = c("KM", "KNM")) + 
+  scale_fill_discrete(breaks = c("1", "2"), label = c("KM", "KNM")) +
+  ylab("density")
+```
 
 Three candidate distributions for each of KM and KNM are considered. For the increasing of complexity, we have single beta, two-component beta mixture and three-component beta mixture distributions. And they are also nested in that order. Naturally, we first look at the maximized log-likelihood of each model, and we can do asymptotic log-likelihood ratio chi-square tests for single beta against two-component beta mixture distributions, and two-component against three-component beta mixture distributions. The p-values of those test are shown in the Table \ref{Full Data KM Distribution Estimation} and Table \ref{Full Data KNM Distribution Estimation} as the column "p-value". Surprisingly (or not), we found all those p-values are 0 which strongly suggests a more complex model when there is one. However, considering the size of the data we are using to fit these models, we can expect the statistical significance will be easily achieved since any small difference of the sufficiency will be detected. So we have to take the sample size effect into consideration. As Bayesian information criterion (BIC) is a well used criterion which takes the model complexity, sufficiency and the sample size (by a log function) into account. As shown in the column "BIC" in the tables, the BICs for the single beta distributions are larger than that of the two-component beta mixtures by relatively large proportions. And the BICs for the two-component beta mixture distributions are a little larger than that of the three-component beta mixture distributions for both KM and KNM. Obviously, we would prefer the two-component beta mixture distributions, but we would cast a doubt when it comes to the three-component beta mixture distributions. We still prefer the two-component one instead of the three-component one. The reasons are: 1) these differences of BICs between two and three component distributions are really small in proportion (by 0.3% for KM and 0.017% for KNM), 2) the estimation cost is not accounted, which will be higher for a more complex model, 3) the BICs still don't take the sample size effect fully into account since the log function for sample size goes to flat when the sample sizes are large. By simple calculation, we can see that the log-likelihood increased by a multiplicative factor more than 10 when the sample sizes increased from KM case to KNM case, however, at the same time, the log of sample size only roughly increased from 9 to 11. So we choose the two-component beta mixture distributions for both KM and KNM. And also as we have seen, these distributions have potential good forensic interpretations. 
 
-It’s also helpful to see how the individual components look like in the beta mixture distributions as in Figure \ref{components}. The KNM and KM distributions seem to share a common component while keeping the other components far apart from each other. The separated components represent the ideal cases where the bullet land engraved areas preserved the information of source well and result in clearly distinct separation. The shared components represent the cases where the KM results in lower scores because of some degree of tank rash, pitting, breakoff or other damages on the bullets and the KNM results in higher score because of the random identification effect. According to the estimated prior probabilities, both distributions put less weight on the common component while putting larger weight on the the components characterizing the differences of KM and KNM respectively, which agrees on our expectation that majorities of the distributions are separated while the minorities overlapped. These properties together well explained the observed empirical distribution of similarity scores in our cases. Particularly, the heavier tail of the KM comparisons is explicitly included in the form of the model by one of the components.
+It’s also helpful to see how the individual components look like in the beta mixture distributions as in \autoref{fig:components}. The KNM and KM distributions seem to share a common component while keeping the other components far apart from each other. The separated components represent the ideal cases where the bullet land engraved areas preserved the information of source well and result in clearly distinct separation. The shared components represent the cases where the KM results in lower scores because of some degree of tank rash, pitting, breakoff or other damages on the bullets and the KNM results in higher score because of the random identification effect. According to the estimated prior probabilities, both distributions put less weight on the common component while putting larger weight on the the components characterizing the differences of KM and KNM respectively, which agrees on our expectation that majorities of the distributions are separated while the minorities overlapped. These properties together well explained the observed empirical distribution of similarity scores in our cases. Particularly, the heavier tail of the KM comparisons is explicitly included in the form of the model by one of the components.
 
-\begin{figure}[h]
-    \centering
-    \includegraphics[width=0.5\textwidth]{../code/organized code/generated figures/components.png}
-    \caption{Estimated components}
-    \label{components}
-\end{figure}
+```{r components, out.width="70%", fig.align="center", fig.cap="Estimated-components", fig.keep="hold", fig.pos="h"}
+myfit1n2_simulation %>%
+  ggplot(aes(color = Class)) + 
+  geom_line(aes(x = ccf, y = y1))  +
+  geom_line(aes(x = ccf, y = y2))  +
+  scale_color_discrete(breaks = c("1", "2"), label = c("KM", "KNM")) + 
+  ylab("density")
+```
 
 Application: Determining source in the LAPD data
 =====================
@@ -236,18 +292,117 @@ We evaluate the accuracy under each scenario by using a comparable set of tests 
 Evaluate the error rates
 ================================
 
-(report theoretical error rates)
-
-- given the cutoff point where the two distributions have equal density (also a likelihood ratio with value 1, which does an optimal classification under 0-1 loss? or at the point where the probabilities equal to each other instead of the densities)
-
-- Consider four types of error rates (will need a table to illustrate this): false positive error rate, false negative error rate, false identification error rate, false exclusion error rate.
-
 - Given the iid assumption, could we develop a further model for the bullet level distribution and estimate the corresponding error rates?
 
+Estimating the underlying theoretical error rates is a fundamental challenge in the forensic science [@PCAST2016; @PCAST2016addendum]. The estimation process becomes more straightforward after we finished the distribution estimation. There are many types of error rates can be defined. We focused on the four most used ones, i.e. 1) False positive rate (FPR), 2) False negative rate (FNR), 3) False identification rate (FIR), 4) False exclusion rate (FER), as defined in Table \ref{Error rate table}. FPR and FNR are considered source-specific assessment. They are both probabilities given the ground truth to make false conclusions, which is useful especially when we evaluate an algorithm. FIR and FER are considered decision-specific assessment. They are both probabilities given the algorithm decisions to false claim the actual source, which is useful in real cases when jury is presented with the forensic conclusions to make judgment.
+
+\begin{table}[h]
+\centering
+\begin{tabular}{ |p{1.8cm}||p{3.2cm} |p{3.1cm}| p{2.5cm}|}
+ \hline
+ &\multicolumn{2}{c|}{Ground Truth}&  \\
+ \hline
+    & Match & Non-Match&Error Rate\\
+ \hline
+ Identification & Correctly judged as matches, True Positives (TP) & Incorrectly judged as matches, False Positive (FP)&False ~~~~~~~~~~~~~Identification Rate (FP/(TP + FP))\\
+ \hline
+ Elimination & Incorrectly judged as non-matches, False Negative (FN)& Correctly judged as non-matches, True Negative (TN)&False Exclusion Rate (FN/(TN + FN))\\
+ \hline
+ Error Rate & False Negative Rate (FN/(FN+TP)) & False Positive Rate (FP/(FP + TN))&\\
+ \hline
+\end{tabular}
+\caption{xxxx}
+\label{Error rate table}
+
+\end{table}
+
+The error rates are also affected by the threshold selected to make decisions. In an extreme example, if we are very conservative in making identifications, we can set the threshold to be large enough, say CCF >= 0.99, then the FPR will be 0. But at the same time, the FNR will be 1. It's clear that there are trade-offs between the error rates. So, to make these error rates comparable and consistent, for the current paper, we refer the threshold as the value where the probability densities of KM and KNM distributions equal with each other. This is not a bad choice, since it has good statistical meaning that at this value, the likelihood ratio equals 1 and any deviation from 1 would give preference to a certain decision (as if a threshold). For the two component beta mixture distributions we estimated in last section, this threshold is 0.529. In the application of the algorithms, the threshold need to be carefully chosen where the study of associated error rates will in turn be essential guiding that process.
+
+The four theoretical error rates are directly associated with the distributions we estimated as shown in the \autoref{fig:fnr-fpr} and \autoref{fig:fir-fer}. The estimated values of the error rates are reported in Table \ref{estimated-error-rates}. The FPR is 0.148, while the FNR is 0.301 which is much larger. This means for the given threshold value 0.529, the algorithm has probability 0.148 to misclssify an actual different-sourced pair of land engraved areas (LEAs) into identifications. And the algorithm has a probability 0.301 to misclassify an actual same-sourced pair of land engraved areas (LEAs) into eliminations. The fact that FNR is larger than FPR implies that for the current threshold, we are more likely to misclassify an pair of KM LEAs instead of KNM LEAs. This is partly due to the fact the KM distribution is more spread than the KNM distribution. The FPR will decrease rapidly when increasing the threshold, while the FNR will be small only when the threshold is very low at great cost of FPR. And similar pattern can be observed from FIR and FER. However, these error rates are explained in a totally different view. FIR is 0.212 means when the algorithm reports an identification (to the jury in court potentially), the algorithm could have made wrong claim at probability 0.212. As we aforementioned, the FPR and FNR are used to evaluate algorithms overall while the FIR and FER are used to evaluate a certain result reported.
+
+<!-- 1) False positive rate -->
+<!-- 2) False negative rate -->
+<!-- 3) Negative predictive value/ False identification rate -->
+<!-- 4) False omission rate/ False exclusion rate -->
 
 
+```{r fnr-fpr, out.width="70%", fig.align="center", fig.cap="False Negative Rate(FNR) and False Positive Rate(FPR)", fig.keep="hold", fig.pos="h"}
+# prepare the polygon
+polydata_fnr <- myfit1n2_simulation %>% 
+  filter(ccf<=0.53, Class == "1") %>%
+  select(ccf, y) %>%
+  bind_rows(data.frame(ccf = 0.53, y = 0))
+polydata_fpr <- myfit1n2_simulation %>% 
+  filter(ccf>=0.53, Class == "2") %>%
+  select(ccf, y) %>%
+  bind_rows(data.frame(ccf = 0.53, y = 0))
+polydata_fnrfpr <- bind_rows(polydata_fnr, polydata_fpr, .id = "Class")
+
+myfit1n2_simulation %>%
+  ggplot() + 
+  geom_polygon(aes(x = ccf, y = y, fill = Class), data = polydata_fnrfpr, alpha = 0.5) +
+  geom_vline(xintercept = 0.529, linetype = 2) +
+  geom_line(aes(x = ccf, y = y, color = Class)) +  
+  geom_text(aes(x = ccf, y = y, label = label), data = data.frame(ccf = 0.72, y = 3, label = "Threshold = 0.529")) + 
+  geom_text(aes(x = ccf, y = y, label = label), data = data.frame(ccf = c(0.375, 0.6), y = c(0.5, 0.45), label = c("FNR", "FPR"))) + 
+  scale_color_discrete(breaks = c("1", "2"), label = c("KM", "KNM")) + 
+  scale_fill_discrete(breaks = c("1", "2"), label = c("KM", "KNM")) +
+  ylab("density")
+```
 
 
+```{r fir-fer, out.width="70%", fig.align="center", fig.cap="False Indentification Rate(FIR) and False Exclusion Rate(FER)", fig.keep="hold", fig.pos="h"}
+# prepare the polygon
+polydata_part3 <- myfit1n2_simulation %>%
+  filter(ccf<=0.53)
+
+polydata_part3[1:53,] <- polydata_part3[1:53,] %>% arrange(desc(ccf))
+
+polydata_part4 <- myfit1n2_simulation %>%
+  filter(ccf>=0.53) 
+
+polydata_part4[1:47,] <- polydata_part4[1:47,] %>% arrange(desc(ccf))
+
+polydata_part34 <- bind_rows(polydata_part3 %>% select(ccf, y), polydata_part4 %>% select(ccf, y), .id = "Class")
+polydata_part34 <- polydata_part34 %>% mutate(Class = as.character(as.numeric(Class) + 2))
+
+polydata <- bind_rows(polydata_fnrfpr, polydata_part34)
+
+polydata %>% 
+  ggplot() + 
+  geom_polygon(aes(x = ccf, y = y, group = Class), alpha = 0.1) +
+  geom_text(aes(x = ccf, y = y, label = label), 
+            data = data.frame(ccf = c(0.375, 0.6, 0.375, 0.75), y = c(0.5, 0.45, 2, 1), label = c("A1", "A2", "A3", "A4"))) + 
+  geom_line(aes(x = ccf, y = y, color = Class), data = myfit1n2_simulation) +
+  geom_vline(xintercept = 0.529, linetype = 2) +
+  geom_text(aes(x = ccf, y = y, label = label), data = data.frame(ccf = 0.72, y = 3, label = "Threshold = 0.529")) + 
+  geom_text(aes(x = ccf, y = y, label = label), 
+            data = data.frame(ccf = c(0.15, 0.15), y = c(3.5, 3.2), label = c("FIR = A2/(A2+A4)", "FER = A1/(A1+A3)")))+
+  scale_color_discrete(breaks = c("1", "2"), label = c("KM", "KNM")) + 
+  ylab("density")
+```
+
+\begin{table}[h]
+\centering
+\begin{tabular}{ |p{4.5cm}|p{3cm}|}
+ \hline
+ Type of Error Rates & Estimated Values\\
+ \hline
+ False positive rate (FPR) & ~~~~~~0.148\\
+ \hline
+ False negative rate (FNR)& ~~~~~~0.301\\
+ \hline
+ False identification rate (FIR)& ~~~~~~0.212\\
+ \hline
+ False exclusion rate (FER)& ~~~~~~0.354\\
+ \hline
+\end{tabular}
+\caption{xxxx}
+\label{estimated-error-rates}
+
+\end{table}
+
+Overall, the error rates are not small enough to give confidence to any conclusions. But remember the current comparison discussed is in the land level. In real cases, we will need to combine the land level conclusions to bullet level ones. And this process of combining multiple pieces of evidence will improve the performance greatly. One of the common ways in computer-based bullet analysis is to calculate the sequential average maximum (SAM) [susan's paper and the original paper of SAM?] of land scores. Next, we are going to making use of the KM and KNM distributions in the land level to explore the error rates of the bullet level.
 
 
 Estimations with changing sample size
@@ -291,7 +446,7 @@ knitr::include_graphics("../code/organized code/generated figures/two-component-
 ```
 
 
-
+\clearpage
 
 References {#references .unnumbered}
 ==========
