@@ -216,7 +216,7 @@ It’s also helpful to see how the individual components look like in the beta m
     \label{components}
 \end{figure}
 
-Determining source
+Application: Determining source in the LAPD data
 =====================
 
 In current practice, FTEs  fire two or three test bullets from a suspected firearm using ammunition that matches the evidence found on the crime scene as closely as possible.
@@ -230,7 +230,7 @@ In either of the two scenarios, we derive scores by comparing test fires and the
 
 We evaluate the accuracy under each scenario by using a comparable set of tests with questioned bullets of known origin. 
 
-
+\hh{As test set we are using bullets from the LAPD bullet set: 626 barrels with four fired bullets each. }
 
 
 Evaluate the error rates
