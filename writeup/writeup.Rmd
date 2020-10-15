@@ -101,7 +101,19 @@ In bullet comparisons, an automatic matching algorithm was proposed by Hare [@Ha
 \hh{XXX What does this however refer to?}
 However, due to the limitation of sample sizes and designs of study, a sound distributional assumption about the resulting similarity scores was not well established in the bullet comparison field for automated matching algorithms. The error rates are estimated empirically from dozens of bullets which were originally designed for examiner proficiency tests. And many of those tests are also criticized for the closed-set design and potential information provided to the examiners as pointed out by PCAST [@PCAST2016; @PCAST2016addendum]. It’s important to understand the underlying distributions of the similarity scores to estimate the theoretical error rates of any automatic algorithm. And that also helps later to choose proper thresholds for the methods instead of simply choosing 0.5 (in a 0-1 range of similarity scores) as a belief. 
 
-Generally, in forensic science, we consider the problem of distinguishing two pieces of evidence coming from a same source or different sources. Specifically, in bullet comparisons, we want to know if two bullets are coming from a same gun or not. When shooting a bullet, the barrel will leave markings on the surface of bullets due to the imperfectness of manufacturing. We distinguish land engraved areas (LEA) and groove engraved error areas. And the former is compared by examiners by inspecting the striations under confocal microscopes in labs [@AFTE1992]. And the LEA is also used in the developed computer-based methods. A fired bullet has several LEAs according to the barrels’ design. So, we are not doing one step to identify bullets, instead we consider each LEA and then combine the land level conclusions to a bullet level one. Accordingly, we start our discussion about underlying distributions and error rates from the land level.
+\hh{A sketch of a bullet and a barrel would be good here - showing rifling (grooves and lands) and striation marks. Introduce rifling, Describe LEA and GEA, and structure of LEAs}
+A fired bullet has several LEAs according to the barrels’ design. 
+
+Generally, in forensic science, we consider the problem of distinguishing two pieces of evidence coming from a same source or different sources. Specifically, in bullet comparisons, we want to know if two bullets were fired from the same gun. When shooting a bullet, micro-imperfections inside the barrel leave markings on the surface of a bullet in form of striations. Striations on land engraved areas (LEAs) are used by firearms and toolmarks examiners in comparisons to determine same source of two pieces of evidence [@AFTE1992].
+
+\hh{include paragraph on PCAST and NRC reports: lack of objectivity and error rates}
+
+\hh{Automatic matching algorithms were introduced to address the criticism by PCAST and NRC.} 
+
+\hh{The next paragraph needs to be worked out in more detail. You are getting to densities too fast. First define scores as outcomes of an algorithm, then describe same source density and different source density and (score based) likelihood ratios.} 
+And the LEA is also used in the developed computer-based methods. So, we are not doing one step to identify bullets, instead we consider each LEA and then combine the land level conclusions to a bullet level one. Accordingly, we start our discussion about underlying distributions and error rates from the land level.
+
+
 
 There are two types of distributions we would consider in the bullet comparison cases. One is called known-match (KM) distributions for those actually matched lands. The other is called known-non-match distributions (KNM) for those actually not matched lands. Those two distributions are only available in experimental settings where we know the ground truth. They are the starting point for any discussion about theoretical error rates. And particularly, we consider the cross-correlation function (CCF) for bullet signatures as a typical similarity score with range 0-1 used to distinguish between same source and different source comparisons. The cross-correlation function (CCF) is calculated after extracting the signatures of bullet lands by maximizing the cross correlation of two sequence of signatures by horizontally adjusting the signatures [@vorburger2011]. 
 
@@ -259,6 +271,23 @@ myfit1n2_simulation %>%
   scale_color_discrete(breaks = c("1", "2"), label = c("KM", "KNM")) + 
   ylab("density")
 ```
+
+Application: Determining source in the LAPD data
+=====================
+
+In current practice, FTEs  fire two or three test bullets from a suspected firearm using ammunition that matches the evidence found on the crime scene as closely as possible.
+Test fires are checked for consistency of striation marks between fires. Generally, the bullet with the more well exopressed striations is used to compare to the evidence.
+
+Here, we distinguish between two scenarios: (1) use scores from comparisons of test fires to estimate densities for same source and different source, and (2) use scores with known provenance from a database of similar ammunition and firearms. 
+
+\hh{similar to NIST approach of using a database to derive densities for same source (KM) and different source pairs (KNM) (in a setting of cartridge cases). }
+
+In either of the two scenarios, we derive scores by comparing test fires and the questioned bullet.  
+
+We evaluate the accuracy under each scenario by using a comparable set of tests with questioned bullets of known origin. 
+
+\hh{As test set we are using bullets from the LAPD bullet set: 626 barrels with four fired bullets each. }
+
 
 Evaluate the error rates
 ================================
