@@ -45,7 +45,7 @@ ccf_knm_full_data %>% dim()
 #three components cases, however, for the same reason, we should not worry too much.
 #If we have components more than 3, we should restrict the parameter space explicitly.
 
-mine_betamix <- function(data, par, k, control = NULL, hessian = FALSE){
+mine_betamix <- function(data, par, k, control = list(), hessian = FALSE){
   beta_likelihood <- function(par, data) {
     a1 <- par[1]
     b1 <- par[2]
@@ -152,7 +152,7 @@ ccf_km_c3$convergence
 ccf_knm_c3 <- mine_betamix(data = ccf_knm_full_data$ccf,
                           par = c(0.2, 0.2, 10, 20, 10, 15, 10, 10),
                           k = 3,
-                          control = list(maxit = 1000))
+                          control = list(maxit = 3000))
 ccf_knm_c3$convergence
 
 # plot and see===================================
