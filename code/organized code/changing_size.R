@@ -63,21 +63,11 @@ convergence_n1 <- map(ccf_km_c2_n1, "convergence") %>% unlist()
 ccf_km_c2_n1_converged <- subset(ccf_km_c2_n1, convergence_n1 == 0)
 map(ccf_km_c2_n1_converged, "convergence") %>% unlist() %>% sum()
 
-# get the estimation, should order the components, if we want to compare a single parameter
-ccf_km_c2_n1_con_param <- ccf_km_c2_n1_converged %>% map("par") %>% map(param_trans)
-hist(map_dbl(ccf_km_c2_n1_con_param, .f = function(x) x[1]))
-plot(density(map_dbl(ccf_km_c2_n1_con_param, .f = function(x) x[1])))
-boxplot(map_dbl(ccf_km_c2_n1_con_param, .f = function(x) x[1]))
-boxplot(map_dbl(ccf_km_c2_n1_con_param, .f = function(x) x[2]))
-boxplot(map_dbl(ccf_km_c2_n1_con_param, .f = function(x) x[3]))
-boxplot(map_dbl(ccf_km_c2_n1_con_param, .f = function(x) x[4]))
-boxplot(map_dbl(ccf_km_c2_n1_con_param, .f = function(x) x[5]))
-
 # output a data.frame with all those needed
 ccf_km_c2_n1_data <- lapply(1:5, FUN = function(i) {
   column <- ccf_km_c2_n1_converged %>% map("par") %>% map_dbl(.f = function(x) x[i])
   column
-  })  %>% as.data.frame() %>% set_names(c("p1", "a1", "b1", "a2", "b2"))
+})  %>% as.data.frame() %>% set_names(c("p1", "a1", "b1", "a2", "b2"))
 
 temp_data <- lapply(1:5, FUN = function(i) {
   column <- ccf_km_c2_n1_converged %>% map("par") %>% map(param_trans) %>% map_dbl(.f = function(x) x[i])
@@ -161,10 +151,186 @@ ggExtra::ggMarginal(
   fill = 'gray'
 )
 
-# 2 barrels
+# 2 barrels====================================
+# select the random sample
+set.seed(76565548)
+index_km_n2 <- sample(1:442, 160, replace = FALSE)
 
+ccf_km_c2_n2 <- lapply(1:80, FUN = function(i) {
+  b <- index_km_n2 %>% split(rep(1:80, each = 2)) %>% `[[`(i)
+  
+  selected_data <- c(ccf_km_full[[b[1]]]$ccf, ccf_km_full[[b[2]]]$ccf)
+  model <- mine_betamix(data = selected_data, 
+                        par = c(0.3, 5, 5, 5, 2),
+                        k = 2,
+                        control = list(maxit = 3000),
+                        hessian = FALSE)
+  print(i)
+  model
+})
 
+# find the converged estimation: all converged
+map(ccf_km_c2_n2, "convergence") %>% unlist() %>% sum()
+convergence_n2 <- map(ccf_km_c2_n2, "convergence") %>% unlist()
+ccf_km_c2_n2_converged <- subset(ccf_km_c2_n2, convergence_n2 == 0)
+map(ccf_km_c2_n2_converged, "convergence") %>% unlist() %>% sum()
 
+# output a data.frame with all those needed
+ccf_km_c2_n2_data <- lapply(1:5, FUN = function(i) {
+  column <- ccf_km_c2_n2_converged %>% map("par") %>% map_dbl(.f = function(x) x[i])
+  column
+})  %>% as.data.frame() %>% set_names(c("p1", "a1", "b1", "a2", "b2"))
 
+temp_data <- lapply(1:5, FUN = function(i) {
+  column <- ccf_km_c2_n2_converged %>% map("par") %>% map(param_trans) %>% map_dbl(.f = function(x) x[i])
+  column
+})  %>% as.data.frame() %>% set_names(c("p1", "mu1", "phi1", "mu2", "phi2"))
 
+ccf_km_c2_n2_data <- bind_cols(ccf_km_c2_n2_data, temp_data %>% select(-p1))
+ccf_km_c2_n2_data <- ccf_km_c2_n2_data %>%
+  mutate(mu = p1*mu1 + (1-p1)*mu2)
 
+ccf_km_c2_n2_data_long <- ccf_km_c2_n2_data %>% gather()
+ccf_km_c2_n2_data_long %>% 
+  ggplot(aes(y =value)) + 
+  geom_boxplot() + 
+  facet_wrap(~key, scales = "free")
+
+# to plot
+n2_simulated_data <- lapply(1:nrow(ccf_km_c2_n2_data), FUN = function(i) {
+  output <- simulate_betamix_c2(ccf_km_c2_n2_data[i,] %>% as.numeric())
+  output
+}) %>% bind_rows(.id = "sampleID")
+
+n2_simulated_data %>%
+  ggplot(aes(x = x, y = y, group = rep(1:80, each = 99))) + 
+  geom_line()
+
+# averaged curve (average of the curves (densities), and a 2*(1.96?)*sd band)
+n2_simulated_avg_data <- n2_simulated_data %>%
+  group_by(avg_id = rep(1:99, times = 80)) %>%
+  summarise(x = mean(x),
+            y_avg = mean(y),
+            y_sd = sd(y))
+
+n2_simulated_avg_data %>%
+  mutate(y_low = y_avg - y_sd,
+         y_up = y_avg + y_sd) %>%
+  ggplot() + 
+  geom_line(aes(x = x, y = y_avg)) + 
+  geom_line(aes(x = x, y = y_low), color = "blue", linetype = "dashed") + 
+  geom_line(aes(x = x, y = y_up), color = "blue", linetype = "dashed")
+
+# 3, 4, 5 barrels===================================
+
+# output a list, 
+# [[1]] model, [[2]] parameter data, [[3]] simulated data, 
+# [[4]] boxplot matrix, [[5]] curves, [[6]] averaged and 1-sd-band curve
+
+set.seed(14335256)
+index_km_n3 <- sample(1:442, 240, replace = FALSE)
+index_km_n4 <- sample(1:442, 320, replace = FALSE)
+index_km_n5 <- sample(1:442, 400, replace = FALSE)
+
+changing_size_function <- function(data, index, n) {
+  
+  ccf_km_c2_n2 <- lapply(1:80, FUN = function(i) {
+    b <- index %>% split(rep(1:80, each = n)) %>% `[[`(i)
+    
+    selected_data <- vector()
+    selected_data <- lapply(1:n, FUN = function(x) {
+      output <- c(selected_data, data[[b[x]]]$ccf)
+    }) %>% unlist()
+    
+    model <- mine_betamix(data = selected_data, 
+                          par = c(0.3, 5, 5, 5, 2),
+                          k = 2,
+                          control = list(maxit = 3000),
+                          hessian = FALSE)
+    print(i)
+    model
+  })
+  
+  # find the converged estimation: all converged
+  num_of_unconverged <- map(ccf_km_c2_n2, "convergence") %>% unlist() %>% sum()
+  print("num of converged out of 80 samples: ")
+  print(80-num_of_unconverged)
+  convergence_n2 <- map(ccf_km_c2_n2, "convergence") %>% unlist()
+  ccf_km_c2_n2_converged <- subset(ccf_km_c2_n2, convergence_n2 == 0)
+  map(ccf_km_c2_n2_converged, "convergence") %>% unlist() %>% sum()
+  
+  # output a data.frame with all those needed
+  ccf_km_c2_n2_data <- lapply(1:5, FUN = function(i) {
+    column <- ccf_km_c2_n2_converged %>% map("par") %>% map_dbl(.f = function(x) x[i])
+    column
+  })  %>% as.data.frame() %>% set_names(c("p1", "a1", "b1", "a2", "b2"))
+  
+  temp_data <- lapply(1:5, FUN = function(i) {
+    column <- ccf_km_c2_n2_converged %>% map("par") %>% map(param_trans) %>% map_dbl(.f = function(x) x[i])
+    column
+  })  %>% as.data.frame() %>% set_names(c("p1", "mu1", "phi1", "mu2", "phi2"))
+  
+  ccf_km_c2_n2_data <- bind_cols(ccf_km_c2_n2_data, temp_data %>% select(-p1))
+  ccf_km_c2_n2_data <- ccf_km_c2_n2_data %>%
+    mutate(mu = p1*mu1 + (1-p1)*mu2)
+  
+  ccf_km_c2_n2_data_long <- ccf_km_c2_n2_data %>% gather()
+  p1 <- ccf_km_c2_n2_data_long %>% 
+    ggplot(aes(y =value)) + 
+    geom_boxplot() + 
+    facet_wrap(~key, scales = "free")
+  
+  # to plot
+  n2_simulated_data <- lapply(1:nrow(ccf_km_c2_n2_data), FUN = function(i) {
+    output <- simulate_betamix_c2(ccf_km_c2_n2_data[i,] %>% as.numeric())
+    output
+  }) %>% bind_rows(.id = "sampleID")
+  
+  p2 <- n2_simulated_data %>%
+    ggplot(aes(x = x, y = y, group = rep(1:80, each = 99))) + 
+    geom_line()
+  
+  # averaged curve (average of the curves (densities), and a 2*(1.96?)*sd band)
+  n2_simulated_avg_data <- n2_simulated_data %>%
+    group_by(avg_id = rep(1:99, times = 80)) %>%
+    summarise(x = mean(x),
+              y_avg = mean(y),
+              y_sd = sd(y))
+  
+  p3 <- n2_simulated_avg_data %>%
+    mutate(y_low = y_avg - y_sd,
+           y_up = y_avg + y_sd) %>%
+    ggplot() + 
+    geom_line(aes(x = x, y = y_avg)) + 
+    geom_line(aes(x = x, y = y_low), color = "blue", linetype = "dashed") + 
+    geom_line(aes(x = x, y = y_up), color = "blue", linetype = "dashed")
+  
+  output <- list(model = ccf_km_c2_n2,
+                 param = ccf_km_c2_n2_data,
+                 simulation = n2_simulated_data,
+                 boxplot = p1,
+                 curves = p2,
+                 averaged = p3)
+  output
+}
+
+ccf_km_c2_n3_results <- changing_size_function(data = ccf_km_full,
+                                               index = index_km_n3,
+                                               n = 3)
+ccf_km_c2_n3_results$boxplot
+ccf_km_c2_n3_results$curves
+ccf_km_c2_n3_results$averaged
+
+ccf_km_c2_n4_results <- changing_size_function(data = ccf_km_full,
+                                               index = index_km_n4,
+                                               n = 4)
+ccf_km_c2_n4_results$boxplot
+ccf_km_c2_n4_results$curves
+ccf_km_c2_n4_results$averaged
+
+ccf_km_c2_n5_results <- changing_size_function(data = ccf_km_full,
+                                               index = index_km_n5,
+                                               n = 5)
+ccf_km_c2_n5_results$boxplot
+ccf_km_c2_n5_results$curves
+ccf_km_c2_n5_results$averaged
