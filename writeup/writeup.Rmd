@@ -292,7 +292,7 @@ The results of the experiment show us how the database scenario with well establ
 knitr::include_graphics("../code/organized code/generated figures/matched_km.png")
 ```
 
-```{r non-matched-result, out.width="70%", fig.align="center", fig.cap="matched-km", fig.keep="hold", fig.pos="h"}
+```{r non-matched-result, out.width="70%", fig.align="center", fig.cap="non-matched", fig.keep="hold", fig.pos="h"}
 knitr::include_graphics("../code/organized code/generated figures/nonmatched_result.png")
 ```
 
@@ -431,20 +431,45 @@ Overall, the error rates are not small enough to give confidence to any conclusi
 Estimations with changing sample size
 ================================
 
-(quantify the variation, reproduce some results in the previous sections with changing sample size)
-
 To address the question that how many test fires we need to reach good estimations of the distributions and finally, a good classification result, we will investigate the estimations and error rates in a changing sample size setting. There are two ways we might evaluate the estimations. First, from the statistical view, we can quantify the variation of the estimated curves, and we can set a goal to achieve by as few data as possible. Secondly, from a practical view, we look at the error rate and find a sample size when the error rates converges. 
 
-Design of the study.
+Design of the study. (subject to changes later)
+
+(maybe we need to reduce the replication, since that also reduces variation? Or no replication?)
+
+(With replication, we can quantify variation of of a given number of sample size, without replication, it seems better meet my expectation of convergence)
+
+As in the previous section, we first need to design the experiment based on our available data. The principle is that we would like to make use of as more as possible replications for each given sample size while avoiding the reuse of data as much as possible. And also to make the quantification of variation comparable across different cases, we would like to keep the number of replications the same for any given sample size used in one estimation. Here, I choose the number of replications as 80, which means for each given sample size, we replicate the estimation 80 times with different sets of data. And in this case, for sample size less than 6, there are no data reused in any sets, for sample size greater or equal to 6, there will be data reused in two estimations. Then we must be careful about the effect of the reuse of data.
+
 
 In the study of the both type of convergence, we also study the behaviors of the two components and evaluate the functional form of the distributions as well.
 
 
 We will reproduce the some results in the previous sections: 1. application section
 
+```{r change-size-mu1mu2mu, out.width="70%", fig.align="center", fig.cap="change-size-mu1mu2mu", fig.keep="hold", fig.pos="h"}
+knitr::include_graphics("../code/organized code/generated figures/change_size_mu1mu2mu.png")
+```
+
+```{r change-size-var1var2var, out.width="70%", fig.align="center", fig.cap="change-size-var1var2var", fig.keep="hold", fig.pos="h"}
+knitr::include_graphics("../code/organized code/generated figures/change_size_var1var2var.png")
+```
+
+```{r change-size-p1, out.width="70%", fig.align="center", fig.cap="change-size-p1", fig.keep="hold", fig.pos="h"}
+knitr::include_graphics("../code/organized code/generated figures/change_size_p1.png")
+```
+
+```{r nchange-size-mu1mu2, out.width="70%", fig.align="center", fig.cap="change-size-mu1mu2", fig.keep="hold", fig.pos="h"}
+knitr::include_graphics("../code/organized code/generated figures/change_size_mu1mu2.png")
+```
+
+[figure of mean convergence]
+
+[figure of variance convergence]
+
 [A quantity to judge the convergence of the distribution, and the plot]
 
-[A plots of the error rates convergence]
+[A plot of the error rates convergence]
 
 
 
