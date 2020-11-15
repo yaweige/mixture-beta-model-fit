@@ -302,6 +302,8 @@ knitr::include_graphics("../code/organized code/generated figures/nonmatched_res
 
 [compare this section with nex section, for KM, they are pretty close]
 
+[what about thresholds and likelihood ratios themselves]
+
 
 
 In this paper, we use the CCF as the similarity score..
