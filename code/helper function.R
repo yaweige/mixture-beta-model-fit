@@ -1,3 +1,22 @@
+# find the cutoff where the pdfs crossing
+find_cross <- function(m1, m2, start = 0.4, end =  0.7, step = 0.0001){
+  a <- 1
+  b <- 2
+  x <- start
+  while(abs(a - b)>=0.002) {
+    x <- x + step
+    a <- dbetamix2(x, m1)
+    b <- dbetamix2(x, m2)
+    
+    if (x > end){
+      print("failed to find the point, out of bound")
+      break
+    }
+  }
+  x
+}
+
+
 ## beta mixture params extractor(produce Beta(alpha, beta))
 # note: unlike cv_summary, this function didn't reorder the components according to their means
 # use cv_summary instead if not just want to see the result
@@ -29,6 +48,20 @@ pbetamix <- function(x, model){
   
   cdf
 }
+# for "optim-model"
+pbetamix2 <- function(x, model){
+  p1 <- model$par[1]
+  p2 <- 1 - model$par[1]
+  a1 <- model$par[2]
+  b1 <- model$par[3]
+  a2 <- model$par[4]
+  b2 <- model$par[5]
+  
+  pdf <- p1*pbeta(x, shape1 = a1, shape2 = b1) + 
+    p2*pbeta(x, shape1 = a2, shape2 = b2)
+  
+  pdf
+}
 
 # similarly, for pdf
 dbetamix <- function(x, model){
@@ -38,6 +71,21 @@ dbetamix <- function(x, model){
   
   pdf <- p1*dbeta(x, shape1 = params[[1]][[1]], shape2 = params[[1]][[2]]) + 
     p2*dbeta(x, shape1 = params[[2]][[1]], shape2 = params[[2]][[2]])
+  
+  pdf
+}
+
+# similarly, for pdf, for optim-model
+dbetamix2 <- function(x, model){
+  p1 <- model$par[1]
+  p2 <- 1 - model$par[1]
+  a1 <- model$par[2]
+  b1 <- model$par[3]
+  a2 <- model$par[4]
+  b2 <- model$par[5]
+  
+  pdf <- p1*dbeta(x, shape1 = a1, shape2 = b1) + 
+    p2*dbeta(x, shape1 = a2, shape2 = b2)
   
   pdf
 }
@@ -57,7 +105,7 @@ rbetamix <- function(n, p1, a1, b1, a2, b2){
 # A function to produce the quantile given a probabilty
 # a temporal one can be used 
 qbetamix <- function(x, model){
-# objective function
+  # objective function
   distance <- function(par, x, model){
     abs(pbetamix(par, model = model) - x)
   }
@@ -149,7 +197,7 @@ simulate_bitamix <- function(model) {
     simulated <- data.frame(xlab = 1:99/100,
                             y = dbeta(1:99/100, shape1 = params[[1]][[1]], shape2 = params[[1]][[2]]))
   }
-
+  
   simulated
 }
 
@@ -254,7 +302,7 @@ land_score_km_generator2 <- function(dir, FAUno = NULL, firstno = NULL, remove =
   output <- lapply(files, function(x) {
     comp_manual_fau <- readRDS(x)
     features_fau <- comp_manual_fau %>% tidyr::unnest(legacy_features)
-    features_slc <- features_fau %>% select(bullet1, bullet2, landA, landB, ccf)
+    features_slc <- features_fau %>% select(bullet1, bullet2, landA, landB, ccf, land1, land2)
     
     reference <- list(n1 = data.frame(landA = 1:6, landB = 1:6),
                       n2 = data.frame(landA = 1:6, landB = rep(1:6, times = 2)[2:7]),
@@ -275,7 +323,7 @@ land_score_km_generator2 <- function(dir, FAUno = NULL, firstno = NULL, remove =
     # reduced duplicated ones, but it doesn't affect the distribution
     output <- features_sum %>% 
       filter(as.numeric(factor(bullet1)) > as.numeric(factor(bullet2))) %>%
-      select(ccf, bullet1, bullet2)
+      select(ccf, bullet1, bullet2, land1, land2)
     
     output
   })
@@ -302,7 +350,7 @@ land_score_knm_generator2 <- function(dir, FAUno = NULL, firstno = NULL, remove 
   output <- lapply(files, function(x) {
     comp_manual_fau <- readRDS(x)
     features_fau <- comp_manual_fau %>% tidyr::unnest(legacy_features)
-    features_slc <- features_fau %>% select(bullet1, bullet2, landA, landB, ccf)
+    features_slc <- features_fau %>% select(bullet1, bullet2, landA, landB, ccf, land1, land2)
     
     reference <- list(n1 = data.frame(landA = 1:6, landB = 1:6),
                       n2 = data.frame(landA = 1:6, landB = rep(1:6, times = 2)[2:7]),
@@ -324,7 +372,7 @@ land_score_knm_generator2 <- function(dir, FAUno = NULL, firstno = NULL, remove 
     output <- features_sum %>% 
       filter(as.numeric(factor(bullet1)) >= as.numeric(factor(bullet2))) %>%
       filter(as.numeric(factor(bullet1)) > as.numeric(factor(bullet2))|as.numeric(factor(landA)) > as.numeric(factor(landB))) %>%
-      select(ccf, bullet1, bullet2)
+      select(ccf, bullet1, bullet2, land1, land2)
     
     output
   })
