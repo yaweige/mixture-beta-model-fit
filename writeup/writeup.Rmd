@@ -73,8 +73,8 @@ myfit3n4_simulation <- bind_rows(myfit3_simulation, myfit4_simulation, .id = "Cl
 ```
 
 ```{r prepare-data2}
-ccf_km_full <- readRDS("../data/organized data/ccf/ccf_km_full.rds")
-ccf_knm_full <- readRDS("../data/organized data/ccf/ccf_knm_full.rds")
+ccf_km_full <- readRDS("../data/organized data/ccf-related/ccf_km_full.rds")
+ccf_knm_full <- readRDS("../data/organized data/ccf-related/ccf_knm_full.rds")
 
 ccf_km_full_data <- bind_rows(ccf_km_full)
 ccf_knm_full_data <- bind_rows(ccf_knm_full)
@@ -275,18 +275,18 @@ myfit1n2_simulation %>%
 Application: Determining source in the LAPD data
 =====================
 
-In current practice, FTEs  fire two or three test bullets from a suspected firearm using ammunition that matches the evidence found on the crime scene as closely as possible.
-Test fires are checked for consistency of striation marks between fires. Generally, the bullet with the more well expressed striations is used to compare to the evidence. With an automated algorithm in these cases as a tool helping the examiners, we will make use all those available test bullets and lands to generate similarity scores. And those scores will be used to get score-based likelihood ratios which will quantify the strength of evidence supporting either hypothesis from the prosecution side or the defendant side. The critical step of producing likelihood ratio is to get estimations of the distributions of both KM and KNM comparisons.
+In the current practice, FTEs  fire two or three test bullets from a suspected firearm using ammunition that matches the evidence found on the crime scene as closely as possible.
+Test fires are checked for consistency of striation marks between fires. Generally, the bullet with the more well expressed striations is used to compare to the evidence. With an automated algorithm in these cases as a tool helping the examiners, we will make use of all those available test bullets and lands to generate similarity scores. And those scores will be used to get score-based likelihood ratios which will quantify the strength of evidence supporting either hypothesis from the prosecution side or the defendant side. The critical step of producing likelihood ratio is to get estimations of the distributions of both KM and KNM comparisons.
 
-Here, we distinguish between two scenarios: 1) use scores from comparisons of test fires to estimate densities for same source and different source, and 2) use scores with known provenance from a database of similar ammunition and firearms. The second scenario is where our analysis of the theoretical distributions of the relevant population of similarity scores stand out. For a similar combination of firearms and ammunition, the similarity scores extracted through a same algorithm are considered identically distributed and comprise the relevant population, which is not a bad idea. In real cases, as stated, we can only make use of similarity scores from two or three test fires. This is good enough to produce valid comparisons but likely not good enough to estimate the distributions which generate the likelihood ratios. Besides the likelihood ratio, the reference distributions are also important in deciding thresholds and control the error rates. For threshold specifically, we choose the point where the likelihood ratio is 1 which has no preference for either hypothesis.
+Here, we distinguish between two scenarios: 1) use scores from comparisons of test fires to estimate densities for same source and different source, and 2) use scores with known provenance from a database of similar ammunition and firearms. The second scenario is where our analysis of the theoretical distributions of the relevant population of similarity scores stand out. For a similar combination of firearms and ammunition, the similarity scores extracted through a same algorithm are considered identically distributed and comprise the relevant population, which is not a bad idea. In real cases, as stated, we can only make use of similarity scores from two or three test fires. This is good enough to produce valid comparisons but likely not good enough to estimate the distributions which generate the likelihood ratios. Besides the likelihood ratio calculation, the reference distributions are also important in deciding thresholds and control the error rates. For thresholds specifically, we choose the point where the likelihood ratio is 1 which has no preference for either hypothesis.
 
 In either of the two scenarios, we derive scores by comparing test fires and the questioned bullet. The pipeline of the process is as follows: 1) given a questioned bullet and a suspected firearm, 2) conduct test fires with the suspected firearm and collect three test fired bullets, 3) for every pair of bullets (including the questioned), we conduct all possible land comparisons and get 36 land comparison scores (6 land engraved areas on each bullet), 4) among 36 comparisons within a pair of bullets, we select the six comparisons as KM comparisons (for comparisons among test fired bullets) or questioned land comparisons (for comparisons between the questioned bullet and any test fired bullet) by SAM [reference] due to the nature order of land engraved areas produced by a same barrels. Then, for the first scenario, the KM and KNM distributions will be estimated with the KM and KNM similarity scores among the test fired bullets respectively. While for the second scenario, the distributions are estimated with a database of the similarity scores from similar firearms and ammunition.
 
 To show the usefulness of the relevant population and the better distribution estimations by using a database, we design an experiment with our LAPD data set. We randomly split our data into the database sets and case sets. For the database sets, we conduct every comparison within each set (among four bullets), and estimate the KM and KNM reference distribution as two component beta mixture distributions with all available data. For the case sets, we randomly choose one bullet out of each set (four bullets a set) as a questioned bullets and leave the other three as test fired bullets. By compare the questioned bullet with the other three from the sets, we get known-matched bullet comparisons. By randomly matching the questioned bullets with the test fired bullets (except its own set and simple exchanges of bullets between two sets), we get known-non-matched bullet comparisons. One important question is how many sets of bullets should be assigned as database sets since we would like to keep it small but sufficient and put more data into case sets to evaluate the performance. And also, this is an important question in general that how many test fires do we need in general firearm forensic practice. We will dig into this issue in the later section. But for now, we split the 442 sets into 342 database sets and 100 test sets.
 
-Following the above procedure, we have 100 questioned bullets (same bullets in same and different source cases), 100 same source question-test pairs, 100 different source question-test pairs. For each questioned bullet in either case (same or different source), we have 18 questioned land comparisons. For the database scenario, we have 342x36 = 12312 known matched land comparisons, and 342x240 = 82080 known non-matched land comparisons. For each individual case, we have 18 known matched land comparisons (among test bullets), and 125 known non-matched land comparisons. [may be summarized in a table, and for the specific counts, we will provide details of that when introducing the LAPD data set]
+Following the above procedure, we have 100 questioned bullets (same bullets in same and different source cases), 100 same source question-test pairs, 100 different source question-test pairs. For each questioned bullet in either case (same or different source), we have 18 questioned land comparisons. For the database scenario, we have 342x36 = 12312 known matched land comparisons, and 342x240 = 82080 known non-matched land comparisons. For the individual case scenario, we have 18 known matched land comparisons (among test bullets), and 125 known non-matched land comparisons. [may be summarized in a table, and for the specific counts, we will provide details of that when introducing the LAPD data set]
 
-The results of the experiment show us how the database scenario with well established density estimations improve the over-all accuracy. As shown in Fig/Table...
+The results of the experiment show us how the database scenario with well established density estimations improve the over-all accuracy. As shown in \autoref{fig:matched-km}, the left boxplot represents the the individual case scenario where everything is calculated and predicted based on one questioned bullet and three test fired bullets. The right boxplot represents the database scenario where the similarity scores among one questioned bullet and three test fired bullets are evaluated based on a relevant database. \autoref{fig:matched-km} is based on the matched bullets, in which case all the comparisons of lands are actually matches. For each boxplot, there are one hundred points (number of questioned bullets), and each point represents the proportion of correct predictions (i.e. matched lands) of one questioned bullet and the corresponding three test fired bullets based on total eighteen land-land comparisons as shown in y-axis. \autoref{fig:non-matched-result} is formed similar to \autoref{fig:matched-km}, but all the land-land comparisons are non-matched comparisons based on non-matched bullets. And in \autoref{fig:non-matched-result} the y-axis is the proportion of correctly predicted non-matched lands. The results of the experiments are very strong support of making use of a relevant database for automated algorithms. In \autoref{fig:matched-km}, the evaluation based on an individual set are a little better than using of the database because of its more aggressive and data specific way of calculating likelihood ratio and selection of thresholds. But that improvement is little comparing with the significant loss of the accuracy in correctly identifying the non-matched land-land comparisons. \autoref{fig:non-matched-result} implies that it makes no sense of using the individual case calculation to do prediction for non-matched bullet comparisons, while the database scenario works much better and even better than the two results of the matched bullet case, which meets our expectation of a more concentrated KNM distribution than the KM distribution.
 
 ```{r matched-km, out.width="70%", fig.align="center", fig.cap="matched-km", fig.keep="hold", fig.pos="h"}
 knitr::include_graphics("../code/organized code/generated figures/matched_km.png")
@@ -433,9 +433,11 @@ Overall, the error rates are not small enough to give confidence to any conclusi
 Estimations with changing sample size
 ================================
 
-To address the question that how many test fires we need to reach good estimations of the distributions and finally, a good classification result, we will investigate the estimations and error rates in a changing sample size setting. There are two ways we might evaluate the estimations. First, from the statistical view, we can quantify the variation of the estimated curves, and we can set a goal to achieve by as few data as possible. Secondly, from a practical view, we look at the error rate and find a sample size when the error rates converges. 
+To address the question that how many test fires we need to reach good estimations of the distributions in a database and finally, a good classification result, we will investigate the estimations and error rates in a changing sample size setting. There are two ways we might evaluate the estimations. First, from a statistical view, we can quantify the variation of the estimated curves, and find the minimum requirement to get the estimation converged. From a practical view, we look at the error rate and find a sample size when the error rates converges. Then, we can make sure to get reliable estimations of the densities and reliable performance of making predictions with likelihood ratios.
 
 Design of the study. (subject to changes later)
+
+We design a study to evaluate the effect of data sizes. As in the previous sections, we are using the LAPD data sets. And set the unit of data size as a set of four same source bullets as the case of LAPD and in general, the way of forming a data base. It's worth noting that any meaning statistical results rely on replications. But we must be careful that as the used sample size in a single trial increase, the replications can require very large data sets. Otherwise, the heavy reuse of data could cause high dependence among the results and lead to false conclusions. We are using a approach that is adopted in machine learning field of dealing with this issue. Instead of using different samples at each given sample size, we are adding new data to the existing pool of used data. This also meets the sequential convergence pattern in a statistical sense perfectly. And when the addition of new data doesn't significantly change some adopted measurements of our goal, then we find the minimum number of sample size reaching that stage. And we also repeat the above process with ten randomly selected sequences, which further investigates the data specific effect in the process and it is harder to see all the sequences converged uniformly to a same reasonable small interval.
 
 (maybe we need to reduce the replication, since that also reduces variation? Or no replication?)
 
@@ -479,36 +481,6 @@ Conclusion
 ==================================
 
 
-```{r, include=FALSE}
-library(ggplot2)
-fau330_combined_A_observed <- readRDS("../data/fau330_combined_A_observed.rds")
-fau330_combined_noA_simulated <- readRDS("../data/fau330_combined_noA_simulated.rds")
-fau330_combined_A_rf_observed <- readRDS("../data/fau330_combined_A_rf_observed.rds")
-fau330_combined_noA_rf_simulated <- readRDS("../data/fau330_combined_noA_rf_simulated.rds")
-```
-
-```{r, fig.cap="Densities from training, rugs from test (ccf)", out.width="70%", fig.keep="hold", fig.align='center', include=FALSE}
-ggplot() + 
-  geom_line(data = fau330_combined_noA_simulated, 
-            mapping = aes(x = ccf, y = y, color = id)) + 
-  geom_rug(data = fau330_combined_A_observed, 
-           mapping = aes(x = ccf, color = id), alpha = 0.3) +
-  ggtitle("FAU330: rugs with A, densities without A (ccf)")
-```
-
-```{r, fig.cap="Densities from training, rugs from test (rfscore)", out.width="70%", fig.keep="hold", fig.align='center', include=FALSE}
-ggplot() + 
-  geom_line(data = fau330_combined_noA_rf_simulated, 
-            mapping = aes(x = rfscore, y = y, color = id)) + 
-  geom_rug(data = fau330_combined_A_rf_observed, 
-           mapping = aes(x = rfscore, color = id), alpha = 0.3) +
-  ggtitle("FAU330: rugs with A, densities without A (RF)")
-```
-
-
-```{r, fig.cap="rf_full_2components_combined", out.width="70%", fig.keep="hold", fig.align='center', include=FALSE}
-knitr::include_graphics("../code/organized code/generated figures/two-component-betamix.png")
-```
 
 
 \clearpage

@@ -16,5 +16,5 @@ Corresponding to the theoretical error rate section of the writeup, based on the
 The application section in writeup
 
 # 6. changing_size.R (under updating)
-The changing size/ sample size/sensitivity section in the writeup
+The changing size/sample size/sensitivity section in the writeup
 
