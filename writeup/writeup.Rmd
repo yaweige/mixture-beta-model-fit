@@ -433,21 +433,35 @@ Overall, the error rates are not small enough to give confidence to any conclusi
 Estimations with changing sample size
 ================================
 
-To address the question that how many test fires we need to reach good estimations of the distributions in a database and finally, a good classification result, we will investigate the estimations and error rates in a changing sample size setting. There are two ways we might evaluate the estimations. First, from a statistical view, we can quantify the variation of the estimated curves, and find the minimum requirement to get the estimation converged. From a practical view, we look at the error rate and find a sample size when the error rates converges. Then, we can make sure to get reliable estimations of the densities and reliable performance of making predictions with likelihood ratios.
+To address the question that how many test fires we need to reach good estimations of the distributions in a database and finally, a good classification result with controlled error rates, we will investigate the estimations and error rates in a changing sample size setting. There are two ways we might evaluate the estimations. First, from a statistical view, we can quantify the variation of the estimated curves, and find the minimum requirement to make the estimation converge. From a practical view, we look at the error rate and find a sample size when the error rates converge. Then, we can make sure to get reliable estimations of the densities and reliable performance of making predictions with likelihood ratios.
 
-Design of the study. (subject to changes later)
+We design a study to evaluate the effect of data sizes. As in the previous sections, we are using the LAPD data sets. And set the unit of data size as a set of four same source bullets as in the case of LAPD and in general, the way of forming a data base. It's worth noting that any meaningful statistical results rely on replications. But we must be careful that as the used sample size in a single trial increases, the replications can require very large data sets. Otherwise, the heavy reuse of data could cause high dependence among the results and lead to false conclusions. We are using a approach that is adopted in machine learning field of dealing with this issue. Instead of using different samples at each fixed sample size to achieve replications, we are adding new data to the existing pool of used data to achieve replications by sequentially fitting the model. This also meets the sequential convergence pattern in a statistical sense perfectly. when the addition of new data doesn't significantly change some adopted measurements of our goal, then we find the minimum number of sample size reaching that stage. And additionally, we also repeat the above process with ten randomly selected sequences, which further investigates the data specific effect in the process and it is harder to see all the sequences converged uniformly to a same reasonable small interval. So we also introduce different levels of convergence to formulate the conclusions.
 
-We design a study to evaluate the effect of data sizes. As in the previous sections, we are using the LAPD data sets. And set the unit of data size as a set of four same source bullets as the case of LAPD and in general, the way of forming a data base. It's worth noting that any meaning statistical results rely on replications. But we must be careful that as the used sample size in a single trial increase, the replications can require very large data sets. Otherwise, the heavy reuse of data could cause high dependence among the results and lead to false conclusions. We are using a approach that is adopted in machine learning field of dealing with this issue. Instead of using different samples at each given sample size, we are adding new data to the existing pool of used data. This also meets the sequential convergence pattern in a statistical sense perfectly. And when the addition of new data doesn't significantly change some adopted measurements of our goal, then we find the minimum number of sample size reaching that stage. And we also repeat the above process with ten randomly selected sequences, which further investigates the data specific effect in the process and it is harder to see all the sequences converged uniformly to a same reasonable small interval.
+The figures/tables...
 
-(maybe we need to reduce the replication, since that also reduces variation? Or no replication?)
+[A plot: choose a statistical measurement, lines]
 
-(With replication, we can quantify variation of of a given number of sample size, without replication, it seems better meet my expectation of convergence)
+```{r bd, out.width="70%", fig.align="center", fig.cap="Bhattacharyya Distance", fig.keep="hold", fig.pos="h"}
+knitr::include_graphics("../code/organized code/generated figures/bd.png")
+```
 
-As in the previous section, we first need to design the experiment based on our available data. The principle is that we would like to make use of as more as possible replications for each given sample size while avoiding the reuse of data as much as possible. And also to make the quantification of variation comparable across different cases, we would like to keep the number of replications the same for any given sample size used in one estimation. Here, I choose the number of replications as 80, which means for each given sample size, we replicate the estimation 80 times with different sets of data. And in this case, for sample size less than 6, there are no data reused in any sets, for sample size greater or equal to 6, there will be data reused in two estimations. Then we must be careful about the effect of the reuse of data.
+[A plot: show the threshold, lines]
 
+```{r threshold, out.width="70%", fig.align="center", fig.cap="Threshold", fig.keep="hold", fig.pos="h"}
+knitr::include_graphics("../code/organized code/generated figures/threshold.png")
+```
 
-In the study of the both type of convergence, we also study the behaviors of the two components and evaluate the functional form of the distributions as well.
+[A plot: show the error rates of two types(false positive and false negative), lines, with the full data error rates as horizontal lines, faceted by the two types of error rates]
 
+```{r error, out.width="70%", fig.align="center", fig.cap="Error", fig.keep="hold", fig.pos="h"}
+knitr::include_graphics("../code/organized code/generated figures/error.png")
+```
+
+(try different model for KNM? like one component?)
+
+(In the study of the both types of convergence, we also study the behaviors of the two components and evaluate the functional form of the distributions as well.)
+
+(The convergence of thresholds depends on the convergence of both curves, more demanding)
 
 We will reproduce the some results in the previous sections: 1. application section
 
