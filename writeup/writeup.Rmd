@@ -443,23 +443,29 @@ We design a study to evaluate the effect of data sizes. As in the previous secti
 
 \autoref{fig:error} shows the false negative error rates and the false positive error rates. Similar to the thresholds behavior, the error rate has two stages of converges at about 5 sets and 60 sets of data. But in this figure, the y-axis has the exact practical meaning of error rates and we can quantify how large that variation related to the sample sizes means to us. And after 60 sets of data, the error rates are in reasonably small intervals and the cost of further improvement is high. And we also stress the point of different levels of convergence, a database with 60 sets of data can give predictions almost converged to a number and tens of sets of additional data won't change that significantly. The further convergence of different databases to a same number is more demanding and pretty slow. The range of the interval after 60 sets of data is about 0.045 which means that the most extreme difference of the error rates achieved with different database is 0.04 (larger in false positive and smaller in false negative error rates) for each land to land comparison.
 
-[A plot: choose a statistical measurement, lines]
 
 ```{r bd, out.width="70%", fig.align="center", fig.cap="Bhattacharyya Distance", fig.keep="hold", fig.pos="h"}
 knitr::include_graphics("../code/organized code/generated figures/bd.png")
 ```
 
-[A plot: show the threshold, lines]
 
 ```{r threshold, out.width="70%", fig.align="center", fig.cap="Threshold", fig.keep="hold", fig.pos="h"}
 knitr::include_graphics("../code/organized code/generated figures/threshold.png")
 ```
 
-[A plot: show the error rates of two types(false positive and false negative), lines, with the full data error rates as horizontal lines, faceted by the two types of error rates]
 
 ```{r error, out.width="70%", fig.align="center", fig.cap="Error", fig.keep="hold", fig.pos="h"}
 knitr::include_graphics("../code/organized code/generated figures/error.png")
 ```
+
+To conclude the section, we might ask for 5 sets of bullets as the minimum requirement of a meaningful database. Further, 60 sets of bullets could significantly improve the performance. But further improvement can be very expensive.
+
+
+
+
+
+
+
 
 (try different model for KNM? like one component?)
 
@@ -467,7 +473,7 @@ knitr::include_graphics("../code/organized code/generated figures/error.png")
 
 (The convergence of thresholds depends on the convergence of both curves, more demanding)
 
-We will reproduce the some results in the previous sections: 1. application section
+(We will reproduce the some results in the previous sections: 1. application section?)
 
 ```{r change-size-mu1mu2mu, out.width="70%", fig.align="center", fig.cap="change-size-mu1mu2mu", fig.keep="hold", fig.pos="h"}
 knitr::include_graphics("../code/organized code/generated figures/change_size_mu1mu2mu.png")
