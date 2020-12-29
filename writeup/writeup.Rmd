@@ -87,41 +87,50 @@ ccf_knm_full_data <- ccf_knm_full_data %>% filter(ccf < 0.90)
 Introduction
 ====================================
 
-Firearm examination is an important topic in forensic science to \yg{help identify if two pieces of firearm evidence are from a same source or not by examining the characteristics on the evidence left by the firearms.} \hh{XXX go into a bit more detail on what you mean by the underlying pattern} Currently, those examinations are executed in forensic labs by Firearms and Toolmark Examiners (FTEs) under the regulation of AFTE [@AFTE1992]. However, this process is in its nature based on human decisions and therefore subjective. \yg{The National Research Countcil called out this subjectivity in conventional firearm identification processes to be reduced or to be complemented by more objective procedures} [@Council2009]. The President’s Council of Advisers on Science and Technology (PCAST) also emphasized the importance to establish the scientific validity and reliability of subjective forensic feature-comparison methods by blind empirical test [@PCAST2016]. The PCAST report also recognized the importance of developing of objective computer-based algorithms in its following addendum [@PCAST2016addendum].
+Firearm examination is an important topic in forensic science to help identify if two pieces of firearm evidence are from a same source or not by examining the characteristics on the evidence left by the firearms.  Currently, those examinations are executed in forensic labs by Firearms and Toolmark Examiners (FTEs) under the regulation of AFTE [@AFTE1992]. However, this process is in its nature based on human decisions and therefore subjective. The National Research Council criticized this subjectivity in the conventional firearm identification process and called for it to be reduced or to be complemented by more objective procedures [@Council2009]. The President’s Council of Advisers on Science and Technology (PCAST) also emphasized the importance to establish the scientific validity and reliability of subjective forensic feature-comparison methods by blind empirical testing [@PCAST2016]. Additionally, the PCAST report recognized the importance of developing of objective computer-based algorithms in its following addendum [@PCAST2016addendum].
 
-In \hh{response to this criticism, subsequent research on } cartridge case comparisons introduced the method of  congruent matching cells (CMC) [@Song2015], which \hh{allows a quantitative assessment of the similarity of two breech face impressions.} Theoretical error rates of CMC were analyzed by @Song2018 and @Zhang2019 on \yg{the data set of} @Fadul2011 based on \yg{the beta-binomial model and the correlated binomial model}. \hh{XXX could you expand on those distributional models?}.
+In response to this criticism, subsequent research on cartridge case comparisons introduced the method of  congruent matching cells (CMC) [@Song2015], which allows a quantitative assessment of the similarity of two breech face impressions. Theoretical error rates of CMC were analyzed by @Song2018 and @Zhang2019 on the data set of @Fadul2011 based on variants of a binomial model. 
 
 
 \hh{XXX xiao-hue Tai's paper should be mentioned.}
 
 \hh{XXX mention the data that all of these methods are based on.}
 
-In bullet comparisons, an automatic matching algorithm was proposed by Hare [@Hare2016]. The discussion about the degraded land comparison was also made in the following paper [@Hare2017]. The empirical error rates associated with this method based on three test sets are discussed by Vanderplas [@Vanderplas2020]. The most prominent single feature in the random forest proposed by Hare [@Hare2016] is the cross-correlation function [@vorburger2011] according to the empirical studies [@Vanderplas2020; @Hare2016]. Other automated comparison methods or improvement such as Robust LOESS in groove engraved area identification [@Rice2020], Chumbley score method [@Krishnan2019] are also proposed. 
+In bullet comparisons, an automatic matching algorithm was proposed by @Hare2016. <!--The discussion about the degraded land comparison was also made in the following paper [@Hare2017].--> Empirical error rates associated with this method are discussed by @Vanderplas2020  based on three test sets . The most prominent single feature in the random forest model is the cross-correlation function, previously identified as important in other methods of similarity assessment [@chumbley; @vorburger2011; @Krishnan2019; @cmps]. }
+<!--Other automated comparison methods or improvement such as Robust LOESS in groove engraved area identification [@Rice2020], Chumbley score method [@Krishnan2019] are also proposed. -->
 
-\hh{XXX What does this however refer to?}
-However, due to the limitation of sample sizes and designs of study, a sound distributional assumption about the resulting similarity scores was not well established in the bullet comparison field for automated matching algorithms. The error rates are estimated empirically from dozens of bullets which were originally designed for examiner proficiency tests. And many of those tests are also criticized for the closed-set design and potential information provided to the examiners as pointed out by PCAST [@PCAST2016; @PCAST2016addendum]. It’s important to understand the underlying distributions of the similarity scores to estimate the theoretical error rates of any automatic algorithm. And that also helps later to choose proper thresholds for the methods instead of simply choosing 0.5 (in a 0-1 range of similarity scores) as a belief. 
+\hh{One less well investigated aspect of the cross-correlation measure, however, is its distribution.}
+Due to  limitation of sample sizes and study designs, a sound distributional assumption about the resulting similarity scores is not well established in the bullet comparison field for automated matching algorithms. Error rates are generally estimated empirically from only dozens of bullets originally used in examiner proficiency tests. And many of those tests are also criticized for the closed-set design and potential information provided to the examiners as pointed out by PCAST [@PCAST2016; @PCAST2016addendum]. It is important to understand the underlying distributions of the similarity scores to estimate the theoretical error rates of any automatic algorithm. And that also helps later to choose proper thresholds for the methods instead of simply choosing a \hh{threshold to distinguish between same and different source.} <!--0.5 (in a 0-1 range of similarity scores) as a belief. -->
+
+\hh{XXX Let's end the introduction here with a  paragraph on the structure of the rest of the paper.}
+
+In section 2... In section 3...
+
+
+Background
+====
+
 
 \hh{A sketch of a bullet and a barrel would be good here - showing rifling (grooves and lands) and striation marks. Introduce rifling, Describe LEA and GEA, and structure of LEAs}
 A fired bullet has several LEAs according to the barrels’ design. 
 
 Generally, in forensic science, we consider the problem of distinguishing two pieces of evidence coming from a same source or different sources. Specifically, in bullet comparisons, we want to know if two bullets were fired from the same gun. When shooting a bullet, micro-imperfections inside the barrel leave markings on the surface of a bullet in form of striations. Striations on land engraved areas (LEAs) are used by firearms and toolmarks examiners in comparisons to determine same source of two pieces of evidence [@AFTE1992].
 
-\hh{include paragraph on PCAST and NRC reports: lack of objectivity and error rates}
 
-\hh{Automatic matching algorithms were introduced to address the criticism by PCAST and NRC.} 
 
 \hh{The next paragraph needs to be worked out in more detail. You are getting to densities too fast. First define scores as outcomes of an algorithm, then describe same source density and different source density and (score based) likelihood ratios.} 
 And the LEA is also used in the developed computer-based methods. So, we are not doing one step to identify bullets, instead we consider each LEA and then combine the land level conclusions to a bullet level one. Accordingly, we start our discussion about underlying distributions and error rates from the land level.
 
 
 
-There are two types of distributions we would consider in the bullet comparison cases. One is called known-match (KM) distributions for those actually matched lands. The other is called known-non-match distributions (KNM) for those actually not matched lands. Those two distributions are only available in experimental settings where we know the ground truth. They are the starting point for any discussion about theoretical error rates. And particularly, we consider the cross-correlation function (CCF) for bullet signatures as a typical similarity score with range 0-1 used to distinguish between same source and different source comparisons. The cross-correlation function (CCF) is calculated after extracting the signatures of bullet lands by maximizing the cross correlation of two sequence of signatures by horizontally adjusting the signatures [@vorburger2011]. 
 
-In section 2... In section 3...
+
 
 
 The distributional forms of similarity scores
 ============================
+
+There are two types of distributions we have to consider in the case of bullet comparisons. One is called known-match (KM) or same-source distribution for correlation coefficients from known same-source pairs of LEA scans. The other is called known-non-match distributions (KNM) for those actually not matched lands. Those two distributions are only available in experimental settings where we know the ground truth. They are the starting point for any discussion about theoretical error rates. In particular, we consider the cross-correlation function (CCF) for bullet signatures as a typical similarity score with a practical range of 0-1 \hh{XXX this needs to be expanded on a bit. We might want to distinguish between a practical and a theoretical range} used to distinguish between same source and different source comparisons. The cross-correlation function (CCF) is calculated after extracting the signatures of bullet lands by maximizing the cross correlation of two sequence of signatures by horizontally adjusting the signatures [@vorburger2011]. 
 
 The quantitative methods used to objectively measure the similarity between LEAs report various quantities, such as counts, correlations, distances, probabilities and more general similarity scores [@ma2004; @nichols1997; @nichols2003; @Hare2016]. To understand how those quantities reflect the strength of evidence and to study the underlying error rates in making decisions based on those quantities, distributional forms are usually set up [@Zhang2019; @Song2018]. Particularly, we are focusing on the similarity scores which range from 0 to 1 and the probabilities reported as the likelihood of an actual match. The similarity scores reported in the forensic researches are classified into two categories as known matches (KM) and known non-matches (KNM), and the corresponding distributions are named as KM distributions and KNM distributions. When we make any decisions based on any quantitative measurement, we are actually making a distinguish between those two potential distributions. The strength of any identification process is also measured by the disparities of those distributions. However, in practice, we can hardly discriminate those two distributions entirely, thus, we are never 100% sure which distribution the observed score comes from. This is where the identification error raises. 
 
