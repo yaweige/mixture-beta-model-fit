@@ -85,6 +85,7 @@ ccf_knm_full_data <- ccf_knm_full_data %>% filter(ccf < 0.90)
 ```
 
 \hh{Next steps:
+
 1. for any image that you include with include_graphics("image.png") write a ggsave("image.png") in the code
 2. Let's use darkgrey for different source and darkorange for same source comparisons
 3. Switch from known match and known non-match to (known) same source and (known) different source
@@ -186,7 +187,10 @@ In this definition, $\mu_{il}$ and $\phi_{il}$ are distribution parameters for $
 LAPD data set and the estimated distributions
 ==========================================
 
+
+
 For the following sections of the paper, we will base our analysis on the LAPD data sets. This is a large data set of … It is the first time such a large data set available to the researchers, which makes it possible for a statistical analysis for the distribution of similarity scores. (More on the data. Is there any formal documentation for LAPD? And number of land comparisons for different cases should be discussed here)
+
 
 We consider cross correlation functions (CCF) for land comparisons, which is produced by calculating the maximized CCF between two signatures extracted from a pair of bullet LEAs.
 
@@ -291,6 +295,8 @@ myfit1n2_simulation %>%
 
 Application: Determining source in the LAPD data
 =====================
+
+\hh{move the description of the database construction into this section}
 
 In the current practice, FTEs  fire two or three test bullets from a suspected firearm using ammunition that matches the evidence found on the crime scene as closely as possible.
 Test fires are checked for consistency of striation marks between fires. Generally, the bullet with the more well expressed striations is used to compare to the evidence. With an automated algorithm in these cases as a tool helping the examiners, we will make use of all those available test bullets and lands to generate similarity scores. And those scores will be used to get score-based likelihood ratios which will quantify the strength of evidence supporting either hypothesis from the prosecution side or the defendant side. The critical step of producing likelihood ratio is to get estimations of the distributions of both KM and KNM comparisons.
