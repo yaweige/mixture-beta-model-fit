@@ -85,6 +85,7 @@ ccf_knm_full_data <- ccf_knm_full_data %>% filter(ccf < 0.90)
 ```
 
 \hh{Next steps:
+
 1. for any image that you include with include_graphics("image.png") write a ggsave("image.png") in the code
 2. Let's use darkgrey for different source and darkorange for same source comparisons
 3. Switch from known match and known non-match to (known) same source and (known) different source
@@ -186,7 +187,10 @@ In this definition, $\mu_{il}$ and $\phi_{il}$ are distribution parameters for $
 LAPD data set and the estimated distributions
 ==========================================
 
+
+
 For the following sections of the paper, we will base our analysis on the LAPD data sets. This is a large data set of … It is the first time such a large data set available to the researchers, which makes it possible for a statistical analysis for the distribution of similarity scores. (More on the data. Is there any formal documentation for LAPD? And number of land comparisons for different cases should be discussed here)
+
 
 We consider cross correlation functions (CCF) for land comparisons, which is produced by calculating the maximized CCF between two signatures extracted from a pair of bullet LEAs.
 
@@ -291,6 +295,8 @@ myfit1n2_simulation %>%
 
 Application: Determining source in the LAPD data
 =====================
+
+\hh{move the description of the database construction into this section}
 
 In the current practice, FTEs  fire two or three test bullets from a suspected firearm using ammunition that matches the evidence found on the crime scene as closely as possible.
 Test fires are checked for consistency of striation marks between fires. Generally, the bullet with the more well expressed striations is used to compare to the evidence. With an automated algorithm in these cases as a tool helping the examiners, we will make use of all those available test bullets and lands to generate similarity scores. And those scores will be used to get score-based likelihood ratios which will quantify the strength of evidence supporting either hypothesis from the prosecution side or the defendant side. The critical step of producing likelihood ratio is to get estimations of the distributions of both KM and KNM comparisons.
@@ -492,27 +498,14 @@ To conclude the section, we might ask for 5 sets of bullets as the minimum requi
 
 (We will reproduce the some results in the previous sections: 1. application section?)
 
-```{r change-size-mu1mu2mu, out.width="70%", fig.align="center", fig.cap="change-size-mu1mu2mu", fig.keep="hold", fig.pos="h"}
-knitr::include_graphics("../code/organized code/generated figures/change_size_mu1mu2mu.png")
-```
-
-```{r change-size-var1var2var, out.width="70%", fig.align="center", fig.cap="change-size-var1var2var", fig.keep="hold", fig.pos="h"}
-knitr::include_graphics("../code/organized code/generated figures/change_size_var1var2var.png")
-```
-
-```{r change-size-p1, out.width="70%", fig.align="center", fig.cap="change-size-p1", fig.keep="hold", fig.pos="h"}
-knitr::include_graphics("../code/organized code/generated figures/change_size_p1.png")
-```
-
-```{r nchange-size-mu1mu2, out.width="70%", fig.align="center", fig.cap="change-size-mu1mu2", fig.keep="hold", fig.pos="h"}
-knitr::include_graphics("../code/organized code/generated figures/change_size_mu1mu2.png")
-```
-
+\clearpage
 
 Conclusion
 ==================================
 
+Different measurements of similarities of forensic evidence are proposed, but the strength of those evidence is not clear when we study all those scores in hands. Likelihood ratios are considered as a way to unify the different scores and directly link to the strength of evidence. The distributional form is the key of the likelihood ratio analysis of forensic evidence in determining the densities and the thresholds.
 
+We did a distributional analysis of the similarity scores to guide the use of likelihood ratios in quantifying the strength of forensic evidence. In particular, we picked the CCF as a typical similarity score and established two-component beta mixture distributions as the theoretical forms for both known-matched and known-nonmatched land-land comparisons. Then we showed how effectively the use of those theoretical forms from a relevant population could help in improving the performance of the prediction in forensic practice with likelihood ratios. Then we analyzed the associated underlying theoretical error rates in using likelihood ratios with the distributional forms we established. Ideally, we would expect to achieve those error rates if the relevant population is accessible. Thus, we could theoretically control the error rates in the practice. Further, we analyzed the amount of data necessary to establish a reasonable database for the relevant population, and finally achieve the target error rates.
 
 
 \clearpage
