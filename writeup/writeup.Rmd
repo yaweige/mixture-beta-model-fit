@@ -126,65 +126,84 @@ Background
 
 \hh{The next paragraph needs to be worked out in more detail. You are getting to densities too fast. First define scores as outcomes of an algorithm, then describe same source density and different source density and (score based) likelihood ratios.} 
 
-\yg{The similarity scores could come as various forms, such as 0-1 open interval, 0-1 closed interval, counts, etc. for different algorithms. This provides us a rich tool box and help the field advance, but it comes with issues. For the practitioners not in statistical major who don't fully understand the differences among those algorithms, a same number represents different strength of evidence is extremely confusing. And even in the academic field, we need a unified way to quantify the strength of evidence considering different behaviors of different scores. The score based on likelihood ratios is proposed in forensic science to measure the strength of evidence. And it represents how likely one result is more likely than the other one and comes with great statistical property in terms of minimizing losses and achieving large sample properties. The key of making use of likelihood ratios is to understand the underlying theoretical distributions of each particular type of scores. Intuitively, without knowing how a type of score is distributed, it makes no sense to make any claim for a particular value. For example, the random forest method in the bullet comparison gives very separated scores, either close to one or close to zero, and it actually achieves good classification results. But it doesn't mean it won't make an error, it makes error even when the score close to zero which we might expect to be different source pairs. But when CCF achives that score close to 0, we hardly make wrong claims. It's because the difference of distributions of each score and the absolute value itself could be misleading.}
+\yg{The similarity scores could come as various forms, such as counts, correlations, distances, probabilities, etc. for different algorithms}[@ma2004; @nichols1997; @nichols2003; @Hare2016]. \yg{This provides us with a rich tool box and help the field advance, but it comes with issues. For the practitioners not in statistical major who don't fully understand the differences among those algorithms, a same number represents different strength of evidence is extremely confusing. And even in the academic field, we need a unified way to quantify the strength of evidence considering different behaviors of different scores. The score based on likelihood ratios is proposed in forensic science to measure the strength of evidence. And it represents how much one result is more likely than the other one and comes with great statistical properties in terms of minimizing losses and achieving large sample properties. The key of making use of likelihood ratios is to understand the underlying theoretical distributions of each particular type of scores. Intuitively, without knowing how a type of score is distributed, it makes no sense to make any claim for a particular value. For example, the random forest method in the bullet comparison gives very separated scores, either close to one or close to zero, and it actually achieves good classification results. But it doesn't mean it won't make an error, it makes error even when the score close to zero which we might expect to be different source pairs. But when CCF achives that score close to 0, we hardly make wrong claims. It's because the difference of distributions of each score and the absolute value itself could be misleading. And the prediction error rates should be evaluated and controlled at the same time.}
 
-(error rates)
-
-And the LEA is also used in the developed computer-based methods. So, we are not doing one step to identify bullets, instead we consider each LEA and then combine the land level conclusions to a bullet level one. Accordingly, we start our discussion about underlying distributions and error rates from the land level.
-
-
-
-
-
+<!-- And the LEA is also used in the developed computer-based methods. So, we are not doing one step to identify bullets, instead we consider each LEA and then combine the land level conclusions to a bullet level one. Accordingly, we start our discussion about underlying distributions and error rates from the land level. -->
 
 
 The distributional forms of similarity scores
 ============================
 
-There are two types of distributions we have to consider in the case of bullet comparisons. One is called known-match (KM) or same-source distribution for correlation coefficients from known same-source pairs of LEA scans. The other is called known-non-match distributions (KNM) for those actually not matched lands. Those two distributions are only available in experimental settings where we know the ground truth. They are the starting point for any discussion about theoretical error rates. In particular, we consider the cross-correlation function (CCF) for bullet signatures as a typical similarity score with a practical range of 0-1 \hh{XXX this needs to be expanded on a bit. We might want to distinguish between a practical and a theoretical range} used to distinguish between same source and different source comparisons. The cross-correlation function (CCF) is calculated after extracting the signatures of bullet lands by maximizing the cross correlation of two sequence of signatures by horizontally adjusting the signatures [@vorburger2011]. 
+There are two types of distributions we have to consider in the case of bullet comparisons. One is called known-match (KM) or same-source distribution for similarity scores from same-source pairs of LEA scans. The other is called known-non-match distributions (KNM) for those actually not matched lands.\yg{When we make any decisions based on any quantitative measurement, we are actually making a choice between those two potential distributions. The strength of any identification process is also measured by the disparities of those distributions. However, those two distributions are only available in experimental settings where we know the ground truth. And the distributions could be different for different scores and different combination of firearm and bullets.} In particular, we consider the cross-correlation function (CCF) for bullet signatures as a typical similarity score with a practical range of 0-1. \yg{Although CCF could theoretically be negative values, that is almost never observed for LEA comparisons in practice (none of our 121992 cases). And it behaves well under a distribution in 0-1 and we can always convert it to 0-1 by simple transformation if there are rare cases. So we treat CCF with the range 0-1}. The cross-correlation function (CCF) is calculated after extracting the signatures of bullet lands by maximizing the cross correlation of two sequence of signatures by horizontally adjusting the signatures [@vorburger2011]. And CCF is the most prominent single feature in the automatic random forest algorithm [@Hare2016]. So, it is selected as a representative of similarity scores with range from 0 to 1 in this paper for further analysis. As the name indicated, the higher the similarity score is, the stronger evidence is to support the same source assumption.
 
-The quantitative methods used to objectively measure the similarity between LEAs report various quantities, such as counts, correlations, distances, probabilities and more general similarity scores [@ma2004; @nichols1997; @nichols2003; @Hare2016]. To understand how those quantities reflect the strength of evidence and to study the underlying error rates in making decisions based on those quantities, distributional forms are usually set up [@Zhang2019; @Song2018]. Particularly, we are focusing on the similarity scores which range from 0 to 1 and the probabilities reported as the likelihood of an actual match. The similarity scores reported in the forensic researches are classified into two categories as known matches (KM) and known non-matches (KNM), and the corresponding distributions are named as KM distributions and KNM distributions. When we make any decisions based on any quantitative measurement, we are actually making a distinguish between those two potential distributions. The strength of any identification process is also measured by the disparities of those distributions. However, in practice, we can hardly discriminate those two distributions entirely, thus, we are never 100% sure which distribution the observed score comes from. This is where the identification error raises. 
+<!-- The quantitative methods used to objectively measure the similarity between LEAs report various quantities, such as counts, correlations, distances, probabilities and more general similarity scores [@ma2004; @nichols1997; @nichols2003; @Hare2016]. To understand how those quantities reflect the strength of evidence and to study the underlying error rates in making decisions based on those quantities, distributional forms are usually set up [@Zhang2019; @Song2018]. Particularly, we are focusing on the similarity scores which range from 0 to 1. The similarity scores reported in the forensic researches are classified into two categories as known matches (KM) and known non-matches (KNM), and the corresponding distributions are named as KM distributions and KNM distributions. When we make any decisions based on any quantitative measurement, we are actually making a choice between those two potential distributions. The strength of any identification process is also measured by the disparities of those distributions. However, in practice, we can hardly discriminate those two distributions entirely, thus, we are never 100% sure which distribution the observed score comes from. This is where the identification error raises.  -->
 
-The cross-correlation function (CCF) is the most prominent single feature in the automatic random forest algorithm [@Hare2016] which has theoretical range from -1 to 1. But in real applications, this similarity score always has values in 0 to 1, e.g. in our case, none of 121992 comparisons has negative values. So, it is selected as a representative of similarity scores with range from 0 to 1 in this paper for further analysis. The similarity scores in 0 to 1 can be explained as probabilities that quantify the likelihood that a pair of LEAs are actually a match. Or we can think of them as general similarity measurement. As the name indicated, the higher the similarity score is, the stronger evidence is to support the same source assumption. For different combination of ammunition and firearms, the scores are distributed differently. It is expected that systematic differences exist there for different cases [@Vanderplas2020]. So, it is necessary to study the scores under controlled conditions.
+<!-- The cross-correlation function (CCF) is the most prominent single feature in the automatic random forest algorithm [@Hare2016] which has theoretical range from -1 to 1. But in real applications, this similarity score always has values in 0 to 1, e.g. in our case, none of 121992 comparisons has negative values. So, it is selected as a representative of similarity scores with range from 0 to 1 in this paper for further analysis. The similarity scores in 0 to 1 can be explained as probabilities that quantify the likelihood that a pair of LEAs are actually a match. Or we can think of them as general similarity measurement. As the name indicated, the higher the similarity score is, the stronger evidence is to support the same source assumption. For different combination of ammunition and firearms, the scores are distributed differently. It is expected that systematic differences exist there for different cases [@Vanderplas2020]. So, it is necessary to study the scores under controlled conditions. -->
 
-We can see from the Figure ... (a figure of nonparametric fit of the CCF?), which is a typical one we usually have for the similarity scores, that the distributions of KM and KNM are apart for the majorities. In the bullet LEA comparison problems, we usually have a well separated bullet scores but for the land scores, there are usually some overlaps [@Vanderplas2020]. We propose beta distributions for those scores. Because the beta distribution is a well-used distribution in statistics to describe a quantity from 0 to 1 which is usually a probability or proportion quantifying our knowledge for another distribution in Bayesian analysis. And it is very flexible to capture unimodal asymmetric shapes in 0 to 1. However, it may not be adequate to explain a heavy tail or even a second mode. Thus, we further consider the beta mixture distribution which is a more complex distribution than the beta distribution as a special case. In the beta mixture distribution, we introduce a hierarchical structure with a prior probability to combine a few beta distributions as one. The two-component beta mixture distributions are defined below.
+We can see from the Figure ... (a figure of nonparametric fit of the CCF?), which is a typical one we usually have for the similarity scores, that the distributions of KM and KNM are apart for the majorities. In the bullet LEA comparison problems, we usually have a well separated bullet scores but for the land scores, there are usually some overlaps [@Vanderplas2020]. We propose beta distributions for those scores. Because the beta distribution is a well-used distribution in statistics to describe a quantity from 0 to 1 which is usually a probability or proportion quantifying our knowledge for another distribution in Bayesian analysis. And it is very flexible to capture unimodal asymmetric shapes in 0 to 1. However, it may not be adequate to explain a heavy tail or even a second mode. Thus, we further consider the beta mixture distribution which is a more complicated distribution than the beta distribution as a special case. In the beta mixture distribution, we introduce a hierarchical structure with a prior probability to combine a few beta distributions as one. The beta mixture distributions are defined below.
 
-The reported similarity scores are denoted as $Y_{ij}$ for $j^{th}$ LEA comparison within class $i$, where $i = 1$ is KM and $i = 2$ is KNM. $Y_{ij}$'s are considered independent and identically distributed within each class following a k-component beta mixture distribution, i.e.
-
-\begin{align*}
-Y_{1j} \stackrel{iid}{\sim}  Betamix(p_1, \mu_{1}, \phi_{1})\\
-Y_{2j} \stackrel{iid}{\sim}  Betamix(p_2, \mu_{2}, \phi_{2})
-\end{align*}
-
-where $p_i$, $\mu_i$ and $\phi_i$ are parameter vectors defined as:
+Assuming a random variable $Y$ follows a k-component beta mixture distribution, it has the distribution expressed as follows:
 
 \begin{align*}
-&p_i = (p_{i1}, p_{i2}, p_{i3}, ... , p_{ik}),                  &p_{il} \in [0, 1], l = 1, 2, 3, ..., k~~ \mbox{and} ~~\sum_{l = 1}^k p_{il} = 1 \\
-&\mu_i = (\mu_{i1}, \mu_{i2}, \mu_{i3}, ... , \mu_{ik}),        &\mu_{il} \in (0, 1), l = 1, 2, 3, ..., k \\
-&\phi_i = (\phi_{i1}, \phi_{i2}, \phi_{i3}, ... , \phi_{ik},    &\phi_{il} \in (0, +\infty), l = 1, 2, 3, ..., k
+Y \stackrel{}{\sim}  Betamix(p, \mu, \phi)
 \end{align*}
 
-then, the $Betamix(p_i, \mu_i, \phi_i)$ distribution can be explicitly written as:
+where $p$, $\mu$ and $\phi$ are parameter vectors defined as:
 
 \begin{align*}
-f(x;p_i, \mu_i, \phi_i) =& p_{i1}f_1(x;\mu_{i1}, \phi_{i1}) + p_{i2}f_2(x;\mu_{i2}, \phi_{i2}) +...+ p_{ik}f_k(x;\mu_{ik}, \phi_{ik})
+&p = (p_{1}, p_{2}, p_{3}, ... , p_{k}),                  &p_{l} \in [0, 1], l = 1, 2, 3, ..., k~~ \mbox{and} ~~\sum_{l = 1}^k p_{l} = 1 \\
+&\mu = (\mu_{1}, \mu_{2}, \mu_{3}, ... , \mu_{k}),        &\mu_{l} \in (0, 1),~~ l = 1, 2, 3, ..., k \\
+&\phi = (\phi_{1}, \phi_{2}, \phi_{3}, ... , \phi_{k}),    &\phi_{l} \in (0, +\infty),~~ l = 1, 2, 3, ..., k
 \end{align*}
 
-where $f_l(\cdot;\mu_{il}, \phi_{il})$, $l = 1, 2, 3, ..., k$ are beta distributions with probability densities as:
+then, the $Betamix(p, \mu, \phi)$ can be explicitly written as:
 
 \begin{align*}
-f_l(x;\mu_{il}, \phi_{il}) =  \frac{\Gamma(\phi_{il})}{\Gamma(\mu_{il}\phi_{il})\Gamma((1-\mu_{il})\phi_{il})}x^{\mu_{il}\phi_{il}-1}(1-x)^{(1-\mu_{il})\phi_{il}-1}
+f(x;p, \mu, \phi) =& p_{1}f_1(x;\mu_{1}, \phi_{1}) + p_{2}f_2(x;\mu_{2}, \phi_{2}) +...+ p_{k}f_k(x;\mu_{k}, \phi_{k})
 \end{align*}
 
-
-In this definition, $\mu_{il}$ and $\phi_{il}$ are distribution parameters for $i^{th}$ class and $l^{th}$ component. And $p_i$ is the prior probability for components in $i^{th}$ class which is considered as a fixed real value vector. Note that we are using the mean and precision parameterization of beta distributions which simplifies the math in calculation and is more intuitive ($\mu_{il}$ is the mean, and the variance is roughly proportional to the reciprocal of $\phi_{il}$). It's equivalent to the usual $\alpha_{il}$ and $\beta_{il}$ parameterization through the following transformation:
+where $f_l(\cdot;\mu_{l}, \phi_{l})$, $l = 1, 2, 3, ..., k$ are beta distributions with probability densities as:
 
 \begin{align*}
-\mu_{il} = \frac{\alpha_{il}}{\alpha_{il}+\beta_{il}} \\
-\phi_{il} = \alpha_{il} + \beta_{il}
+f_l(x;\mu_{l}, \phi_{l}) =  \frac{\Gamma(\phi_{l})}{\Gamma(\mu_{l}\phi_{l})\Gamma((1-\mu_{l})\phi_{l})}x^{\mu_{l}\phi_{l}-1}(1-x)^{(1-\mu_{l})\phi_{l}-1}
 \end{align*}
 
+<!-- The reported similarity scores are denoted as $Y_{ij}$ for $j^{th}$ LEA comparison within class $i$, where $i = 1$ is KM and $i = 2$ is KNM. $Y_{ij}$'s are considered independent and identically distributed within each class following a k-component beta mixture distribution, i.e. -->
 
+<!-- \begin{align*} -->
+<!-- Y_{1j} \stackrel{iid}{\sim}  Betamix(p_1, \mu_{1}, \phi_{1})\\ -->
+<!-- Y_{2j} \stackrel{iid}{\sim}  Betamix(p_2, \mu_{2}, \phi_{2}) -->
+<!-- \end{align*} -->
+
+<!-- where $p_i$, $\mu_i$ and $\phi_i$ are parameter vectors defined as: -->
+
+<!-- \begin{align*} -->
+<!-- &p_i = (p_{i1}, p_{i2}, p_{i3}, ... , p_{ik}),                  &p_{il} \in [0, 1], l = 1, 2, 3, ..., k~~ \mbox{and} ~~\sum_{l = 1}^k p_{il} = 1 \\ -->
+<!-- &\mu_i = (\mu_{i1}, \mu_{i2}, \mu_{i3}, ... , \mu_{ik}),        &\mu_{il} \in (0, 1), l = 1, 2, 3, ..., k \\ -->
+<!-- &\phi_i = (\phi_{i1}, \phi_{i2}, \phi_{i3}, ... , \phi_{ik},    &\phi_{il} \in (0, +\infty), l = 1, 2, 3, ..., k -->
+<!-- \end{align*} -->
+
+<!-- then, the $Betamix(p_i, \mu_i, \phi_i)$ distribution can be explicitly written as: -->
+
+<!-- \begin{align*} -->
+<!-- f(x;p_i, \mu_i, \phi_i) =& p_{i1}f_1(x;\mu_{i1}, \phi_{i1}) + p_{i2}f_2(x;\mu_{i2}, \phi_{i2}) +...+ p_{ik}f_k(x;\mu_{ik}, \phi_{ik}) -->
+<!-- \end{align*} -->
+
+<!-- where $f_l(\cdot;\mu_{il}, \phi_{il})$, $l = 1, 2, 3, ..., k$ are beta distributions with probability densities as: -->
+
+<!-- \begin{align*} -->
+<!-- f_l(x;\mu_{il}, \phi_{il}) =  \frac{\Gamma(\phi_{il})}{\Gamma(\mu_{il}\phi_{il})\Gamma((1-\mu_{il})\phi_{il})}x^{\mu_{il}\phi_{il}-1}(1-x)^{(1-\mu_{il})\phi_{il}-1} -->
+<!-- \end{align*} -->
+
+
+In this definition, $\mu_{l}$ and $\phi_{l}$ are distribution parameters for $l^{th}$ component. And $p$ is the prior probability for components in the beta mixture distribution and is considered as a fixed real value vector. Note that we are using the mean and precision parameterization of beta distributions which simplifies the math in calculation and is more intuitive ($\mu_{l}$ is the mean, and the variance is roughly proportional to the reciprocal of $\phi_{l}$). It's equivalent to the usual $\alpha_{l}$ and $\beta_{l}$ parameterization through the following transformation:
+
+\begin{align*}
+\mu_{l} = \frac{\alpha_{l}}{\alpha_{l}+\beta_{l}} \\
+\phi_{l} = \alpha_{l} + \beta_{l}
+\end{align*}
+
+\yg{Note that in our applications, we assume different beta mixture distributions for KM and KNM cases. And within each case, the scores are assumed independent and identically distributed.}
 
 LAPD data set and the estimated distributions
 ==========================================
