@@ -294,8 +294,10 @@ myfit3n4_simulation %>%
   geom_histogram(aes(x = ccf, y = ..density..), bins = 20, color = "gray99",
                  position = "identity", alpha = 0.5, 
                  data = bind_rows(ccf_km_full_data, ccf_knm_full_data, .id = "Class")) +
-  scale_color_discrete(breaks = c("1", "2"), label = c("KM", "KNM")) + 
-  scale_fill_discrete(breaks = c("1", "2"), label = c("KM", "KNM")) +
+  # scale_color_discrete(breaks = c("1", "2"), label = c("KM", "KNM")) + 
+  # scale_fill_discrete(breaks = c("1", "2"), label = c("KM", "KNM")) +
+  scale_color_manual(breaks = c("1", "2"), label = c("KM", "KNM"), values = c("darkorange", "darkgrey")) +
+  scale_fill_manual(breaks = c("1", "2"), label = c("KM", "KNM"), values = c("darkorange", "darkgrey")) +
   ylab("density")
 ```
 
@@ -307,8 +309,10 @@ myfit1n2_simulation %>%
   geom_histogram(aes(x = ccf, y = ..density..), bins = 20, color = "gray99",
                  position = "identity", alpha = 0.5, 
                  data = bind_rows(ccf_km_full_data, ccf_knm_full_data, .id = "Class")) +
-  scale_color_discrete(breaks = c("1", "2"), label = c("KM", "KNM")) + 
-  scale_fill_discrete(breaks = c("1", "2"), label = c("KM", "KNM")) +
+  # scale_color_discrete(breaks = c("1", "2"), label = c("KM", "KNM")) + 
+  # scale_fill_discrete(breaks = c("1", "2"), label = c("KM", "KNM")) +
+  scale_color_manual(breaks = c("1", "2"), label = c("KM", "KNM"), values = c("darkorange", "darkgrey")) +
+  scale_fill_manual(breaks = c("1", "2"), label = c("KM", "KNM"), values = c("darkorange", "darkgrey")) +
   ylab("density")
 ```
 
@@ -321,7 +325,8 @@ myfit1n2_simulation %>%
   ggplot(aes(color = Class)) + 
   geom_line(aes(x = ccf, y = y1))  +
   geom_line(aes(x = ccf, y = y2))  +
-  scale_color_discrete(breaks = c("1", "2"), label = c("KM", "KNM")) + 
+  #scale_color_discrete(breaks = c("1", "2"), label = c("KM", "KNM")) + 
+  scale_color_manual(breaks = c("1", "2"), label = c("KM", "KNM"), values = c("darkorange", "darkgrey")) +
   ylab("density")
 ```
 
@@ -425,8 +430,10 @@ myfit1n2_simulation %>%
   geom_line(aes(x = ccf, y = y, color = Class)) +  
   geom_text(aes(x = ccf, y = y, label = label), data = data.frame(ccf = 0.72, y = 3, label = "Threshold = 0.529")) + 
   geom_text(aes(x = ccf, y = y, label = label), data = data.frame(ccf = c(0.375, 0.6), y = c(0.5, 0.45), label = c("FNR", "FPR"))) + 
-  scale_color_discrete(breaks = c("1", "2"), label = c("KM", "KNM")) + 
-  scale_fill_discrete(breaks = c("1", "2"), label = c("KM", "KNM")) +
+  # scale_color_discrete(breaks = c("1", "2"), label = c("KM", "KNM")) + 
+  # scale_fill_discrete(breaks = c("1", "2"), label = c("KM", "KNM")) +
+  scale_color_manual(breaks = c("1", "2"), label = c("KM", "KNM"), values = c("darkorange", "darkgrey")) +
+  scale_fill_manual(breaks = c("1", "2"), label = c("KM", "KNM"), values = c("darkorange", "darkgrey")) +
   ylab("density")
 ```
 
@@ -458,7 +465,8 @@ polydata %>%
   geom_text(aes(x = ccf, y = y, label = label), data = data.frame(ccf = 0.72, y = 3, label = "Threshold = 0.529")) + 
   geom_text(aes(x = ccf, y = y, label = label), 
             data = data.frame(ccf = c(0.15, 0.15), y = c(3.5, 3.2), label = c("FIR = A2/(A2+A4)", "FER = A1/(A1+A3)")))+
-  scale_color_discrete(breaks = c("1", "2"), label = c("KM", "KNM")) + 
+  # scale_color_discrete(breaks = c("1", "2"), label = c("KM", "KNM")) + 
+  scale_color_manual(breaks = c("1", "2"), label = c("KM", "KNM"), values = c("darkorange", "darkgrey")) +
   ylab("density")
 ```
 
