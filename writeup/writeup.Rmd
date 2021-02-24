@@ -168,20 +168,16 @@ As the name indicates \hh{XXX how does the name indicate that?}, the higher the 
 
 \hh{XXX I'm sorry, but I really can't work with imaginary images. Sketch the images out on your tablet, if you don't want to consider actual figures.}
 We can see from the Figure ... (a figure of nonparametric fit of the CCF?), which is a typical one we usually have for the similarity scores, that the distributions of KM and KNM  ~~for the majorities~~ \hh{XXX the overlap can be expressed in terms of a probability. By definition, the densities overlap. Only the empirical scores observed in practice might be separated.}. In the bullet LEA comparison problems, we usually have a well separated bullet scores but for the land scores, there are usually some overlaps \hh{XXXX probability?} [@Vanderplas2020]. We propose beta distributions for those scores. \hh{XXX be careful with how you use the plural here. The Beta distribution is one family of distributions. You are assuming that both KM and KNM scores follow a beta distribution. } 
-\hh{XXX often-used is not enough - the distribution also needs to fit. It helps that the Beta distribution is quite flexible in what can be described. Move the flexibility up.} The beta distribution is  often-used in Bayesian analysis to describe a quantity from 0 to 1, such as a probability or proportion quantifying our knowledge for another distribution. ~~And~~ it is very flexible to capture unimodal \hh{Beta is not necessarily unimodal} asymmetric shapes in 0 to 1. However, it may not be adequate to explain a heavy tail or even a second mode. Thus, we further consider the beta mixture distribution which is a more complicated distribution than the beta distribution as a special case. In the beta mixture distribution, we introduce a hierarchical structure with a prior probability to combine a few beta distributions as one. The beta mixture distributions are defined below.
+\hh{XXX often-used is not enough - the distribution also needs to fit. It helps that the Beta distribution is quite flexible in what can be described. Move the flexibility up.} The beta distribution is  often-used in Bayesian analysis to describe a quantity from 0 to 1, such as a probability or proportion quantifying our knowledge for another distribution. ~~And~~ it is very flexible to capture unimodal asymmetric densities in 0 to 1. However, it may not be adequate to explain a heavy tail or even a second mode. Thus, we further consider the beta mixture distribution. <!--which is a more complicated distribution than the beta distribution as a special case.--> 
+In the beta mixture distribution, we introduce a weighted sum of prior probabilities to combine several beta densities as one:
 
-Assuming a random variable $Y$ follows a k-component beta mixture distribution, it has the distribution expressed as follows:
-
-\begin{align*}
-Y \stackrel{}{\sim}  Betamix(p, \mu, \phi)
-\end{align*}
-
+\hh{XXX definition XXX }
+Random variable $Y: [0,1] \mapsto \mathbb{R}$ is said to follow a $k$-component beta mixture distribution, $Y \sim  \text{Betamix}(p, \mu, \phi)$, 
 where $p$, $\mu$ and $\phi$ are parameter vectors defined as:
-
 \begin{align*}
-&p = (p_{1}, p_{2}, p_{3}, ... , p_{k}),                  &p_{l} \in [0, 1], l = 1, 2, 3, ..., k~~ \mbox{and} ~~\sum_{l = 1}^k p_{l} = 1 \\
-&\mu = (\mu_{1}, \mu_{2}, \mu_{3}, ... , \mu_{k}),        &\mu_{l} \in (0, 1),~~ l = 1, 2, 3, ..., k \\
-&\phi = (\phi_{1}, \phi_{2}, \phi_{3}, ... , \phi_{k}),    &\phi_{l} \in (0, +\infty),~~ l = 1, 2, 3, ..., k
+&p = (p_{1}, p_{2}, p_{3}, ... , p_{k}),                  &\text{with} 0 \le p_{\ell} \le 1 \forall \ell \in {1, 2, 3, ..., k}~~ \mbox{and} ~~\sum_{\ell = 1}^k p_{\ell} = 1 \\
+&\mu = (\mu_{1}, \mu_{2}, \mu_{3}, ... , \mu_{k}),        &\mu_{\ell} \in (0, 1),~~ l = 1, 2, 3, ..., k \\
+&\phi = (\phi_{1}, \phi_{2}, \phi_{3}, ... , \phi_{k}),    &\phi_{\ell} \in (0, +\infty),~~ l = 1, 2, 3, ..., k
 \end{align*}
 
 then, the $Betamix(p, \mu, \phi)$ can be explicitly written as:
