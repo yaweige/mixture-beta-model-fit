@@ -84,7 +84,6 @@ ccf_knm_full_data <- bind_rows(ccf_knm_full)
 ccf_knm_full_data <- ccf_knm_full_data %>% filter(ccf < 0.90)
 ```
 
-\hh{Thanks for including the color, that is helpful!}
 \hh{Next steps:}
 
 1.  for any image that you include with include_graphics("image.png") write a ggsave("image.png") in the code
@@ -97,22 +96,23 @@ ccf_knm_full_data <- ccf_knm_full_data %>% filter(ccf < 0.90)
 Introduction
 ====================================
 
-Firearm examination is an important topic in forensic science to \hh{answer the questions,} if two pieces of firearm evidence are from a same source. This examination is based on class and individual characteristics left by the firearm on bullets and cartridge cases.  Under current state of the art, these examinations are executed in forensic labs by Firearms and Toolmark Examiners (FTEs) under the regulation of AFTE [@AFTE1992], \hh{and involves visual inspection of similarities, generally with the help of a comparison microscope}. 
+Firearm examination is an important topic in forensic science to answer the questions, if two pieces of firearm evidence are from a same source. This examination is based on class and individual characteristics left by the firearm on bullets and cartridge cases.  Under current state of the art, these examinations are executed in forensic labs by Firearms and Toolmark Examiners (FTEs) under the regulation of AFTE [@AFTE1992], and involves visual inspection of similarities, generally with the help of a comparison microscope. 
 This process is in its nature based on human decisions and therefore subjective. The National Research Council criticized this subjectivity in the conventional firearm identification process and called for it to be reduced or to be complemented by more objective procedures [@Council2009]. The President’s Council of Advisers on Science and Technology (PCAST) also emphasized the importance to establish the scientific validity and reliability of subjective forensic feature-comparison methods by blind empirical testing [@PCAST2016]. Additionally, the PCAST report recognized the importance of developing objective computer-based algorithms in its following addendum [@PCAST2016addendum].
 
 In response to this criticism,  research on cartridge case comparisons introduced the method of  congruent matching cells (CMC) [@Song2015], which allows a quantitative assessment of the similarity of two breech face impressions. Theoretical error rates of CMC were analyzed by @Song2018 and @Zhang2019 on the data set of @Fadul2011 based on variants of a binomial model. 
 In bullet comparisons, a fully automatic matching algorithm was proposed by @Hare2016, its error rates  <!--The discussion about the degraded land comparison was also made in the following paper [@Hare2017].--> are empirically evaluated and  discussed by @Vanderplas2020  based on three test sets. 
-The most prominent single feature in the random forest model is the cross-correlation function, previously identified as important in other methods of similarity assessment [@chumbley; @vorburger2011; @Krishnan2019; @cmps]. }
+The most prominent single feature in the random forest model @Hare2016  proposed is the cross-correlation function (CCF), previously identified as important in other methods of similarity assessment [@chumbley; @vorburger2011; @Krishnan2019; @cmps]. 
 <!--Other automated comparison methods or improvement such as Robust LOESS in groove engraved area identification [@Rice2020], Chumbley score method [@Krishnan2019] are also proposed. -->
+One less well investigated aspect of the cross-correlation measure, however, is its distribution.
 
-\hh{One less well investigated aspect of the cross-correlation measure, however, is its distribution.}
-Due to  limitations of sample sizes and study designs, a sound distributional assumption about the resulting similarity scores is not well established in the bullet comparison field for automated matching algorithms. Error rates are generally estimated empirically from only dozens of bullets \hh{from a selected few firearms} originally used \hh{in case studies} to estimate the current lab practice's error rates. <!-- \hh{I'm not sure how the next factoid is relevant} And many of those tests are also criticized for the closed-set design and potential information provided to the examiners as pointed out by PCAST [@PCAST2016; @PCAST2016addendum].-->
-To estimate the theoretical error rates of any automatic algorithm, it is important to understand the underlying distributions of the similarity scores. \hh{XXX add a few citations for papers discussing score-based likelihood ratios.} These distributions also play a key role in an analysis of  score-based likelihood ratios (SLR), used to quantify the strength of  similarities and unify the measurement of strength of evidence. 
+Due to  limitations of sample sizes and study designs, sound distributional assumptions about the resulting similarity scores is not well established in the bullet comparison field for automated matching algorithms. \yg{Therefore,} error rates are generally estimated empirically from only dozens of bullets from a selected few firearms originally used in case studies to estimate the current lab practice's error rates. 
+<!-- \hh{I'm not sure how the next factoid is relevant} And many of those tests are also criticized for the closed-set design and potential information provided to the examiners as pointed out by PCAST [@PCAST2016; @PCAST2016addendum].-->
+To estimate the theoretical error rates of any automatic algorithm, it is important to understand the underlying distributions of the similarity scores. \hh{XXX add a few citations for papers discussing score-based likelihood ratios.} These distributions also play a key role in an analysis of  score-based likelihood ratios (SLR), used to quantify the strength of  similarities and unify the measurement of strength of evidence. \yg{In this paper, we built beta mixture distribution models for the cross-correlation functions (CCF) to provide a framework for error rate estimations and score-based likelihood ratio analysis of the output of automatic algorithms. We also evaluated the size of data needed to reach good estimations for the distribustions. As will be shown, the size of the data is crutial in applying score-based likelihood ratios and thus, relevent reference databases will be needed and required to exceed the minimal number of specimens.}
+
+
 <!-- \hh{Don't start sentences with `And`. I am also not sure, what you refer to by `that`. }
 And that also helps later \hh{in this paper?} to choose proper thresholds for the methods to reduce the overall error rates instead of simply choosing a threshold to distinguish between same and different sources. \hh{first define thresholds and the need to get from scores to actionable conclusions.}
 -->
-
-\hh{XXX What is the problem that you solve in this paper? }
 
 
 \hh{XXX Let's end the introduction here with a  paragraph on the structure of the rest of the paper.}
@@ -128,19 +128,19 @@ Background
 
 Generally, in forensic science, we consider the problem of determining for two pieces of evidence whether they originate from the same source or from different sources. 
 Specifically, when bullet evidence is compared, it is of interest if two bullets were fired from the same gun. 
-For firearms, there is rifling machined into the internal of the barrels aiming to improve the aerodynamic stability of bullets. During the firing process, microimperfections in a barrel leaves markings on a bullet. These  markings are thought to be unique and are used as the basis to determine the source of the bullets. 
+For firearms, there is rifling machined into the internal of the barrels aiming to improve the aerodynamic stability of bullets. During the firing process, microimperfections in a barrel leave markings on a bullet. These  markings are thought to be unique and are used as the basis to determine the source of the bullets. 
 <!--For forensic purpose, we distinguish between two different levels of characteristics. Characteristics shared by a type of guns and bullets are called class characteristics, such as the number of lands, rifling directions or type of rifling. Different class characteristics lead to a conclusion of `elimination`. Class characteristics can never be used to identify a same source. The characteristics corresponding to a particular firearm are called individual characteristics and are used to identify the source of the bullets.--> 
 For bullet evidence, in particular, striations on land engraved areas (LEAs) are used by firearms and toolmarks examiners to determine same source of two pieces of evidence [@AFTE1992]. <!--The grooves engraved area (GEAs) are the markings left by the grooves between two lands. We usually don't use GEAs directly for the identification purpose but we usually need to distinguish between GEAs and LEAs especially for the computer based algorithms.-->
 For computer based algorithms, 3D scans of the LEAs are used. <!-- to carry more information than traditional 2D scans.-->
 Following the process described in @Hare2016, we extract **signatures** \hh{XXX pictures!} from these scans. Various  scores are used in the literature to describe the similarity between two signatures [@ma2004; @nichols1997; @nichols2003; @Hare2016].
 Here, we will employ the cross-correlation function (CCF) to measure similarity.
 
-\hh{CCF is mathematically a value between -1 and 1, with larger values indicating higher similarity between pairs of signatures. In order to discriminate between same-source and different-source pairs of signatures we need to define a cutoff. Naively, one could assign positive CCF values to indicate same-source pairs and, similarly, negative values to different-source pairs. However, in practice it turns out that values of CCF based on pairs of bullet land signatures are not symmetric around the origin, but mostly positive regardless of source.
-Moreover, different pairings of firearm and ammunition result in different distributions of values, therefore no single CCF value will suffice to distinguish between same-source and different-source pairs. Alternatively to using scores directly, XXXX citations XXX suggest the use of score-based log-likelihood ratios to evaluate the strength of forensic evidence. }
+CCF is mathematically a value between -1 and 1, with larger values indicating higher similarity between pairs of signatures. In order to discriminate between same-source and different-source pairs of signatures we need to define a cutoff. Naively, one could assign positive CCF values to indicate same-source pairs and, similarly, negative values to different-source pairs. However, in practice it turns out that values of CCF based on pairs of bullet land signatures are not symmetric around the origin, but mostly positive regardless of source.
+Moreover, different pairings of firearm and ammunition result in different distributions of values, therefore no single CCF value will suffice to distinguish between same-source and different-source pairs. Alternatively to using scores directly, \hh{XXXX citations XXX} suggest the use of score-based log-likelihood ratios to evaluate the strength of forensic evidence. 
 
 <!--This provides us with a rich tool box and help the field advance, but it comes with issues. For the practitioners not in statistical major who don't fully understand the differences among those algorithms, a same number represents different strength of evidence is extremely confusing. And even in the academic field, we need a unified way to quantify the strength of evidence considering different behaviors of different scores. The score based on likelihood ratios is proposed in forensic science to measure the strength of evidence.-->
 
-\hh{Score-based log-likelihood ratios (SLR) quantify how much more likely one outcome is than the other one. SLRs are used for their well-understood statistical properties and large-sample properties, which allow to both evaluate prediction error rates and control them.}
+Score-based log-likelihood ratios (SLR) quantify how much more likely one outcome is than the other one. SLRs are used for their well-understood statistical properties and large-sample properties, which allow to both evaluate prediction error rates and control them.
 <!--\yg{
 And it represents how much one result is more likely than the other one and comes with great statistical properties in terms of minimizing losses and achieving large sample properties.}--> 
 <!--The key of making use of likelihood ratios is to understand the underlying theoretical distributions of each particular type of scores. Intuitively, without knowing how a type of score is distributed, it makes no sense to make any claim for a particular value. For example, the random forest method in the bullet comparison gives very separated scores, either close to one or close to zero, and it actually achieves good classification results. But it doesn't mean it won't make an error, it makes error even when the score close to zero which we might expect to be different source pairs. But when CCF achives that score close to 0, we hardly make wrong claims. It's because the difference of distributions of each score and the absolute value itself could be misleading. And the prediction error rates should be evaluated and controlled at the same time.-->
@@ -152,12 +152,12 @@ And it represents how much one result is more likely than the other one and come
 The distributional forms of similarity scores
 ============================
 
-Two  distributions \hh{are of immediate interest} in the case of bullet comparisons: (1) the known-match (KM) or same-source distribution for similarity scores of same-source pairs of LEA scans, \hh{and (2)  the } known-non-match distribution (KNM) \hh{or different-source distribution for similarity scores for pairs of LEA scans from different sources}. 
+Two  distributions are of immediate interest in the case of bullet comparisons: (1) the known-match (KM) or same-source distribution for similarity scores of same-source pairs of LEA scans, and (2)  the known-non-match (KNM) or different-source distribution for similarity scores for pairs of LEA scans from different sources. 
 Any decision on the source-ness of a comparison pair is then based on   making a choice between those two  distributions. 
 The strength of any identification is also measured by the disparities of those distributions. However, those two distributions are only available in experimental settings where we know  ground truth. 
 The distribution of similarity scores could also be influenced by the combination of firearm and ammunition.
 \hh{XXX this transition is a bit abrupt}
-In \hh{this paper}, we consider the cross-correlation function (CCF) between pairs of bullet signatures as a{n example for a} similarity score. \hh{The cross-correlation for bullet signatures has} a practical range of 0-1. \yg{Although CCF values could theoretically be negative, that is almost never observed for LEA comparisons in practice (and in none of the more than 100k comparisons considered here).}
+In this paper, we consider the cross-correlation function (CCF) between pairs of bullet signatures as an example for a similarity score. The cross-correlation for bullet signatures has a practical range of 0-1. \yg{Although CCF values could theoretically be negative, that is almost never observed for LEA comparisons in practice (and in none of the more than 100k comparisons considered here).}
 <!--\yg{And it behaves well under a distribution in 0-1 and we can always convert it to 0-1 by simple transformation if there are rare cases. So we treat CCF with the range 0-1}.\hh{mathematically this is correct, but which transformation are yu suggesting? The implications of scaling the similarity score are pretty terrible, just adjusting the minimal similarity score to be 0 and changing to a potentially zero-inflated distribution might be better. } -->
 The cross-correlation function (CCF) is calculated after extracting the signatures of bullet lands by maximizing the cross correlation of two sequence of signatures by horizontally adjusting the signatures [@vorburger2011]. ~~And~~ CCF is the most prominent single feature in the automatic random forest algorithm [@Hare2016]. 
 As the name indicates \hh{XXX how does the name indicate that?}, the higher the similarity score is, the stronger evidence is to support the same source assumption.
@@ -172,6 +172,9 @@ We can see from the Figure ... (a figure of nonparametric fit of the CCF?), whic
 In the beta mixture distribution, we introduce a weighted sum of prior probabilities to combine several beta densities as one:
 
 \hh{XXX definition XXX }
+
+\yg{XXX pictures for betamix XXX}
+
 Random variable $Y: [0,1] \mapsto \mathbb{R}$ is said to follow a $k$-component beta mixture distribution, $Y \sim  \text{Betamix}(p, \mu, \phi)$, 
 where $p$, $\mu$ and $\phi$ are parameter vectors defined as:
 \begin{align*}
