@@ -105,9 +105,11 @@ The most prominent single feature in the random forest model @Hare2016  proposed
 <!--Other automated comparison methods or improvement such as Robust LOESS in groove engraved area identification [@Rice2020], Chumbley score method [@Krishnan2019] are also proposed. -->
 One less well investigated aspect of the cross-correlation measure, however, is its distribution.
 
-Due to  limitations of sample sizes and study designs, sound distributional assumptions about the resulting similarity scores is not well established in the bullet comparison field for automated matching algorithms. \yg{Therefore,} error rates are generally estimated empirically from only dozens of bullets from a selected few firearms originally used in case studies to estimate the current lab practice's error rates. 
+Due to  limitations of sample sizes and study designs, sound distributional assumptions about the resulting similarity scores are not well established in the bullet comparison field for automated matching algorithms. Therefore, error rates are generally estimated empirically.
+\hh{This estimation is often based on} only dozens of bullets from a selected few firearms. <!--originally used in case studies to estimate the current lab practice's error rates. -->
 <!-- \hh{I'm not sure how the next factoid is relevant} And many of those tests are also criticized for the closed-set design and potential information provided to the examiners as pointed out by PCAST [@PCAST2016; @PCAST2016addendum].-->
-To estimate the theoretical error rates of any automatic algorithm, it is important to understand the underlying distributions of the similarity scores. \hh{XXX add a few citations for papers discussing score-based likelihood ratios.} These distributions also play a key role in an analysis of  score-based likelihood ratios (SLR), used to quantify the strength of  similarities and unify the measurement of strength of evidence. \yg{In this paper, we built beta mixture distribution models for the cross-correlation functions (CCF) to provide a framework for error rate estimations and score-based likelihood ratio analysis of the output of automatic algorithms. We also evaluated the size of data needed to reach good estimations for the distribustions. As will be shown, the size of the data is crutial in applying score-based likelihood ratios and thus, relevent reference databases will be needed and required to exceed the minimal number of specimens.}
+To estimate the theoretical error rates of any automatic algorithm, it is important to understand the underlying distributions of the similarity scores. \hh{XXX add a few citations for papers discussing score-based likelihood ratios.} These distributions also play a key role in an analysis of  score-based likelihood ratios (SLR), used to quantify the strength of  similarities and unify the measurement of strength of evidence. 
+\yg{\hh{XXX use present tense for the paper - in this paper we build .... we evaluate ... we show ... XXX } In this paper, we built beta mixture distribution models for the cross-correlation functions (CCF) to provide a framework for error rate estimations and score-based likelihood ratio analysis of the output of automatic algorithms. We also evaluated the size of data needed to reach good estimations for the distribustions. As will be shown, the size of the data is crutial in applying score-based likelihood ratios and thus, relevent reference databases will be needed and required to exceed the minimal number of specimens.}
 
 
 <!-- \hh{Don't start sentences with `And`. I am also not sure, what you refer to by `that`. }
@@ -153,36 +155,45 @@ The distributional forms of similarity scores
 ============================
 
 Two  distributions are of immediate interest in the case of bullet comparisons: (1) the known-match (KM) or same-source distribution for similarity scores of same-source pairs of LEA scans, and (2)  the known-non-match (KNM) or different-source distribution for similarity scores for pairs of LEA scans from different sources. 
-Any decision on the source-ness of a comparison pair is then based on making a choice between those two  distributions. 
+Any decision on the source of a comparison pair is then based on making a choice between those two  distributions. 
 The strength of any identification is also measured by the disparities of those distributions. 
 However, those two distributions are only available in experimental settings where we know the ground truth. 
 \yg{XXX I think the transition here is a little abrupt, so I might add something like: In this paper, we explore those distributions by setting up models for the experimental data, and explore the estimation process of those models in real cases.}
 <!-- \yg{By setting up distributional models, we could conduct estimations and control the error rates of the identification process.} -->
-In this paper, we consider the cross-correlation function (CCF) between pairs of bullet signatures as an example for similarity scores. The cross-correlation for bullet signatures has a practical range of 0-1. \yg{Although CCF values could theoretically be negative, that is almost never observed for LEA comparisons in practice (and in none of the more than 100k comparisons considered here).}
-<!--\yg{And it behaves well under a distribution in 0-1 and we can always convert it to 0-1 by simple transformation if there are rare cases. So we treat CCF with the range 0-1}.\hh{mathematically this is correct, but which transformation are yu suggesting? The implications of scaling the similarity score are pretty terrible, just adjusting the minimal similarity score to be 0 and changing to a potentially zero-inflated distribution might be better. } -->
-The cross-correlation function (CCF) is calculated after extracting the signatures of bullet lands by maximizing the cross correlation of two sequence of signatures by horizontally adjusting the signatures [@vorburger2011]. CCF is the most prominent single feature in the automatic random forest algorithm [@Hare2016]. The larger CCF is, the stronger evidence is to support the same source assumption.
+In this paper, we consider the cross-correlation function (CCF) between pairs of bullet signatures as an example for similarity scores. \hh{XXX this discussion was started above, let's move the next two sentences up.} The cross-correlation for bullet signatures has a practical range of 0-1. \yg{Although CCF values could theoretically be negative, that is almost never observed for LEA comparisons in practice (and in none of the more than 100k comparisons considered here).}
+
+\hh{XXX move the next sentence up to 'signatures are extracted ...'}
+The cross-correlation function (CCF) is calculated after extracting the signatures of bullet lands by maximizing the cross correlation of two sequence of signatures by horizontally adjusting the signatures. 
+<!--\hh{XXX this sentence, too. }
+ The larger CCF is, the stronger evidence is to support the same source assumption. HH: repeat from above-->
 
 <!-- The quantitative methods used to objectively measure the similarity between LEAs report various quantities, such as counts, correlations, distances, probabilities and more general similarity scores [@ma2004; @nichols1997; @nichols2003; @Hare2016]. To understand how those quantities reflect the strength of evidence and to study the underlying error rates in making decisions based on those quantities, distributional forms are usually set up [@Zhang2019; @Song2018]. Particularly, we are focusing on the similarity scores which range from 0 to 1. The similarity scores reported in the forensic researches are classified into two categories as known matches (KM) and known non-matches (KNM), and the corresponding distributions are named as KM distributions and KNM distributions. When we make any decisions based on any quantitative measurement, we are actually making a choice between those two potential distributions. The strength of any identification process is also measured by the disparities of those distributions. However, in practice, we can hardly discriminate those two distributions entirely, thus, we are never 100% sure which distribution the observed score comes from. This is where the identification error raises.  -->
 
 <!-- The cross-correlation function (CCF) is the most prominent single feature in the automatic random forest algorithm [@Hare2016] which has theoretical range from -1 to 1. But in real applications, this similarity score always has values in 0 to 1, e.g. in our case, none of 121992 comparisons has negative values. So, it is selected as a representative of similarity scores with range from 0 to 1 in this paper for further analysis. The similarity scores in 0 to 1 can be explained as probabilities that quantify the likelihood that a pair of LEAs are actually a match. Or we can think of them as general similarity measurement. As the name indicated, the higher the similarity score is, the stronger evidence is to support the same source assumption. For different combination of ammunition and firearms, the scores are distributed differently. It is expected that systematic differences exist there for different cases [@Vanderplas2020]. So, it is necessary to study the scores under controlled conditions. -->
 
-```{r example, out.width="70%", fig.align="center", fig.cap="Histograms of the KM and KNM of CCFs", fig.keep="hold", fig.pos="h"}
+```{r example, out.width="70%", fig.align="center", fig.cap="Histograms of the KM and KNM of CCFs \\hh{XXX is there a reason why you don't use densities rather than the histograms?}", fig.keep="hold", fig.pos="h"}
 myfit3n4_simulation %>%
   ggplot(aes(color = Class, fill = Class)) +
-  geom_histogram(aes(x = ccf, y = ..density..), bins = 20, color = "gray99",
+  geom_histogram(aes(x = ccf, y = ..density..), binwidth = 0.05, #color = "gray99",
                  position = "identity", alpha = 0.5, 
                  data = bind_rows(ccf_km_full_data, ccf_knm_full_data, .id = "Class")) +
-  # scale_color_discrete(breaks = c("1", "2"), label = c("KM", "KNM")) + 
-  # scale_fill_discrete(breaks = c("1", "2"), label = c("KM", "KNM")) +
+  geom_density(aes(x = ccf, y = ..density..), #color = "gray99",
+                 position = "identity", alpha = 0.5, 
+                 data = bind_rows(ccf_km_full_data, ccf_knm_full_data, .id = "Class")) +
   scale_color_manual(breaks = c("1", "2"), label = c("KM", "KNM"), values = c("darkorange", "darkgrey")) +
   scale_fill_manual(breaks = c("1", "2"), label = c("KM", "KNM"), values = c("darkorange", "darkgrey")) +
   ylab("density")
 ```
 
-<!-- \hh{XXX I'm sorry, but I really can't work with imaginary images. Sketch the images out on your tablet, if you don't want to consider actual figures.} -->
-We can see from \autoref{fig:example} which is a typical \yg{pattern} we have for the CCFs of LEA comparisons, that the distributions of KM and KNM \yg{both have relatively high probabilities for values below and above 0.5. Therefore, there is not a clear separation of the histograms of the same-source and different-source comparisons of the LEA scans.}
+\hh{XXX in the caption for figure 1 add: (1) what type of plot is shown? (2) what data is shown? (3) what is your main finding?}
+\autoref{fig:example} \hh{shows the densities of cross-correlation values for both known-matching pairs and known non-matching pairs of bullet land-engraved areas (LEAs). XXX what data are you using? XXX The two densities exhibit a fairly typical pattern,} in the sense, that \hh{the distribution for known non-matching (KNM) pairs has a mode for CCF values below 0.5 and the distribution of CCF values for KM pairs peaks in a value above 0.5. } 
+<!--which is a typical \yg{pattern} we have for the CCFs of LEA comparisons, that the distributions of KM and KNM \yg{both have relatively high probabilities  for values below and above 0.5. Therefore, there is not a clear separation of the histograms of the same-source and different-source comparisons of the LEA scans.} -->
+
 <!-- \hh{XXX the overlap can be expressed in terms of a probability. By definition, the densities overlap. Only the empirical scores observed in practice might be separated.}.  -->
-In the bullet LEA comparison problems, we usually have well separated bullet scores \yg{but not for the land scores according to} @Vanderplas2020. \yg{To capture the features of the distributions which are partly revealed in \autoref{fig:example}, we consider the beta distribution family to account for the unimodal pattern shown in the KNM distribution.}
+
+<!--In the bullet LEA comparison problems, we usually have well separated bullet scores \yg{but not for the land scores according to} @Vanderplas2020.-->
+
+\yg{To capture the features of the distributions which are partly revealed in \autoref{fig:example}, we consider the beta distribution family to account for the unimodal pattern shown in the KNM distribution.}
 <!-- \hh{XXX be careful with how you use the plural here. The Beta distribution is one family of distributions. You are assuming that both KM and KNM scores follow a beta distribution. } -->
 <!-- \hh{XXX often-used is not enough - the distribution also needs to fit. It helps that the Beta distribution is quite flexible in what can be described. Move the flexibility up.}  -->
 \yg{The beta distributions are very flexible to capture unimodal asymmetric densities in the range from 0 to 1.}
@@ -214,7 +225,7 @@ where $f_l(\cdot;\mu_{l}, \phi_{l})$, $l = 1, 2, 3, ..., k$ are beta distributio
 f_l(x;\mu_{l}, \phi_{l}) =  \frac{\Gamma(\phi_{l})}{\Gamma(\mu_{l}\phi_{l})\Gamma((1-\mu_{l})\phi_{l})}x^{\mu_{l}\phi_{l}-1}(1-x)^{(1-\mu_{l})\phi_{l}-1}
 \end{align*}
 
-```{r betamixFig, out.width="70%", fig.align="center", fig.cap="Two component beta-mixture distributions. From left to right, one component with (mu = 0.75, phi = 40) is held fixed, and the other component with (phi = 40) has mu changing from 0.25 to 0.75. The prior probablity p1 is fixed at 0.5. With the increase of the varying mu, the two modes gradualy merge to one", fig.pos="h"}
+```{r betamixFig, out.width="70%", fig.align="center", fig.cap="Two component beta-mixture distributions. From left to right, one component with (mu = 0.75, phi = 40) is held fixed, and the other component with (phi = 40) has mu changing from 0.25 to 0.75. The prior probablity p1 is fixed at 0.5. With the increase of the varying mu, the two modes gradualy merge to one \\hh{XXX include mu into the data set and facet by it.}", fig.pos="h"}
 
 simdata <- function(p1, a1, b1, a2, b2) {
   dcomp1 <- dbeta(1:999/1000, shape1 = a1, shape2 = b1)
@@ -231,12 +242,13 @@ comdata <- lapply(1:21, FUN = function(i) {
 }) %>% bind_rows(.id = "id") %>% filter((as.numeric(id) %% 2) == 1)
 
 comdata %>%
-  ggplot(aes(x = x, y = y, group = id, color = as.numeric(id))) + 
+  ggplot(aes(x = x, y = y, group = id)) + #, color = as.numeric(id))) + 
   geom_line() + 
-  scale_color_gradient2(low = "black", mid = "grey", high = "orange", midpoint = 11) +
+#  scale_color_gradient2(low = "black", mid = "grey", high = "orange", midpoint = 11) + # HH: stay away from grey/orange unless you encode KM and KNM
   ylab("Density") + 
   xlab("Value") +
-  guides(color = guide_none())
+  guides(color = guide_none()) +
+  facet_wrap(~as.numeric(id), labeller = "label_both")
 
 ```
 
