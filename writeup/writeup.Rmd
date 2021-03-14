@@ -105,11 +105,10 @@ The most prominent single feature in the random forest model @Hare2016  proposed
 <!--Other automated comparison methods or improvement such as Robust LOESS in groove engraved area identification [@Rice2020], Chumbley score method [@Krishnan2019] are also proposed. -->
 One less well investigated aspect of the cross-correlation measure, however, is its distribution.
 
-Due to  limitations of sample sizes and study designs, sound distributional assumptions about the resulting similarity scores are not well established in the bullet comparison field for automated matching algorithms. Therefore, error rates are generally estimated empirically.
-\hh{This estimation is often based on} only dozens of bullets from a selected few firearms. <!--originally used in case studies to estimate the current lab practice's error rates. -->
+Due to  limitations of sample sizes and study designs, sound distributional assumptions about the resulting similarity scores are not well established in the bullet comparison field for automated matching algorithms. Therefore, error rates are generally estimated empirically. This estimation is often based on only dozens of bullets from a selected few firearms. <!--originally used in case studies to estimate the current lab practice's error rates. -->
 <!-- \hh{I'm not sure how the next factoid is relevant} And many of those tests are also criticized for the closed-set design and potential information provided to the examiners as pointed out by PCAST [@PCAST2016; @PCAST2016addendum].-->
 To estimate the theoretical error rates of any automatic algorithm, it is important to understand the underlying distributions of the similarity scores. \hh{XXX add a few citations for papers discussing score-based likelihood ratios.} These distributions also play a key role in an analysis of  score-based likelihood ratios (SLR), used to quantify the strength of  similarities and unify the measurement of strength of evidence. 
-\yg{\hh{XXX use present tense for the paper - in this paper we build .... we evaluate ... we show ... XXX } In this paper, we built beta mixture distribution models for the cross-correlation functions (CCF) to provide a framework for error rate estimations and score-based likelihood ratio analysis of the output of automatic algorithms. We also evaluated the size of data needed to reach good estimations for the distribustions. As will be shown, the size of the data is crutial in applying score-based likelihood ratios and thus, relevent reference databases will be needed and required to exceed the minimal number of specimens.}
+\yg{In this paper, we build beta mixture distribution models for the cross-correlation functions (CCF) to provide a framework for error rate estimations and score-based likelihood ratio analysis of the output of automatic algorithms. We also evaluate the size of data needed to reach good estimations for the distributions. We show the size of the data is crucial in applying score-based likelihood ratios and thus, relevant reference databases are needed and required to exceed the minimal number of specimens.}
 
 
 <!-- \hh{Don't start sentences with `And`. I am also not sure, what you refer to by `that`. }
@@ -136,8 +135,9 @@ For bullet evidence, in particular, striations on land engraved areas (LEAs) are
 For computer based algorithms, 3D scans of the LEAs are used. <!-- to carry more information than traditional 2D scans.-->
 Following the process described in @Hare2016, we extract **signatures** \hh{XXX pictures!} from these scans. Various  scores are used in the literature to describe the similarity between two signatures [@ma2004; @nichols1997; @nichols2003; @Hare2016].
 Here, we will employ the cross-correlation function (CCF) to measure similarity.
+\yg{The cross-correlation function (CCF) is calculated by maximizing the cross correlation of two sequence of signatures by horizontally adjusting the signatures.}
 
-CCF is mathematically a value between -1 and 1, with larger values indicating higher similarity between pairs of signatures. In order to discriminate between same-source and different-source pairs of signatures we need to define a cutoff. Naively, one could assign positive CCF values to indicate same-source pairs and, similarly, negative values to different-source pairs. However, in practice it turns out that values of CCF based on pairs of bullet land signatures are not symmetric around the origin, but mostly positive regardless of source.
+CCF is mathematically a value between -1 and 1, with larger values indicating higher similarity between pairs of signatures. In order to discriminate between same-source and different-source pairs of signatures we need to define a cutoff. Naively, one could assign positive CCF values to indicate same-source pairs and, similarly, negative values to different-source pairs. However, in practice it turns out that values of CCF based on pairs of bullet land signatures are not symmetric around the origin, but mostly positive regardless of source. \yg{The negative values are almost never observed for LEA comparisons in practice (and in none of the more than 100k comparisons considered in this paper).}
 Moreover, different pairings of firearm and ammunition result in different distributions of values, therefore no single CCF value will suffice to distinguish between same-source and different-source pairs. Alternatively to using scores directly, \hh{XXXX citations XXX} suggest the use of score-based log-likelihood ratios to evaluate the strength of forensic evidence. 
 
 <!--This provides us with a rich tool box and help the field advance, but it comes with issues. For the practitioners not in statistical major who don't fully understand the differences among those algorithms, a same number represents different strength of evidence is extremely confusing. And even in the academic field, we need a unified way to quantify the strength of evidence considering different behaviors of different scores. The score based on likelihood ratios is proposed in forensic science to measure the strength of evidence.-->
@@ -149,23 +149,40 @@ And it represents how much one result is more likely than the other one and come
 
 <!-- And the LEA is also used in the developed computer-based methods. So, we are not doing one step to identify bullets, instead we consider each LEA and then combine the land level conclusions to a bullet level one. Accordingly, we start our discussion about underlying distributions and error rates from the land level. -->
 
+Material
+============================
+
+\yg{XXX This is trying to reformat the paper to sections like: 1) Material, 2) Methods, 3) Results, 4) Discussion. We might also put Methods before Material, since the training/testing data split and specific data used heavily depends on the study design/methods. Not sure about this. Or like the 3/9 reading group paper, we can put the Material and Methods sections together and use subsubsections, which will give us the largest flexibility to group things together while taking care of the logical order. Something like:}
+
+\yg{1. Material and methods}
+
+\yg{1.1 Data acquisition}
+
+\yg{1.2 Distributional models}
+
+\yg{1.3 Database model v.s. case specific model (only for this section, data is split into testing and training set)}
+
+\yg{1.3.1 Training set and testing set}
+
+\yg{1.3.2 Study design}
+
+\yg{1.4 Effect of the number of speciments}
+
+Data Acquisition
+---------------------------
+
+
+Training Set and Test Set
+----------------------------
+
 
 
 The distributional forms of similarity scores
 ============================
 
-Two  distributions are of immediate interest in the case of bullet comparisons: (1) the known-match (KM) or same-source distribution for similarity scores of same-source pairs of LEA scans, and (2)  the known-non-match (KNM) or different-source distribution for similarity scores for pairs of LEA scans from different sources. 
-Any decision on the source of a comparison pair is then based on making a choice between those two  distributions. 
+Two  distributions are of immediate interest in the case of bullet comparisons: (1) the known-match (KM) or same-source distribution for similarity scores of same-source pairs of LEA scans, and (2)  the known-non-match (KNM) or different-source distribution for similarity scores for pairs of LEA scans from different sources. Any decision on the source of a comparison pair is then based on making a choice between those two  distributions. 
 The strength of any identification is also measured by the disparities of those distributions. 
-However, those two distributions are only available in experimental settings where we know the ground truth. 
-\yg{XXX I think the transition here is a little abrupt, so I might add something like: In this paper, we explore those distributions by setting up models for the experimental data, and explore the estimation process of those models in real cases.}
-<!-- \yg{By setting up distributional models, we could conduct estimations and control the error rates of the identification process.} -->
-In this paper, we consider the cross-correlation function (CCF) between pairs of bullet signatures as an example for similarity scores. \hh{XXX this discussion was started above, let's move the next two sentences up.} The cross-correlation for bullet signatures has a practical range of 0-1. \yg{Although CCF values could theoretically be negative, that is almost never observed for LEA comparisons in practice (and in none of the more than 100k comparisons considered here).}
-
-\hh{XXX move the next sentence up to 'signatures are extracted ...'}
-The cross-correlation function (CCF) is calculated after extracting the signatures of bullet lands by maximizing the cross correlation of two sequence of signatures by horizontally adjusting the signatures. 
-<!--\hh{XXX this sentence, too. }
- The larger CCF is, the stronger evidence is to support the same source assumption. HH: repeat from above-->
+However, those two distributions are only available in experimental settings where we know the ground truth.
 
 <!-- The quantitative methods used to objectively measure the similarity between LEAs report various quantities, such as counts, correlations, distances, probabilities and more general similarity scores [@ma2004; @nichols1997; @nichols2003; @Hare2016]. To understand how those quantities reflect the strength of evidence and to study the underlying error rates in making decisions based on those quantities, distributional forms are usually set up [@Zhang2019; @Song2018]. Particularly, we are focusing on the similarity scores which range from 0 to 1. The similarity scores reported in the forensic researches are classified into two categories as known matches (KM) and known non-matches (KNM), and the corresponding distributions are named as KM distributions and KNM distributions. When we make any decisions based on any quantitative measurement, we are actually making a choice between those two potential distributions. The strength of any identification process is also measured by the disparities of those distributions. However, in practice, we can hardly discriminate those two distributions entirely, thus, we are never 100% sure which distribution the observed score comes from. This is where the identification error raises.  -->
 
