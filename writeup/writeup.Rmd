@@ -188,7 +188,7 @@ However, those two distributions are only available in experimental settings whe
 
 <!-- The cross-correlation function (CCF) is the most prominent single feature in the automatic random forest algorithm [@Hare2016] which has theoretical range from -1 to 1. But in real applications, this similarity score always has values in 0 to 1, e.g. in our case, none of 121992 comparisons has negative values. So, it is selected as a representative of similarity scores with range from 0 to 1 in this paper for further analysis. The similarity scores in 0 to 1 can be explained as probabilities that quantify the likelihood that a pair of LEAs are actually a match. Or we can think of them as general similarity measurement. As the name indicated, the higher the similarity score is, the stronger evidence is to support the same source assumption. For different combination of ammunition and firearms, the scores are distributed differently. It is expected that systematic differences exist there for different cases [@Vanderplas2020]. So, it is necessary to study the scores under controlled conditions. -->
 
-```{r example, out.width="70%", fig.align="center", fig.cap="Histograms of the cross-correlation functions (CCFs) for the known-matched and known-nonmatched comparisons respectively for the LAPD data set. ", fig.keep="hold", fig.pos="h"}
+```{r example, out.width="70%", fig.align="center", fig.cap="Histograms of the cross-correlation functions (CCFs) for the known-matched and known-nonmatched comparisons respectively for the LAPD data set. The histograms imply that the KNM distribution has a mode below 0.5 while the KM distribution peaks in a value above 0.5. The KM distribution also shows a heavy tail to the left or possibly a potential second mode", fig.keep="hold", fig.pos="h"}
 myfit3n4_simulation %>%
   ggplot(aes(color = Class, fill = Class)) +
   geom_histogram(aes(x = ccf, y = ..density..), binwidth = 0.05, #color = "gray99",
@@ -204,10 +204,13 @@ myfit3n4_simulation %>%
 ```
 
 \hh{XXX in the caption for figure 1 add: (1) what type of plot is shown? (2) what data is shown? (3) what is your main finding?}
-\autoref{fig:example} \hh{shows the densities of cross-correlation values for both known-matching pairs and known non-matching pairs of bullet land-engraved areas (LEAs). XXX what data are you using? XXX The two densities exhibit a fairly typical pattern,} in the sense, that \hh{the distribution for known non-matching (KNM) pairs has a mode for CCF values below 0.5 and the distribution of CCF values for KM pairs peaks in a value above 0.5. } 
-<!--which is a typical \yg{pattern} we have for the CCFs of LEA comparisons, that the distributions of KM and KNM \yg{both have relatively high probabilities  for values below and above 0.5. Therefore, there is not a clear separation of the histograms of the same-source and different-source comparisons of the LEA scans.} -->
+<!-- \autoref{fig:example} \hh{shows the densities of cross-correlation values for both known-matching pairs and known non-matching pairs of bullet land-engraved areas (LEAs). XXX what data are you using? XXX The two densities exhibit a fairly typical pattern,} in the sense, that \hh{the distribution for known non-matching (KNM) pairs has a mode for CCF values below 0.5 and the distribution of CCF values for KM pairs peaks in a value above 0.5. }  -->
 
-<!-- \hh{XXX the overlap can be expressed in terms of a probability. By definition, the densities overlap. Only the empirical scores observed in practice might be separated.}.  -->
+\yg{XXX I changed the following paragraph from density to histogram}
+
+\autoref{fig:example} shows the histograms of cross-correlation values for both known-matching pairs and known non-matching pairs of bullet land-engraved areas (LEAs). The two histograms exhibit a fairly typical pattern, in the sense, that the distribution for known non-matching (KNM) pairs has a mode for CCF values below 0.5 and the distribution of CCF values for KM pairs peaks in a value above 0.5.
+
+<!-- which is a typical \yg{pattern} we have for the CCFs of LEA comparisons, that the distributions of KM and KNM \yg{both have relatively high probabilities  for values below and above 0.5. Therefore, there is not a clear separation of the histograms of the same-source and different-source comparisons of the LEA scans.} -->
 
 <!--In the bullet LEA comparison problems, we usually have well separated bullet scores \yg{but not for the land scores according to} @Vanderplas2020.-->
 
