@@ -243,30 +243,41 @@ where $f_l(\cdot;\mu_{l}, \phi_{l})$, $l = 1, 2, 3, ..., k$ are beta distributio
 f_l(x;\mu_{l}, \phi_{l}) =  \frac{\Gamma(\phi_{l})}{\Gamma(\mu_{l}\phi_{l})\Gamma((1-\mu_{l})\phi_{l})}x^{\mu_{l}\phi_{l}-1}(1-x)^{(1-\mu_{l})\phi_{l}-1}
 \end{align*}
 
-```{r betamixFig, out.width="70%", fig.align="center", fig.cap="Two component beta-mixture distributions. From left to right, one component with (mu = 0.75, phi = 40) is held fixed, and the other component with (phi = 40) has mu changing from 0.25 to 0.75. The prior probablity p1 is fixed at 0.5. With the increase of the varying mu, the two modes gradualy merge to one \\hh{XXX include mu into the data set and facet by it.}", fig.pos="h"}
+```{r betamixFig, out.width="70%", fig.align="center", fig.cap="Two component beta-mixture distribution illustration examples. One component with (mu = 0.759, phi = 18.476) is held fixed, and the other component with (phi = 15.812) has mu changing from 0.1 to 0.466 with the mode moving from left to right at the same time. The prior probability p1 is fixed at 0.419. With the increase of the varying mu, the two modes gradually get closer to form an ideal shape for the KM distribution. The parameters are inspired by the later section estimation", fig.pos="h"}
+
+p1 <- 0.419
+mu1 <- 0.466
+phi1 <- 15.812
+mu2 <- 0.759
+phi2 <- 18.476
 
 simdata <- function(p1, a1, b1, a2, b2) {
-  dcomp1 <- dbeta(1:999/1000, shape1 = a1, shape2 = b1)
-  dcomp2 <- dbeta(1:999/1000, shape1 = a2, shape2 = b2)
+  dcomp1 <- dbeta(0:1000/1000, shape1 = a1, shape2 = b1)
+  dcomp2 <- dbeta(0:1000/1000, shape1 = a2, shape2 = b2)
   
-  output <- data.frame(x = 1:999/1000, y = p1*dcomp1 + (1-p1)*dcomp2)
+  output <- data.frame(x = 0:1000/1000, y = p1*dcomp1 + (1-p1)*dcomp2)
   output
 }
 
-params <- data.frame(a = 10:30, b = 30:10)
-comdata <- lapply(1:21, FUN = function(i) {
-  output <- simdata(p1 = 0.5, a1 = params[i,1], b1 = params[i,2], a2 = 30, b2 = 10)
+seq_mu1 <- seq(from = 0.1, to = 0.466, length.out = 7)
+params <- data.frame(p1 = p1, mu1 = seq_mu1, phi1 = phi1, mu2 = mu2, phi2 = phi2)
+comdata <- lapply(seq_along(seq_mu1), FUN = function(i) {
+  p1 <- params$p1[i]
+  mu1 <- params$mu1[i]
+  phi1 <- params$phi1[i]
+  mu2 <- params$mu2[i]
+  phi2 <- params$phi2[i]
+  output <- simdata(p1, a1 = mu1*phi1, b1 = (1-mu1)*phi1, a2 = mu2*phi2, b2 = (1-mu2)*phi2)
   output
-}) %>% bind_rows(.id = "id") %>% filter((as.numeric(id) %% 2) == 1)
+}) %>% bind_rows(.id = "id")
 
 comdata %>%
-  ggplot(aes(x = x, y = y, group = id)) + #, color = as.numeric(id))) + 
+  ggplot(aes(x = x, y = y, group = id, color = as.numeric(id))) + 
   geom_line() + 
-#  scale_color_gradient2(low = "black", mid = "grey", high = "orange", midpoint = 11) + # HH: stay away from grey/orange unless you encode KM and KNM
+  scale_color_gradient2(low = "black", mid = "grey", high = "darkorange", midpoint = 4) +
   ylab("Density") + 
   xlab("Value") +
-  guides(color = guide_none()) +
-  facet_wrap(~as.numeric(id), labeller = "label_both")
+  guides(color = guide_none())
 
 ```
 
