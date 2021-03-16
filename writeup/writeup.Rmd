@@ -108,7 +108,7 @@ One less well investigated aspect of the cross-correlation measure, however, is 
 Due to  limitations of sample sizes and study designs, sound distributional assumptions about the resulting similarity scores are not well established in the bullet comparison field for automated matching algorithms. Therefore, error rates are generally estimated empirically. This estimation is often based on only dozens of bullets from a selected few firearms. <!--originally used in case studies to estimate the current lab practice's error rates. -->
 <!-- \hh{I'm not sure how the next factoid is relevant} And many of those tests are also criticized for the closed-set design and potential information provided to the examiners as pointed out by PCAST [@PCAST2016; @PCAST2016addendum].-->
 To estimate the theoretical error rates of any automatic algorithm, it is important to understand the underlying distributions of the similarity scores. \hh{XXX add a few citations for papers discussing score-based likelihood ratios.} These distributions also play a key role in an analysis of  score-based likelihood ratios (SLR), used to quantify the strength of  similarities and unify the measurement of strength of evidence. 
-\yg{In this paper, we build beta mixture distribution models for the cross-correlation functions (CCF) to provide a framework for error rate estimations and score-based likelihood ratio analysis of the output of automatic algorithms. We also evaluate the size of data needed to reach good estimations for the distributions. We show the size of the data is crucial in applying score-based likelihood ratios and thus, relevant reference databases are needed and required to exceed the minimal number of specimens.}
+In this paper, we build beta mixture distribution models for the cross-correlation function (CCF) to provide a framework for error rate estimations and score-based likelihood ratio analysis of the output of automatic algorithms. We also evaluate the size of data needed to reach good estimations for the distributions. We show the size of the data is crucial in applying score-based likelihood ratios and thus, relevant reference databases are needed and required to exceed the minimal number of specimens.
 
 
 <!-- \hh{Don't start sentences with `And`. I am also not sure, what you refer to by `that`. }
@@ -135,10 +135,10 @@ For bullet evidence, in particular, striations on land engraved areas (LEAs) are
 For computer based algorithms, 3D scans of the LEAs are used. <!-- to carry more information than traditional 2D scans.-->
 Following the process described in @Hare2016, we extract **signatures** \hh{XXX pictures!} from these scans. Various  scores are used in the literature to describe the similarity between two signatures [@ma2004; @nichols1997; @nichols2003; @Hare2016].
 Here, we will employ the cross-correlation function (CCF) to measure similarity.
-\yg{The cross-correlation function (CCF) is calculated by maximizing the cross correlation of two sequence of signatures by horizontally adjusting the signatures.}
+The cross-correlation function (CCF) is calculated by maximizing the  correlation of two  signatures under a vertical shift.
 
-CCF is mathematically a value between -1 and 1, with larger values indicating higher similarity between pairs of signatures. In order to discriminate between same-source and different-source pairs of signatures we need to define a cutoff. Naively, one could assign positive CCF values to indicate same-source pairs and, similarly, negative values to different-source pairs. However, in practice it turns out that values of CCF based on pairs of bullet land signatures are not symmetric around the origin, but mostly positive regardless of source. \yg{The negative values are almost never observed for LEA comparisons in practice (and in none of the more than 100k comparisons considered in this paper).}
-Moreover, different pairings of firearm and ammunition result in different distributions of values, therefore no single CCF value will suffice to distinguish between same-source and different-source pairs. Alternatively to using scores directly, \hh{XXXX citations XXX} suggest the use of score-based log-likelihood ratios to evaluate the strength of forensic evidence. 
+Mathematically, CCF is  a value between -1 and 1, with larger values indicating higher similarity between pairs of signatures. Discriminating between same-source and different-source pairs of signatures is based on a cutoff value. Naively, one could assign positive CCF values to indicate same-source pairs and, similarly, negative values to different-source pairs. However, in practice it turns out that values of CCF based on pairs of bullet land signatures are not symmetric around the origin, but mostly positive regardless of source. Negative values are rarely observed for LEA comparisons in practice (and in none of the more than 100k comparisons considered in this paper).
+Moreover, different pairings of firearm and ammunition result in different distributions of values, therefore no single CCF value is sufficient to distinguish between same-source and different-source pairs. Alternatively to using scores directly, \hh{XXXX citations XXX} suggest the use of score-based log-likelihood ratios to evaluate the strength of forensic evidence. 
 
 <!--This provides us with a rich tool box and help the field advance, but it comes with issues. For the practitioners not in statistical major who don't fully understand the differences among those algorithms, a same number represents different strength of evidence is extremely confusing. And even in the academic field, we need a unified way to quantify the strength of evidence considering different behaviors of different scores. The score based on likelihood ratios is proposed in forensic science to measure the strength of evidence.-->
 
@@ -151,6 +151,9 @@ And it represents how much one result is more likely than the other one and come
 
 Material
 ============================
+
+\hh{XXX The main idea behind the paper format should be that it is easy to tell what other people have done, and what you have done. If you have a materials and methods section you mix the two things up. XXX A section of 'materials' is also not terribly usual for a statistics paper. I would suggest to have 'Distributional Models' go into 'Background' 
+}
 
 \yg{XXX This is trying to reformat the paper to sections like: 1) Material, 2) Methods, 3) Results, 4) Discussion. We might also put Methods before Material, since the training/testing data split and specific data used heavily depends on the study design/methods. Not sure about this. Or like the 3/9 reading group paper, we can put the Material and Methods sections together and use subsubsections, which will give us the largest flexibility to group things together while taking care of the logical order. Something like:}
 
@@ -167,6 +170,28 @@ Material
 \yg{1.3.2 Study design}
 
 \yg{1.4 Effect of the number of specimens}
+
+
+\hh{1. Background and Methods}
+
+....
+
+\hh{1.2 Distributional models}
+
+
+\hh{2. Data }
+
+\hh{2.1 Format and acquisition}
+
+\hh{2.2 Database model v.s. case specific model (only for this section, data is split into testing and training set)}
+
+\hh{2.2.1 Training set and testing set}
+
+\hh{3. Results}
+\hh{3.1 Study design}
+
+\hh{3.2 Effect of the number of specimens}
+
 
 Data Acquisition
 ---------------------------
