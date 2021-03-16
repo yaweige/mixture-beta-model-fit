@@ -31,10 +31,17 @@ header-includes:
   -  \usepackage[dvipsnames]{xcolor}
   -  \usepackage{multirow}
   -  \usepackage{diagbox}
+  -  \usepackage{amsthm}
 ---
+
+
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}[section]
 
 \newcommand{\hh}[1]{{\textcolor{orange}{#1}}}
 \newcommand{\yg}[1]{{\textcolor{blue}{#1}}}
+
+
 
 _Text based on elsarticle sample manuscript, see [http://www.elsevier.com/author-schemas/latex-instructions#elsarticle](http://www.elsevier.com/author-schemas/latex-instructions#elsarticle)_
 
@@ -251,25 +258,30 @@ In the beta mixture distribution, we introduce a weighted sum of prior probabili
 
 \yg{XXX pictures for betamix XXX}
 
-Random variable $Y: [0,1] \mapsto \mathbb{R}$ is said to follow a $k$-component beta mixture distribution, $Y \sim  \text{Betamix}(p, \mu, \phi)$, 
-where $p$, $\mu$ and $\phi$ are parameter vectors defined as:
-\begin{align*}
-&p = (p_{1}, p_{2}, p_{3}, ... , p_{k}),                  &\text{with} 0 \le p_{\ell} \le 1 \forall \ell \in {1, 2, 3, ..., k}~~ \mbox{and} ~~\sum_{\ell = 1}^k p_{\ell} = 1 \\
-&\mu = (\mu_{1}, \mu_{2}, \mu_{3}, ... , \mu_{k}),        &\mu_{\ell} \in (0, 1),~~ l = 1, 2, 3, ..., k \\
-&\phi = (\phi_{1}, \phi_{2}, \phi_{3}, ... , \phi_{k}),    &\phi_{\ell} \in (0, +\infty),~~ l = 1, 2, 3, ..., k
-\end{align*}
-
-then, the $Betamix(p, \mu, \phi)$ can be explicitly written as:
-
-\begin{align*}
-f(x;p, \mu, \phi) =& p_{1}f_1(x;\mu_{1}, \phi_{1}) + p_{2}f_2(x;\mu_{2}, \phi_{2}) +...+ p_{k}f_k(x;\mu_{k}, \phi_{k})
-\end{align*}
-
-where $f_l(\cdot;\mu_{l}, \phi_{l})$, $l = 1, 2, 3, ..., k$ are beta distributions with probability densities as:
-
+\begin{definition}[Beta distribution]
 \begin{align*}
 f_l(x;\mu_{l}, \phi_{l}) =  \frac{\Gamma(\phi_{l})}{\Gamma(\mu_{l}\phi_{l})\Gamma((1-\mu_{l})\phi_{l})}x^{\mu_{l}\phi_{l}-1}(1-x)^{(1-\mu_{l})\phi_{l}-1}
 \end{align*}
+\hh{give $\mu$ and $\phi$ names}
+\end{definition}
+
+\begin{definition}[Beta-Mix distribution]
+Random variable $Y$ is said to follow a $k$-component beta mixture distribution $Y \sim  \text{Betamix}(p, \mu, \phi)$ with parameter vectors $p$, $\mu$ and $\phi$, if its density is written as:
+
+\begin{align*}
+f(y;p, \mu, \phi) =& p_{1}f_1(y;\mu_{1}, \phi_{1}) + p_{2}f_2(y;\mu_{2}, \phi_{2}) +...+ p_{k}f_k(y;\mu_{k}, \phi_{k}),
+\end{align*}
+where
+$f_\ell(\cdot;\mu_{\ell}, \phi_{\ell})$, $\ell = 1, 2, 3, ..., k$ are beta densities
+and parameters
+$p$, $\mu$ and $\phi$ are  defined as:
+\begin{align*}
+&p = (p_{1}, p_{2}, p_{3}, ... , p_{k}),                  &\text{with } 0 \le p_{\ell} \le 1 \forall \ell \in {1, 2, 3, ..., k}~~ \mbox{and} ~~\sum_{\ell = 1}^k p_{\ell} = 1 \\
+&\mu = (\mu_{1}, \mu_{2}, \mu_{3}, ... , \mu_{k}),        &\mu_{\ell} \in (0, 1),~~ l = 1, 2, 3, ..., k \\
+&\phi = (\phi_{1}, \phi_{2}, \phi_{3}, ... , \phi_{k}),    &\phi_{\ell} \in (0, +\infty),~~ l = 1, 2, 3, ..., k
+\end{align*}
+\end{definition}
+
 
 ```{r betamixFig, out.width="70%", fig.align="center", fig.cap="Two component beta-mixture distribution illustration examples. One component with (mu = 0.759, phi = 18.476) is held fixed, and the other component with (phi = 15.812) has mu changing from 0.1 to 0.466 with the mode moving from left to right at the same time. The prior probability p1 is fixed at 0.419. With the increase of the varying mu, the two modes gradually get closer to form an ideal shape for the KM distribution. The parameters are inspired by the later section estimation", fig.pos="h"}
 
