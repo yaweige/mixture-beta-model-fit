@@ -121,6 +121,15 @@ ccf_knm_full_data <- ccf_knm_full_data %>% filter(ccf < 0.90)
 
 \yg{4. Results and discussion}
 
+\yg{4.1 Model result}
+
+\yg{4.2 Error rate result}
+
+\yg{4.3 Database model v.s. case specific model result}
+
+\yg{4.4 Sample size effect and convergence result}
+
+
 
 Introduction
 ====================================
@@ -369,8 +378,8 @@ We design a study to evaluate the effect of data sizes. As in the previous secti
 Results and discussion
 ========================================
 
-LAPD data set and the estimated distributions
-==========================================
+Model result
+------------------------------------
 
 <!-- \yg{For the following sections of the paper, we will base our analysis on the LAPD data set[reference]. The data set consists of bullets fired from 626 Beretta F/FS firearms with 4 bullets for each barrel. It is the first time such a large data set available to the researchers, which makes it possible for a statistical analysis for the distributions of similarity scores. For the firearms used, there are 6 lands in each barrel which will leave 6 LEAs on the bullets for comparisons. We follow the aforementioned standard procejure to generate CCFs as similarity scores (include the procedure). There are 6 different bullet comparisons within a set of 4 bullets for a barrel. There are 6 same source land comparisons and 30 distinct different source land comparisons in each of those 6 bullet comparisons. In total, for a single barrel, there are 36 same source land to land comparisons. For the different source land to land comparisons, we have much more cases. If we limit the scope within each barrel, there will be} $30\times 6 + 15 \times 4 = 240$ \yg{land to land comparisons for which we also take the comparisons among lands on a same bullet into consideration.} -->
 
@@ -484,50 +493,8 @@ myfit1n2_simulation %>%
   ylab("density")
 ```
 
-Application: Determining source in the LAPD data
-=====================
-
-<!-- In the current practice, FTEs  fire two or three test bullets from a suspected firearm using ammunition that matches the evidence found on the crime scene as closely as possible. -->
-<!-- Test fires are checked for consistency of striation marks between fires. Generally, the bullet with the more well expressed striations is used to compare to the evidence. With an automated algorithm in these cases as a tool helping the examiners, we will make use of all those available test bullets and lands to generate similarity scores. And those scores will be used to get score-based likelihood ratios which will quantify the strength of evidence supporting either hypothesis from the prosecution side or the defendant side. The critical step of producing likelihood ratio is to get estimations of the distributions of both KM and KNM comparisons. -->
-
-<!-- Here, we distinguish between two scenarios: 1) use scores from comparisons of test fires to estimate densities for same source and different source, and 2) use scores with known provenance from a database of similar ammunition and firearms. The second scenario is where our analysis of the theoretical distributions of the relevant population of similarity scores stand out. For a similar combination of firearms and ammunition, the similarity scores extracted through a same algorithm are considered identically distributed and comprise the relevant population, which is not a bad idea. In real cases, as stated, we can only make use of similarity scores from two or three test fires. This is good enough to produce valid comparisons but likely not good enough to estimate the distributions which generate the likelihood ratios. Besides the likelihood ratio calculation, the reference distributions are also important in deciding thresholds and control the error rates. For thresholds specifically, we choose the point where the likelihood ratio is 1 which has no preference for either hypothesis. -->
-
-<!-- In either of the two scenarios, we derive scores by comparing test fires and the questioned bullet. The pipeline of the process is as follows: 1) given a questioned bullet and a suspected firearm, 2) conduct test fires with the suspected firearm and collect three test fired bullets, 3) for every pair of bullets (including the questioned), we conduct all possible land comparisons and get 36 land comparison scores (6 land engraved areas on each bullet), 4) among 36 comparisons within a pair of bullets, we select the six comparisons as KM comparisons (for comparisons among test fired bullets) or questioned land comparisons (for comparisons between the questioned bullet and any test fired bullet) by SAM [reference] due to the nature order of land engraved areas produced by a same barrels. Then, for the first scenario, the KM and KNM distributions will be estimated with the KM and KNM similarity scores among the test fired bullets respectively. While for the second scenario, the distributions are estimated with a database of the similarity scores from similar firearms and ammunition. -->
-
-<!-- To show the usefulness of the relevant population and the better distribution estimations by using a database, we design an experiment with our LAPD data set. We randomly split our data into the database sets and case sets. For the database sets, we conduct every comparison within each set (among four bullets), and estimate the KM and KNM reference distribution as two component beta mixture distributions with all available data. For the case sets, we randomly choose one bullet out of each set (four bullets a set) as a questioned bullets and leave the other three as test fired bullets. By compare the questioned bullet with the other three from the sets, we get known-matched bullet comparisons. By randomly matching the questioned bullets with the test fired bullets (except its own set and simple exchanges of bullets between two sets), we get known-non-matched bullet comparisons. One important question is how many sets of bullets should be assigned as database sets since we would like to keep it small but sufficient and put more data into case sets to evaluate the performance. And also, this is an important question in general that how many test fires do we need in general firearm forensic practice. We will dig into this issue in the later section. But for now, we split the 442 sets into 342 database sets and 100 test sets. -->
-
-<!-- Following the above procedure, we have 100 questioned bullets (same bullets in same and different source cases), 100 same source question-test pairs, 100 different source question-test pairs. For each questioned bullet in either case (same or different source), we have 18 questioned land comparisons. For the database scenario, we have 342x36 = 12312 known matched land comparisons, and 342x240 = 82080 known non-matched land comparisons. For the individual case scenario, we have 18 known matched land comparisons (among test bullets), and 125 known non-matched land comparisons. [may be summarized in a table, and for the specific counts, we will provide details of that when introducing the LAPD data set] -->
-
-The results of the experiment show us how the database scenario with well established density estimations improve the over-all accuracy. As shown in \autoref{fig:matched-km}, the left boxplot represents the the individual case scenario where everything is calculated and predicted based on one questioned bullet and three test fired bullets. The right boxplot represents the database scenario where the similarity scores among one questioned bullet and three test fired bullets are evaluated based on a relevant database. \autoref{fig:matched-km} is based on the matched bullets, in which case all the comparisons of lands are actually matches. For each boxplot, there are one hundred points (number of questioned bullets), and each point represents the proportion of correct predictions (i.e. matched lands) of one questioned bullet and the corresponding three test fired bullets based on total eighteen land-land comparisons as shown in y-axis. \autoref{fig:non-matched-result} is formed similar to \autoref{fig:matched-km}, but all the land-land comparisons are non-matched comparisons based on non-matched bullets. And in \autoref{fig:non-matched-result} the y-axis is the proportion of correctly predicted non-matched lands. The results of the experiments are very strong support of making use of a relevant database for automated algorithms. In \autoref{fig:matched-km}, the evaluation based on an individual set are a little better than using of the database because of its more aggressive and data specific way of calculating likelihood ratio and selection of thresholds. But that improvement is little comparing with the significant loss of the accuracy in correctly identifying the non-matched land-land comparisons. \autoref{fig:non-matched-result} implies that it makes no sense of using the individual case calculation to do prediction for non-matched bullet comparisons, while the database scenario works much better and even better than the two results of the matched bullet case, which meets our expectation of a more concentrated KNM distribution than the KM distribution.
-
-```{r matched-km, out.width="70%", fig.align="center", fig.cap="matched-km", fig.keep="hold", fig.pos="h"}
-knitr::include_graphics("../code/organized code/generated figures/matched_km.png")
-```
-
-```{r non-matched-result, out.width="70%", fig.align="center", fig.cap="non-matched", fig.keep="hold", fig.pos="h"}
-knitr::include_graphics("../code/organized code/generated figures/nonmatched_result.png")
-```
-
-[boxplot for KM and KNM, two scenarios, error rates]
-
-[overall confusion table]
-
-[compare this section with nex section, for KM, they are pretty close]
-
-[what about thresholds and likelihood ratios themselves]
-
-
-
-In this paper, we use the CCF as the similarity score..
-
-We evaluate the accuracy under each scenario by using a comparable set of tests with questioned bullets of known origin. 
-
-\hh{As test set we are using bullets from the LAPD bullet set: 626 barrels with four fired bullets each. }
-
-\yg{Should we consider a binomial decison rule to get a bullet comparison results? if that works well here...}
-
-Evaluate the error rates
-================================
+Error rate result
+----------------------------------------
 
 - Given the iid assumption, could we develop a further model for the bullet level distribution and estimate the corresponding error rates?
 
@@ -644,9 +611,53 @@ polydata %>%
 
 Overall, the error rates are not small enough to give confidence to any conclusions. But remember the current comparison discussed is in the land level. In real cases, we will need to combine the land level conclusions to bullet level ones. And this process of combining multiple pieces of evidence will improve the performance greatly. One of the common ways in computer-based bullet analysis is to calculate the sequential average maximum (SAM) [susan's paper and the original paper of SAM?] of land scores. Next, we are going to making use of the KM and KNM distributions in the land level to explore the error rates of the bullet level.
 
+Database model v.s. case specific model result
+--------------------------------------------
 
-Estimations with changing sample size
-================================
+<!-- In the current practice, FTEs  fire two or three test bullets from a suspected firearm using ammunition that matches the evidence found on the crime scene as closely as possible. -->
+<!-- Test fires are checked for consistency of striation marks between fires. Generally, the bullet with the more well expressed striations is used to compare to the evidence. With an automated algorithm in these cases as a tool helping the examiners, we will make use of all those available test bullets and lands to generate similarity scores. And those scores will be used to get score-based likelihood ratios which will quantify the strength of evidence supporting either hypothesis from the prosecution side or the defendant side. The critical step of producing likelihood ratio is to get estimations of the distributions of both KM and KNM comparisons. -->
+
+<!-- Here, we distinguish between two scenarios: 1) use scores from comparisons of test fires to estimate densities for same source and different source, and 2) use scores with known provenance from a database of similar ammunition and firearms. The second scenario is where our analysis of the theoretical distributions of the relevant population of similarity scores stand out. For a similar combination of firearms and ammunition, the similarity scores extracted through a same algorithm are considered identically distributed and comprise the relevant population, which is not a bad idea. In real cases, as stated, we can only make use of similarity scores from two or three test fires. This is good enough to produce valid comparisons but likely not good enough to estimate the distributions which generate the likelihood ratios. Besides the likelihood ratio calculation, the reference distributions are also important in deciding thresholds and control the error rates. For thresholds specifically, we choose the point where the likelihood ratio is 1 which has no preference for either hypothesis. -->
+
+<!-- In either of the two scenarios, we derive scores by comparing test fires and the questioned bullet. The pipeline of the process is as follows: 1) given a questioned bullet and a suspected firearm, 2) conduct test fires with the suspected firearm and collect three test fired bullets, 3) for every pair of bullets (including the questioned), we conduct all possible land comparisons and get 36 land comparison scores (6 land engraved areas on each bullet), 4) among 36 comparisons within a pair of bullets, we select the six comparisons as KM comparisons (for comparisons among test fired bullets) or questioned land comparisons (for comparisons between the questioned bullet and any test fired bullet) by SAM [reference] due to the nature order of land engraved areas produced by a same barrels. Then, for the first scenario, the KM and KNM distributions will be estimated with the KM and KNM similarity scores among the test fired bullets respectively. While for the second scenario, the distributions are estimated with a database of the similarity scores from similar firearms and ammunition. -->
+
+<!-- To show the usefulness of the relevant population and the better distribution estimations by using a database, we design an experiment with our LAPD data set. We randomly split our data into the database sets and case sets. For the database sets, we conduct every comparison within each set (among four bullets), and estimate the KM and KNM reference distribution as two component beta mixture distributions with all available data. For the case sets, we randomly choose one bullet out of each set (four bullets a set) as a questioned bullets and leave the other three as test fired bullets. By compare the questioned bullet with the other three from the sets, we get known-matched bullet comparisons. By randomly matching the questioned bullets with the test fired bullets (except its own set and simple exchanges of bullets between two sets), we get known-non-matched bullet comparisons. One important question is how many sets of bullets should be assigned as database sets since we would like to keep it small but sufficient and put more data into case sets to evaluate the performance. And also, this is an important question in general that how many test fires do we need in general firearm forensic practice. We will dig into this issue in the later section. But for now, we split the 442 sets into 342 database sets and 100 test sets. -->
+
+<!-- Following the above procedure, we have 100 questioned bullets (same bullets in same and different source cases), 100 same source question-test pairs, 100 different source question-test pairs. For each questioned bullet in either case (same or different source), we have 18 questioned land comparisons. For the database scenario, we have 342x36 = 12312 known matched land comparisons, and 342x240 = 82080 known non-matched land comparisons. For the individual case scenario, we have 18 known matched land comparisons (among test bullets), and 125 known non-matched land comparisons. [may be summarized in a table, and for the specific counts, we will provide details of that when introducing the LAPD data set] -->
+
+The results of the experiment show us how the database scenario with well established density estimations improve the over-all accuracy. As shown in \autoref{fig:matched-km}, the left boxplot represents the the individual case scenario where everything is calculated and predicted based on one questioned bullet and three test fired bullets. The right boxplot represents the database scenario where the similarity scores among one questioned bullet and three test fired bullets are evaluated based on a relevant database. \autoref{fig:matched-km} is based on the matched bullets, in which case all the comparisons of lands are actually matches. For each boxplot, there are one hundred points (number of questioned bullets), and each point represents the proportion of correct predictions (i.e. matched lands) of one questioned bullet and the corresponding three test fired bullets based on total eighteen land-land comparisons as shown in y-axis. \autoref{fig:non-matched-result} is formed similar to \autoref{fig:matched-km}, but all the land-land comparisons are non-matched comparisons based on non-matched bullets. And in \autoref{fig:non-matched-result} the y-axis is the proportion of correctly predicted non-matched lands. The results of the experiments are very strong support of making use of a relevant database for automated algorithms. In \autoref{fig:matched-km}, the evaluation based on an individual set are a little better than using of the database because of its more aggressive and data specific way of calculating likelihood ratio and selection of thresholds. But that improvement is little comparing with the significant loss of the accuracy in correctly identifying the non-matched land-land comparisons. \autoref{fig:non-matched-result} implies that it makes no sense of using the individual case calculation to do prediction for non-matched bullet comparisons, while the database scenario works much better and even better than the two results of the matched bullet case, which meets our expectation of a more concentrated KNM distribution than the KM distribution.
+
+```{r matched-km, out.width="70%", fig.align="center", fig.cap="matched-km", fig.keep="hold", fig.pos="h"}
+knitr::include_graphics("../code/organized code/generated figures/matched_km.png")
+```
+
+```{r non-matched-result, out.width="70%", fig.align="center", fig.cap="non-matched", fig.keep="hold", fig.pos="h"}
+knitr::include_graphics("../code/organized code/generated figures/nonmatched_result.png")
+```
+
+[boxplot for KM and KNM, two scenarios, error rates]
+
+[overall confusion table]
+
+[compare this section with nex section, for KM, they are pretty close]
+
+[what about thresholds and likelihood ratios themselves]
+
+
+
+In this paper, we use the CCF as the similarity score..
+
+We evaluate the accuracy under each scenario by using a comparable set of tests with questioned bullets of known origin. 
+
+\hh{As test set we are using bullets from the LAPD bullet set: 626 barrels with four fired bullets each. }
+
+\yg{Should we consider a binomial decison rule to get a bullet comparison results? if that works well here...}
+
+
+
+
+Sample size effect and convergence result
+------------------------------------------------
 
 <!-- To address the question that how many test fires we need to reach good estimations of the distributions in a database and finally, a good classification result with controlled error rates, we will investigate the estimations and error rates in a changing sample size setting. There are two ways we might evaluate the estimations. First, from a statistical view, we can quantify the variation of the estimated curves, and find the minimum requirement to make the estimation converge. From a practical view, we look at the error rate and find a sample size when the error rates converge. Then, we can make sure to get reliable estimations of the densities and reliable performance of making predictions with likelihood ratios. -->
 
@@ -697,7 +708,7 @@ Conclusion
 
 <!-- (Different measurements of similarities of forensic evidence are proposed, but the strength of those evidence is not clear when we study all those scores in hands. Likelihood ratios are considered as a way to unify the different scores and directly link to the strength of evidence. The distributional form is the key of the likelihood ratio analysis of forensic evidence in determining the densities and the thresholds.) -->
 
-\yg{We did a distributional analysis of the similarity scores to guide the use of likelihood ratios in quantifying the strength of forensic evidence. In particular, we picked the CCF as a typical similarity score and established two-component beta mixture distributions as the theoretical forms for both known-matched and known-nonmatched land-land comparisons. Then we showed how effectively the use of those theoretical forms from a relevant population could help in improving the performance of the prediction in forensic practice with likelihood ratios. The false negative error rates based on individual cases are a little bit lower than the ones based on the relevant database, but it comes with extreme false positive error rates. As expected, the predictions based on individual cases face the problem similar to overfitting issues. This result strongly supports using a relevant database for the relevant population in likelihood ratio analyses for forensic science. We analyzed the associated underlying theoretical error rates in using likelihood ratios with the distributional forms we established. Ideally, we would expect to achieve those error rates if the relevant population is accessible. Thus, we could theoretically control the error rates in the practice. Further, we analyzed the amount of data necessary to establish a reasonable database for the relevant population, and finally achieve the target error rates. We introduced different level of convergence for the required data sizes. Intuitively, the requirement for a particular database to produce stable results is lower than the requirement of all databases to produce a same stable result. And we could conclude that for a particular database, the ideal size would be 60 sets of bullets.}
+We did a distributional analysis of the similarity scores to guide the use of likelihood ratios in quantifying the strength of forensic evidence. In particular, we picked the CCF as a typical similarity score and established two-component beta mixture distributions as the theoretical forms for both known-matched and known-nonmatched land-land comparisons. Then we showed how effectively the use of those theoretical forms from a relevant population could help in improving the performance of the prediction in forensic practice with likelihood ratios. The false negative error rates based on individual cases are a little bit lower than the ones based on the relevant database, but it comes with extreme false positive error rates. As expected, the predictions based on individual cases face the problem similar to overfitting issues. This result strongly supports using a relevant database for the relevant population in likelihood ratio analyses for forensic science. We analyzed the associated underlying theoretical error rates in using likelihood ratios with the distributional forms we established. Ideally, we would expect to achieve those error rates if the relevant population is accessible. Thus, we could theoretically control the error rates in the practice. Further, we analyzed the amount of data necessary to establish a reasonable database for the relevant population, and finally achieve the target error rates. We introduced different level of convergence for the required data sizes. Intuitively, the requirement for a particular database to produce stable results is lower than the requirement of all databases to produce a same stable result. And we could conclude that for a particular database, the ideal size would be 60 sets of bullets.
 
 
 \clearpage
