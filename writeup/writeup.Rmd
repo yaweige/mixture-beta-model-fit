@@ -53,7 +53,7 @@ theme_set(theme_bw())
 knitr::opts_chunk$set(echo = FALSE)
 ```
 
-```{r data-input-section, include=FALSE}
+```{r data-input-section, include=FALSE,eval=FALSE}
 # I call part1 for the model estimation part and
 # part2 for the "application" section
 ccf_data <- read.csv("../data/organized data/ccf-related/ccf_data.csv")
@@ -62,7 +62,7 @@ ccf_data_part1 <- ccf_data %>% filter(usage == "part1")
 ccf_data_part2 <- ccf_data %>% filter(usage == "part2")
 ```
 
-```{r model-estimation-section, include=FALSE}
+```{r model-estimation-section, include=FALSE,eval=FALSE}
 ccf_km_full_data <- ccf_data_part1 %>% filter(source == "KM")
 ccf_knm_full_data <- ccf_data_part1 %>% filter(source == "KNM")
 
@@ -188,15 +188,15 @@ ccf_knm_c3$convergence
 
 ```
 
-```{r error-rate-section, include=FALSE}
+```{r error-rate-section, include=FALSE,eval=FALSE}
 
 ```
 
-```{r application-section, include=FALSE}
+```{r application-section, include=FALSE,eval=FALSE}
 
 ```
 
-```{r sample-size-section, include=FALSE}
+```{r sample-size-section, include=FALSE,eval=FALSE}
 
 ```
 
