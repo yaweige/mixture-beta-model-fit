@@ -48,8 +48,156 @@ _Text based on elsarticle sample manuscript, see [http://www.elsevier.com/author
 ```{r setup, warning=FALSE,message=FALSE, echo=FALSE}
 library(dplyr)
 library(ggplot2)
+library(readr)
 theme_set(theme_bw())
 knitr::opts_chunk$set(echo = FALSE)
+```
+
+```{r data-input-section, include=FALSE}
+# I call part1 for the model estimation part and
+# part2 for the "application" section
+ccf_data <- read.csv("../data/organized data/ccf-related/ccf_data.csv")
+ccf_data_part1 <- ccf_data %>% filter(usage == "part1")
+# To be added
+ccf_data_part2 <- ccf_data %>% filter(usage == "part2")
+```
+
+```{r model-estimation-section, include=FALSE}
+ccf_km_full_data <- ccf_data_part1 %>% filter(source == "KM")
+ccf_knm_full_data <- ccf_data_part1 %>% filter(source == "KNM")
+
+# only 35 knms out of 146880 knms are greater than (or equal to) 0.9, remove those
+ccf_knm_full_data <- ccf_knm_full_data %>% filter(ccf < 0.90)
+
+# The function to do the model fit
+mine_betamix <- function(data, par, k, control = list(), hessian = FALSE){
+  beta_likelihood <- function(par, data) {
+    a1 <- par[1]
+    b1 <- par[2]
+    
+    beta_1 <- dbeta(data, shape1 = a1, shape2 = b1)
+    
+    output <- -sum(log(beta_1))
+  }
+  
+  betamix_likelihood <- function(par = c(0.5, 1, 1, 1, 1), data) {
+    p1 <- par[1]
+    a1 <- par[2]
+    b1 <- par[3]
+    a2 <- par[4]
+    b2 <- par[5]
+    
+    if (p1<=0 | p1>=1 | a1<= 0 | b1 <= 0| a2<=0| b2<=0){
+      output <- Inf
+    } else if ((a1/(a1 + b1))>=(a2/(a2 + b2))) {
+      output <- Inf
+    } else {
+      beta_1 <- dbeta(data, shape1 = a1, shape2 = b1)
+      beta_2 <- dbeta(data, shape1 = a2, shape2 = b2)
+      output <- -sum(log(p1*beta_1 + (1-p1)*beta_2))
+    }
+    
+    output
+  }
+  
+  beta_c3_likelihood <- function(par, data) {
+    p1 <- par[1]
+    p2 <- par[2]
+    a1 <- par[3]
+    b1 <- par[4]
+    a2 <- par[5]
+    b2 <- par[6]
+    a3 <- par[7]
+    b3 <- par[8]
+    
+    beta_1 <- dbeta(data, shape1 = a1, shape2 = b1)
+    beta_2 <- dbeta(data, shape1 = a2, shape2 = b2)
+    beta_3 <- dbeta(data, shape1 = a3, shape2 = b3)
+    
+    output <- -sum(log(p1*beta_1 + p2*beta_2 + (1 - p1 - p2)*beta_3))
+  }
+  
+  if (k == 1) {
+    output <- optim(par = par, fn = beta_likelihood, 
+                    data = data,
+                    control = control,
+                    hessian = hessian)
+  } else if (k == 2) {
+    output <- optim(par = par, fn = betamix_likelihood, 
+                    data = data,
+                    control = control,
+                    hessian = hessian)
+  } else if (k == 3) {
+    output <- optim(par = par, fn = beta_c3_likelihood, 
+                    data = data,
+                    control = control,
+                    hessian = hessian)
+  }
+  
+  output$value <- -output$value
+  names(output)[which(names(output) == "value")] <- "logLik"
+  output
+}
+
+# single beta============================
+ccf_km_c1 <- mine_betamix(data = ccf_km_full_data$ccf, 
+                          par = c(4.16, 2.38),
+                          k = 1)
+# be sure to check the convergence
+ccf_km_c1$convergence
+
+ccf_knm_c1 <- mine_betamix(data = ccf_knm_full_data$ccf, 
+                           par = c(6.457, 9.54),
+                           k = 1)
+ccf_knm_c1$convergence
+
+# two-component beta mixture=========================
+ccf_km_c2 <- mine_betamix(data = ccf_km_full_data$ccf, 
+                          par = c(0.3, 5, 5, 5, 2),
+                          k = 2,
+                          control = list(maxit = 1000))
+
+ccf_km_c2$convergence
+
+# starting values borrowed from betamix fit result, however, it doesn't need to be so informative,
+# par = c(0.5, 5, 10, 5, 5) works well too
+ccf_knm_c2 <- mine_betamix(data = ccf_knm_full_data$ccf, 
+                           par = c(0.634, 11.5, 21, 6.8, 7.2),
+                           k = 2,
+                           control = list(maxit = 1000))
+ccf_knm_c2$convergence
+
+# three-component beta mixture========================
+
+ccf_km_c3 <- mine_betamix(data = ccf_km_full_data$ccf,
+                          par = c(0.548, 0.2, 7.5, 4.19, 10.69, 17, 26, 6),
+                          k = 3,
+                          control = list(maxit = 3000))
+ccf_km_c3$convergence
+
+ccf_knm_c3 <- mine_betamix(data = ccf_knm_full_data$ccf,
+                           par = c(0.65, 0.314, 12, 23, 12.5, 12.5, 12.3, 6.2),
+                           k = 3,
+                           control = list(maxit = 3000))
+ccf_knm_c3$convergence
+# summary model params================================
+
+# simulation to plot===================================
+
+# statistics calculated for the models=========================
+
+```
+
+```{r error-rate-section, include=FALSE}
+
+```
+
+```{r application-section, include=FALSE}
+
+```
+
+```{r sample-size-section, include=FALSE}
+
 ```
 
 ```{r prepare-data}
