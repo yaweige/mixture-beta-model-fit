@@ -69,7 +69,16 @@ ccf_knm_full_data <- ccf_data_part1 %>% filter(source == "KNM")
 # only 35 knms out of 146880 knms are greater than (or equal to) 0.9, remove those
 ccf_knm_full_data <- ccf_knm_full_data %>% filter(ccf < 0.90)
 
-# The function to do the model fit
+# The function to do the model fit====================
+#par: starting values provided, different by each k
+#par = c(a, b) when k = 1,
+#par = c(p1, a1, b1, a2, b2), when k = 2
+#par = c(p1, p2, a1, b1, a2, b2, a3, b3), when k =3
+#k: number of components 1, 2 or 3.
+#data: numeric vector
+#control: provided to "optim"
+#if the function produce warnings of NaN, that's not a problem, since I don't set hard bounds for parameters
+#the "optim" function will handle that well
 mine_betamix <- function(data, par, k, control = list(), hessian = FALSE){
   beta_likelihood <- function(par, data) {
     a1 <- par[1]
@@ -181,10 +190,119 @@ ccf_knm_c3 <- mine_betamix(data = ccf_knm_full_data$ccf,
                            control = list(maxit = 3000))
 ccf_knm_c3$convergence
 # summary model params================================
+#par = c(a, b) when k = 1,
+#par = c(p1, a1, b1, a2, b2), when k = 2
+#par = c(p1, p2, a1, b1, a2, b2, a3, b3), when k =3
+
+param_extract <- function(model) {
+  if(model$convergence != 0) warning("model not converged")
+  par <- model$par
+  nparam <- length(par)
+  
+  if(nparam == 2) {
+    output <- data.frame(a = par[1],
+                         b = par[2])
+    output <- output %>% mutate(mu = 1/(a+b),
+                                phi = a+b)
+    
+  } else if (nparam == 5) {
+    output <- data.frame(p1 = par[1],
+                         a1 = par[2],
+                         b1 = par[3],
+                         a2 = par[4],
+                         b2 = par[5])
+    output <- output %>% mutate(mu1 = 1/(a1+b1),
+                                phi1 = a1+b1,
+                                mu2 = 1/(a2+b2),
+                                phi2 = a2+b2)
+  } else if (nparam == 8) {
+    output <- data.frame(p1 = par[1],
+                         p2 = par[2],
+                         a1 = par[3],
+                         b1 = par[4],
+                         a2 = par[5],
+                         b2 = par[6],
+                         a3 = par[7],
+                         b3 = par[8])
+    output <- output %>% mutate(mu1 = 1/(a1+b1),
+                                phi1 = a1+b1,
+                                mu2 = 1/(a2+b2),
+                                phi2 = a2+b2,
+                                mu3 = 1/(a3+b3),
+                                phi3 = a3+b3)
+  } else {
+    stop("The function can't handle this case")
+  }
+  return(output)
+}
+
+param_km_c1 <- param_extract(ccf_km_c1)
+param_knm_c1 <- param_extract(ccf_knm_c1)
+param_km_c2 <- param_extract(ccf_km_c2)
+param_knm_c2 <- param_extract(ccf_knm_c2)
 
 # simulation to plot===================================
 
+# two-component betamix
+myfit1_simulation <- data.frame(ccf = (1:99)/100, 
+                                y1 = dbeta((1:99)/100, 
+                                           shape1 = param_km_c2$a1, 
+                                           shape2 = param_km_c2$b1),
+                                y2 = dbeta((1:99)/100, 
+                                           shape1 = param_km_c2$a2, 
+                                           shape2 = param_km_c2$b2))
+
+myfit1_simulation <- myfit1_simulation %>% mutate(y = param_km_c2$p1*y1 + (1-param_km_c2$p1)*y2)
+
+myfit2_simulation <- data.frame(ccf = (1:99)/100, 
+                                y1 = dbeta((1:99)/100, 
+                                           shape1 = param_knm_c2$a1, 
+                                           shape2 = param_knm_c2$b1),
+                                y2 = dbeta((1:99)/100, 
+                                           shape1 = param_knm_c2$a2, 
+                                           shape2 = param_knm_c2$b2))
+
+myfit2_simulation <- myfit2_simulation %>% mutate(y = param_knm_c2$p1*y1 + (1-param_knm_c2$p1)*y2)
+
+myfit1n2_simulation <- bind_rows(myfit1_simulation, myfit2_simulation, .id = "Class")
+
+# single beta
+# one component
+myfit3_simulation <- data.frame(ccf = (1:99)/100, 
+                                y = dbeta((1:99)/100, 
+                                          shape1 = param_km_c1$a, 
+                                          shape2 = param_km_c1$b))
+
+myfit4_simulation <- data.frame(ccf = (1:99)/100, 
+                                y = dbeta((1:99)/100, 
+                                          shape1 = param_knm_c1$a, 
+                                          shape2 = param_knm_c1$b))
+
+myfit3n4_simulation <- bind_rows(myfit3_simulation, myfit4_simulation, .id = "Class")
+
 # statistics calculated for the models=========================
+
+# likelihood ratio
+lr1 <- 2*(ccf_km_c2$logLik - ccf_km_c1$logLik)
+lr1p <- 1-pchisq(2*(ccf_km_c2$logLik - ccf_km_c1$logLik), df = 3)
+
+lr2 <- 2*(ccf_km_c3$logLik - ccf_km_c2$logLik)
+lr2p <- 1-pchisq(2*(ccf_km_c3$logLik - ccf_km_c2$logLik), df = 3)
+
+lr3 <- 2*(ccf_knm_c2$logLik - ccf_knm_c1$logLik)
+lr3p <- 1-pchisq(2*(ccf_knm_c2$logLik - ccf_knm_c1$logLik), df = 3)
+
+lr4 <- 2*(ccf_knm_c3$logLik - ccf_knm_c2$logLik)
+lr4p <- 1-pchisq(2*(ccf_knm_c3$logLik - ccf_knm_c2$logLik), df = 3)
+
+# bic
+bic1 <- 2*log(nrow(ccf_km_full_data))- 2*ccf_km_c1$logLik
+bic2 <- 5*log(nrow(ccf_km_full_data))- 2*ccf_km_c2$logLik
+bic3 <- 8*log(nrow(ccf_km_full_data))- 2*ccf_km_c3$logLik
+
+bic4 <- 2*log(nrow(ccf_knm_full_data))- 2*ccf_knm_c1$logLik
+bic5 <- 5*log(nrow(ccf_knm_full_data))- 2*ccf_knm_c2$logLik
+bic6 <- 8*log(nrow(ccf_knm_full_data))- 2*ccf_knm_c3$logLik
 
 ```
 
