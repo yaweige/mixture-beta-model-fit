@@ -307,6 +307,63 @@ bic6 <- 8*log(nrow(ccf_knm_full_data))- 2*ccf_knm_c3$logLik
 ```
 
 ```{r error-rate-section, include=FALSE,eval=FALSE}
+pbetamix2 <- function(x, model){
+  p1 <- model$par[1]
+  p2 <- 1 - model$par[1]
+  a1 <- model$par[2]
+  b1 <- model$par[3]
+  a2 <- model$par[4]
+  b2 <- model$par[5]
+  
+  pdf <- p1*pbeta(x, shape1 = a1, shape2 = b1) + 
+    p2*pbeta(x, shape1 = a2, shape2 = b2)
+  
+  pdf
+}
+
+dbetamix2 <- function(x, model){
+  p1 <- model$par[1]
+  p2 <- 1 - model$par[1]
+  a1 <- model$par[2]
+  b1 <- model$par[3]
+  a2 <- model$par[4]
+  b2 <- model$par[5]
+  
+  pdf <- p1*dbeta(x, shape1 = a1, shape2 = b1) + 
+    p2*dbeta(x, shape1 = a2, shape2 = b2)
+  
+  pdf
+}
+
+find_cross <- function(m1, m2, start = 0.4){
+  a <- 1
+  b <- 2
+  x <- start
+  while(abs(a - b)>=0.001) {
+    x <- x + 0.0001
+    a <- dbetamix2(x, m1)
+    b <- dbetamix2(x, m2)
+    
+    if (x > 0.7){
+      stop("the cutoff exceeds 0.7, try smaller steps")
+    }
+  }
+  x
+}
+
+# 0.529
+cutoff1 <- find_cross(ccf_km_c2, ccf_knm_c2, 0.4)
+
+# numbers as a reference but changed a little for now
+# FPR: 0.148
+fdr <- 1 - pbetamix2(cutoff1, ccf_knm_c2)
+# FNR: 0.301
+fnr <- pbetamix2(cutoff1, ccf_km_c2)
+# FIR: 0.212
+fir <- (1 - pbetamix2(cutoff1, ccf_knm_c2))/(1 - pbetamix2(cutoff1, ccf_km_c2))
+# FER: 0.354
+fer <- pbetamix2(cutoff1, ccf_km_c2)/pbetamix2(cutoff1, ccf_knm_c2)
+
 
 ```
 
@@ -315,6 +372,97 @@ bic6 <- 8*log(nrow(ccf_knm_full_data))- 2*ccf_knm_c3$logLik
 ```
 
 ```{r sample-size-section, include=FALSE,eval=FALSE}
+# These are randomly generated sequences, to reduce the randomness of each run, it is stored
+change_size_sequences <- read_csv("../data/organized data/ccf-related/change_size_sequences.csv")
+
+# make use of different starting values (this actually has no significant effect, and only part of it is shown in the final report)
+# the full model one:
+starting_1 <- matrix(c(param_km_c2$p1,  param_km_c2$a1,  param_km_c2$b1, param_km_c2$a2, param_km_c2$b2,
+                       param_knm_c2$p1,  param_knm_c2$a1,  param_knm_c2$b1, param_knm_c2$a2, param_knm_c2$b2),
+                     nrow = 2, byrow = TRUE, 
+                     dimnames = list(class = c("KM", "KNM"), param = c("p1", "a1", "b1", "a2", "b2")))
+
+starting_1
+
+# kind of non-informative (some 6's to let the mu1 < mu2)
+starting_2 <- matrix(c(0.3, 5, 6, 5, 5,
+                       0.7, 5, 6, 5, 5),
+                     nrow = 2, byrow = TRUE, 
+                     dimnames = list(class = c("KM", "KNM"), param = c("p1", "a1", "b1", "a2", "b2")))
+starting_2
+
+# The function to do the fit
+# For example: example <- change_size_sequence_fit(ccf_km_full_data, seq = change_size_sequences$seq1, start = starting_1[1,], class = "km")
+change_size_sequence_fit <- function(data, seq, start = c(0.3, 5, 6, 5, 5), k = 2, class) {
+  if (class == "km") {
+    step <- 36
+  } else if (class == "knm") {
+    step <- 240
+  } else {
+    stop("class not one of km or knm")
+  }
+  model_list <- lapply(seq_along(seq), FUN = function(i) {
+    index_start <- sort(seq[1:i]-1)*step+1
+    index_end <- sort(seq[1:i])*step
+    index <-  Map(f = function(x, y) {
+      output <- x:y
+      output
+    }, index_start, index_end) %>% unlist
+    
+    used_data <- data$ccf[index]
+    model <- mine_betamix(data = used_data,
+                          par = start,
+                          k = k,
+                          control = list(maxit = 3000),
+                          hessian = FALSE)
+    
+  })
+  model_list
+}
+
+# The run =====================================
+# might be better in a function......
+# KM, start 1, sequence 1, first 100
+km_st1_sq1_100 <- change_size_sequence_fit(ccf_km_full_data, seq = change_size_sequences$seq1[1:100], start = starting_1[1,], class = "km")
+# .............sequence 2
+km_st1_sq2_100 <- change_size_sequence_fit(ccf_km_full_data, seq = change_size_sequences$seq2[1:100], start = starting_1[1,], class = "km")
+# .............sequence 3
+km_st1_sq3_100 <- change_size_sequence_fit(ccf_km_full_data, seq = change_size_sequences$seq3[1:100], start = starting_1[1,], class = "km")
+# ....start 2..seq 1
+km_st2_sq1_100 <- change_size_sequence_fit(ccf_km_full_data, seq = change_size_sequences$seq1[1:100], start = starting_2[1,], class = "km")
+# ....start 2..seq 2
+km_st2_sq2_100 <- change_size_sequence_fit(ccf_km_full_data, seq = change_size_sequences$seq2[1:100], start = starting_2[1,], class = "km")
+# ....start 2..seq 3
+km_st2_sq3_100 <- change_size_sequence_fit(ccf_km_full_data, seq = change_size_sequences$seq3[1:100], start = starting_2[1,], class = "km")
+
+
+# KNM, start 1, sequence 1, first 100
+knm_st1_sq1_100 <- change_size_sequence_fit(ccf_knm_full_data, seq = change_size_sequences$seq1[1:100], start = starting_1[2,], class = "knm")
+# .............sequence 2
+knm_st1_sq2_100 <- change_size_sequence_fit(ccf_knm_full_data, seq = change_size_sequences$seq2[1:100], start = starting_1[2,], class = "knm")
+# .............sequence 3
+knm_st1_sq3_100 <- change_size_sequence_fit(ccf_knm_full_data, seq = change_size_sequences$seq3[1:100], start = starting_1[2,], class = "knm")
+# ....start 2..seq 1
+knm_st2_sq1_100 <- change_size_sequence_fit(ccf_knm_full_data, seq = change_size_sequences$seq1[1:100], start = starting_2[2,], class = "knm")
+# ....start 2..seq 2
+knm_st2_sq2_100 <- change_size_sequence_fit(ccf_knm_full_data, seq = change_size_sequences$seq2[1:100], start = starting_2[2,], class = "knm")
+# ....start 2..seq 3
+knm_st2_sq3_100 <- change_size_sequence_fit(ccf_knm_full_data, seq = change_size_sequences$seq3[1:100], start = starting_2[2,], class = "knm")
+
+change_size_sequence_result <- list(km_st1_sq1_100,
+                                    km_st1_sq2_100,
+                                    km_st1_sq3_100,
+                                    km_st2_sq1_100,
+                                    km_st2_sq2_100,
+                                    km_st2_sq3_100,
+                                    knm_st1_sq1_100,
+                                    knm_st1_sq2_100,
+                                    knm_st1_sq3_100,
+                                    knm_st2_sq1_100,
+                                    knm_st2_sq2_100,
+                                    knm_st2_sq3_100)
+
+# Analysis of results=====================================================
 
 ```
 
@@ -499,8 +647,6 @@ However, it may not be adequate to explain a heavy tail or even a second mode su
 In the beta mixture distribution, we introduce a weighted sum of prior probabilities to combine several beta densities as one:
 
 \hh{XXX definition XXX }
-
-\yg{XXX pictures for betamix XXX}
 
 \begin{definition}[Beta distribution]
 \begin{align*}
