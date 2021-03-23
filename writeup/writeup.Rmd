@@ -50,7 +50,7 @@ library(dplyr)
 library(ggplot2)
 library(readr)
 theme_set(theme_bw())
-knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(echo = FALSE, cache = TRUE)
 ```
 
 ```{r data-input-section, include=FALSE,eval=FALSE}
@@ -420,50 +420,99 @@ change_size_sequence_fit <- function(data, seq, start = c(0.3, 5, 6, 5, 5), k = 
   model_list
 }
 
-# The run =====================================
-# might be better in a function......
-# KM, start 1, sequence 1, first 100
-km_st1_sq1_100 <- change_size_sequence_fit(ccf_km_full_data, seq = change_size_sequences$seq1[1:100], start = starting_1[1,], class = "km")
-# .............sequence 2
-km_st1_sq2_100 <- change_size_sequence_fit(ccf_km_full_data, seq = change_size_sequences$seq2[1:100], start = starting_1[1,], class = "km")
-# .............sequence 3
-km_st1_sq3_100 <- change_size_sequence_fit(ccf_km_full_data, seq = change_size_sequences$seq3[1:100], start = starting_1[1,], class = "km")
-# ....start 2..seq 1
-km_st2_sq1_100 <- change_size_sequence_fit(ccf_km_full_data, seq = change_size_sequences$seq1[1:100], start = starting_2[1,], class = "km")
-# ....start 2..seq 2
-km_st2_sq2_100 <- change_size_sequence_fit(ccf_km_full_data, seq = change_size_sequences$seq2[1:100], start = starting_2[1,], class = "km")
-# ....start 2..seq 3
-km_st2_sq3_100 <- change_size_sequence_fit(ccf_km_full_data, seq = change_size_sequences$seq3[1:100], start = starting_2[1,], class = "km")
 
+# The run=================================================
+km_st1_sq1to10_100 <- lapply(1:10, FUN = function(x) {
+  output <- change_size_sequence_fit(ccf_km_full_data, 
+                                     seq = change_size_sequences[,i][1:100], 
+                                     start = starting_1[1,], 
+                                     class = "km")
+})
 
-# KNM, start 1, sequence 1, first 100
-knm_st1_sq1_100 <- change_size_sequence_fit(ccf_knm_full_data, seq = change_size_sequences$seq1[1:100], start = starting_1[2,], class = "knm")
-# .............sequence 2
-knm_st1_sq2_100 <- change_size_sequence_fit(ccf_knm_full_data, seq = change_size_sequences$seq2[1:100], start = starting_1[2,], class = "knm")
-# .............sequence 3
-knm_st1_sq3_100 <- change_size_sequence_fit(ccf_knm_full_data, seq = change_size_sequences$seq3[1:100], start = starting_1[2,], class = "knm")
-# ....start 2..seq 1
-knm_st2_sq1_100 <- change_size_sequence_fit(ccf_knm_full_data, seq = change_size_sequences$seq1[1:100], start = starting_2[2,], class = "knm")
-# ....start 2..seq 2
-knm_st2_sq2_100 <- change_size_sequence_fit(ccf_knm_full_data, seq = change_size_sequences$seq2[1:100], start = starting_2[2,], class = "knm")
-# ....start 2..seq 3
-knm_st2_sq3_100 <- change_size_sequence_fit(ccf_knm_full_data, seq = change_size_sequences$seq3[1:100], start = starting_2[2,], class = "knm")
-
-change_size_sequence_result <- list(km_st1_sq1_100,
-                                    km_st1_sq2_100,
-                                    km_st1_sq3_100,
-                                    km_st2_sq1_100,
-                                    km_st2_sq2_100,
-                                    km_st2_sq3_100,
-                                    knm_st1_sq1_100,
-                                    knm_st1_sq2_100,
-                                    knm_st1_sq3_100,
-                                    knm_st2_sq1_100,
-                                    knm_st2_sq2_100,
-                                    knm_st2_sq3_100)
+knm_st1_sq1to10_100 <- lapply(1:10, FUN = function(i) {
+  output <- change_size_sequence_fit(ccf_knm_full_data, 
+                                     seq = change_size_sequences[,i][1:100], 
+                                     start = starting_1[2,], 
+                                     class = "knm")
+})
 
 # Analysis of results=====================================================
 
+# seq: which sequence used
+# sets: number of sets used
+long_form_result_trans <- function(result) {
+  output1 <- lapply(result, FUN = function(sets) {
+    output2 <- lapply(sets, FUN = function(x) {
+      output3<- data.frame(p1 = x$par[1],
+                           a1 = x$par[2],
+                           b1 = x$par[3],
+                           a2 = x$par[4],
+                           b2 = x$par[5])
+      output3
+    }) %>% bind_rows(.id = "sets")
+    
+    output2 <- output2 %>%
+      mutate(mu1 = a1/(a1 + b1),
+             mu2 = a2/(a2 + b2),
+             mu = p1*mu1 + (1-p1)*mu2,
+             var1 = a1*b1/(a1+b1)^2/(a1+b1+1),
+             var2 = a2*b2/(a2+b2)^2/(a2+b2+1),
+             var = p1^2*var1 + (1-p1)^2*var2)
+    output2
+  })
+  output1
+}
+
+change_size_sequence_knm1to10_data <- long_form_result_trans(knm_st1_sq1to10_100) %>% bind_rows(.id = "seq")
+change_size_sequence_km1to10_data <- long_form_result_trans(km_st1_sq1to10_100) %>% bind_rows(.id = "seq")
+
+# To get thresholds, we need to match the KM and KNM models in using same "seq" and same "sets" used
+
+threshold_newcol <- lapply(1:1000, FUN = function(i){
+  data <- bind_rows(change_size_sequence_km1to10_data,
+                    change_size_sequence_knm1to10_data)
+  kmrow <- data[i, ]
+  knmrow <- data[i+1000, ]
+  fakekmmodel <- list(par = c(kmrow[3:7]) %>% unlist)
+  fakeknmmodel <- list(par = c(knmrow[3:7]) %>% unlist)
+  
+  threshold <- find_cross(m1 = fakekmmodel, m2 = fakeknmmodel,
+                          start = 0.2, end =  0.9, step = 0.0001)
+  threshold
+}) %>% unlist
+
+change_size_sequence_data <- bind_rows(change_size_sequence_km1to10_data,
+                                       change_size_sequence_knm1to10_data)
+change_size_sequence_data$threshold <- c(threshold_newcol, threshold_newcol)
+change_size_sequence_data$class <- rep(c("KM", "KNM"), each = 1000)
+
+# bd column: Bhattacharyya Distance
+# compare the estimated model with the model estimated with all available data: ccf_km_c2, ccf_knm_c2
+bd_part1 <- lapply(1:1000, FUN = function(i) {
+  therow <- change_size_sequence_data[i, ]
+  fakemodel <- list(par = c(therow[3:7]) %>% unlist)
+  
+  f_integrate <- function(x) {
+    sqrt(dbetamix2(x, ccf_km_c2)*dbetamix2(x, fakemodel))
+  }
+  
+  output <- integrate(f_integrate, lower = 0.001, upper = 0.999)[[1]]
+  output <- -log(output)
+}) %>% unlist
+
+bd_part2 <- lapply(1001:2000, FUN = function(i) {
+  therow <- change_size_sequence_data[i, ]
+  fakemodel <- list(par = c(therow[3:7]) %>% unlist)
+  
+  f_integrate <- function(x) {
+    sqrt(dbetamix2(x, ccf_knm_c2)*dbetamix2(x, fakemodel))
+  }
+  
+  output <- integrate(f_integrate, lower = 0.001, upper = 0.999)[[1]]
+  output <- -log(output)
+}) %>% unlist
+
+change_size_sequence_data$bd <- c(bd_part1, bd_part2)
 ```
 
 ```{r prepare-data}
