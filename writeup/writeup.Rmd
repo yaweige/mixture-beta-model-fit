@@ -49,17 +49,25 @@ _Text based on elsarticle sample manuscript, see [http://www.elsevier.com/author
 library(dplyr)
 library(ggplot2)
 library(readr)
+library(stringr)
 theme_set(theme_bw())
 knitr::opts_chunk$set(echo = FALSE, cache = TRUE)
 ```
 
 ```{r data-input-section, include=FALSE,eval=FALSE}
+# Here is all the input data, some are bullet data, some are used sequences or index as records.
 # I call part1 for the model estimation part and
 # part2 for the "application" section
 ccf_data <- read.csv("../data/organized data/ccf-related/ccf_data.csv")
 ccf_data_part1 <- ccf_data %>% filter(usage == "part1")
 # To be added
 ccf_data_part2 <- ccf_data %>% filter(usage == "part2")
+
+# Used for the changing sample size section. These are randomly generated sequences, to reduce the randomness of each run, it is stored
+change_size_sequences <- read.csv("../data/organized data/ccf-related/change_size_sequences.csv")
+
+# The randomly generated test set
+test_fau_bullet_index <- read.csv("../data/organized data/ccf-related/test_fau_bullet_index.csv")
 ```
 
 ```{r model-estimation-section, include=FALSE,eval=FALSE}
@@ -368,13 +376,50 @@ fer <- pbetamix2(cutoff1, ccf_km_c2)/pbetamix2(cutoff1, ccf_knm_c2)
 ```
 
 ```{r application-section, include=FALSE,eval=FALSE}
+# Use part1 data: database, same-source comparison
+test_index <- test_fau_bullet_index$FAU
+questioned_bullet_index <- test_fau_bullet_index$bullet
 
+# introduce FAU and bullet in ccf_km_full_data, ccf_knm_full_data
+ccf_km_full_data <- ccf_km_full_data %>% 
+  mutate(FAU1 = as.numeric(str_extract(land1, pattern = "(?<=LAPD - (FAU )?)\\d+")),
+         FAU2 = as.numeric(str_extract(land2, pattern = "(?<=LAPD - (FAU )?)\\d+")))
+
+ccf_knm_full_data <- ccf_knm_full_data %>% 
+  mutate(FAU1 = as.numeric(str_extract(land1, pattern = "(?<=LAPD - (FAU )?)\\d+")),
+         FAU2 = as.numeric(str_extract(land2, pattern = "(?<=LAPD - (FAU )?)\\d+")))
+
+# split out the test set, FAU1 = FAU2 here. The list is listed in numeric order.
+test_km_sets <- ccf_km_full_data %>%
+  filter(as.character(FAU1) %in% as.character(test_index)) %>%
+  split(f = .$FAU1)
+
+test_knm_sets <- ccf_knm_full_data %>%
+  filter(as.character(FAU1) %in% as.character(test_index)) %>%
+  split(f = .$FAU1)
+
+if (any(names(test_km_sets) != names(test_knm_sets))) stop("FAUs not matched in application section")
+
+test_questioned_sets <- Map(function(x, y, z) {
+  
+  test_km <- x %>% filter(bullet1 != z, bullet2 != z)
+  test_knm <- y %>% filter(bullet1 != z, bullet2 != z)
+  questioned_km <- x %>% filter(bullet1 == z|bullet2 == z)
+  
+  output <- list(test_km = test_km, test_knm = test_knm,
+                 questioned_km = questioned_km)
+  
+}, test_km_sets, test_knm_sets, questioned_bullet_index)
+
+# turn the data unchanged
+ccf_km_full_data <- ccf_km_full_data %>% 
+  select(-FAU1, -FAU2)
+
+ccf_knm_full_data <- ccf_knm_full_data %>%
+  select(-FAU1, -FAU2)
 ```
 
 ```{r sample-size-section, include=FALSE,eval=FALSE}
-# These are randomly generated sequences, to reduce the randomness of each run, it is stored
-change_size_sequences <- read_csv("../data/organized data/ccf-related/change_size_sequences.csv")
-
 # make use of different starting values (this actually has no significant effect, and only part of it is shown in the final report)
 # the full model one:
 starting_1 <- matrix(c(param_km_c2$p1,  param_km_c2$a1,  param_km_c2$b1, param_km_c2$a2, param_km_c2$b2,
