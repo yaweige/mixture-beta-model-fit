@@ -376,7 +376,7 @@ fer <- pbetamix2(cutoff1, ccf_km_c2)/pbetamix2(cutoff1, ccf_knm_c2)
 ```
 
 ```{r application-section, include=FALSE,eval=FALSE}
-# Use part1 data: database, same-source comparison
+# Use part1 data: database, same-source comparison========================================
 test_index <- test_fau_bullet_index$FAU
 questioned_bullet_index <- test_fau_bullet_index$bullet
 
@@ -389,7 +389,7 @@ ccf_knm_full_data <- ccf_knm_full_data %>%
   mutate(FAU1 = as.numeric(str_extract(land1, pattern = "(?<=LAPD - (FAU )?)\\d+")),
          FAU2 = as.numeric(str_extract(land2, pattern = "(?<=LAPD - (FAU )?)\\d+")))
 
-# split out the test set, FAU1 = FAU2 here. The list is listed in numeric order.
+# split out the test set (from the database set), FAU1 = FAU2 here. The list is listed in numeric order.
 test_km_sets <- ccf_km_full_data %>%
   filter(as.character(FAU1) %in% as.character(test_index)) %>%
   split(f = .$FAU1)
@@ -400,6 +400,8 @@ test_knm_sets <- ccf_knm_full_data %>%
 
 if (any(names(test_km_sets) != names(test_knm_sets))) stop("FAUs not matched in application section")
 
+# split the questioned bullet out in each set
+# for now, the 2 barrels not in the data. This will be solved after updating the data later
 test_questioned_sets <- Map(function(x, y, z) {
   
   test_km <- x %>% filter(bullet1 != z, bullet2 != z)
@@ -409,7 +411,50 @@ test_questioned_sets <- Map(function(x, y, z) {
   output <- list(test_km = test_km, test_knm = test_knm,
                  questioned_km = questioned_km)
   
-}, test_km_sets, test_knm_sets, questioned_bullet_index)
+}, test_km_sets, test_knm_sets, questioned_bullet_index[1:98])
+
+# fit the distributions for each set (three test fires)
+case_by_case_models <- lapply(test_questioned_sets, FUN = function(x) {
+  # the starting values are those from the full data models
+  km_model <- mine_betamix(data = x$test_km$ccf, 
+                           par = c(0.419, 7.37, 8.45, 14.03, 4.45),
+                           k = 2,
+                           control = list(maxit = 3000),
+                           hessian = FALSE)
+  knm_model <- mine_betamix(data = x$test_knm$ccf, 
+                            par = c(0.666, 11.23, 20.33, 7.06, 7.22),
+                            k = 2,
+                            control = list(maxit = 3000),
+                            hessian = FALSE)
+  
+  threshold_equal_pdf <- find_cross(km_model, knm_model,start = 0.2,end = 0.9, step = 0.0001)
+  
+  output <- list(km_model = km_model, knm_model = knm_model, threshold_equal_pdf = threshold_equal_pdf)
+  output
+})
+
+# The following check of convergence is not reported
+# KM convergence results, 1 indicates not converged
+case_by_case_models %>% map_dbl(.f = function(x) x$km_model$convergence)
+# KNM convergence results
+case_by_case_models %>% map_dbl(.f = function(x) x$knm_model$convergence)
+# The ones we can use: (both knm and km are converged)
+converged_index <- case_by_case_models %>% map_dbl(.f = function(x) x$km_model$convergence)==0 &
+  case_by_case_models %>% map_dbl(.f = function(x) x$knm_model$convergence) == 0
+
+case_by_case_classifcation <- Map(function(x, y) {
+  # True: identification; False: elimination
+  class <- x$questioned_km$ccf > y$threshold_equal_pdf
+  class
+}, test_questioned_sets, case_by_case_models)
+
+case_by_case_classifcation_converged <- subset(case_by_case_classifcation, converged_index)
+case_by_case_classifcation_converged %>% unlist() %>% sum
+case_by_case_classifcation_converged %>% unlist() %>% length
+
+# Use part2 data================================================================================
+
+
 
 # turn the data unchanged
 ccf_km_full_data <- ccf_km_full_data %>% 
