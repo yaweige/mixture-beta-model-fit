@@ -60,7 +60,7 @@ knitr::opts_chunk$set(echo = FALSE, cache = TRUE)
 # part2 for the "application" section
 ccf_data <- read.csv("../data/organized data/ccf-related/ccf_data.csv")
 ccf_data_part1 <- ccf_data %>% filter(usage == "part1")
-# To be added
+# Some land names is not well coded for part2, will be updated later 
 ccf_data_part2 <- ccf_data %>% filter(usage == "part2")
 
 # Used for the changing sample size section. These are randomly generated sequences, to reduce the randomness of each run, it is stored
@@ -376,7 +376,10 @@ fer <- pbetamix2(cutoff1, ccf_km_c2)/pbetamix2(cutoff1, ccf_knm_c2)
 ```
 
 ```{r application-section, include=FALSE,eval=FALSE}
-# Use part1 data: database, same-source comparison========================================
+# some abuse of notations in part2 data
+# the "nonmatched" in the name refer to the case one bullet with a different source compared with three same source bullets. The "KM" and "KNM" as a variable indicating the way we treat those comparisons. "KNM" refers to "KNM" the same as before. "KM" here doesn't mean all of them is known-matched, for those comparisons among the three same source bullets, they are, for those involving the one different bullet, they are not. But the "KM" involving the one different bullet refers to those lands we suspect to be matched in those bullet comparisons.
+
+# Use part1 data: database, same-source comparison (True results: all same source comparisons)=========
 test_index <- test_fau_bullet_index$FAU
 questioned_bullet_index <- test_fau_bullet_index$bullet
 
@@ -452,7 +455,136 @@ case_by_case_classifcation_converged <- subset(case_by_case_classifcation, conve
 case_by_case_classifcation_converged %>% unlist() %>% sum
 case_by_case_classifcation_converged %>% unlist() %>% length
 
-# Use part2 data================================================================================
+# Use part2 data(True results: all different source comparisons)=================================
+
+ccf_nonmatched_km_data <- ccf_data_part2 %>% filter(source == "KM")
+ccf_nonmatched_knm_data <- ccf_data_part2 %>% filter(source == "KNM")
+
+# For the current coding method, it's not available to get all FAU1 and FAU2
+# but the following would work for the purpose of split (the following step) (to get list forms)
+
+# The fau 246 is used, however, it is labeled as 245 in the land names, so we took care of that by using the current way to split.
+ccf_nonmatched_km_data <- ccf_nonmatched_km_data %>% 
+  mutate(FAU1toSplit = str_extract(land1, pattern = "(?<=LAPD - (FAU )?)\\d+"),
+         FAU2toSplit = str_extract(land2, pattern = "(?<=LAPD - (FAU )?)\\d+"),
+         FAUtoSplit = ifelse(is.na(FAU1toSplit), yes = FAU2toSplit, no = FAU1toSplit))
+
+ccf_nonmatched_knm_data <- ccf_nonmatched_knm_data %>% 
+  mutate(FAU1toSplit = str_extract(land1, pattern = "(?<=LAPD - (FAU )?)\\d+"),
+         FAU2toSplit = str_extract(land2, pattern = "(?<=LAPD - (FAU )?)\\d+"),
+         FAUtoSplit = ifelse(is.na(FAU1toSplit), yes = FAU2toSplit, no = FAU1toSplit))
+
+
+ccf_nonmatched_km <- ccf_nonmatched_km_data %>%
+  split(f = rep(1:98, each = 36))
+
+ccf_nonmatched_knm <- ccf_nonmatched_knm_data %>%
+  split(f = rep(1:98, each = 240))
+
+nonmatched_km_fau_names <- lapply(ccf_nonmatched_km, FUN = function(x){
+  output <- unique(x$FAUtoSplit[!is.na(x$FAUtoSplit)])
+  if (length(output) != 1) stop("Incorrect split in application section for part2 data")
+  output
+}) %>% unlist()
+
+nonmatched_knm_fau_names <- lapply(ccf_nonmatched_knm, FUN = function(x){
+  output <- unique(x$FAUtoSplit[!is.na(x$FAUtoSplit)])
+  if (length(output) != 1) stop("Incorrect split in application section for part2 data")
+  output
+}) %>% unlist()
+
+if (any(nonmatched_km_fau_names != nonmatched_knm_fau_names)) stop("Incorrect split in application section for part2 data")
+names(ccf_nonmatched_km) <- nonmatched_km_fau_names
+names(ccf_nonmatched_knm) <- nonmatched_knm_fau_names
+
+# To fit the models
+nonmatched_test_questioned_sets <- Map(function(x, y) {
+  
+  test_km <- x %>% filter(bullet1 != "Q", bullet2 != "Q")
+  test_knm <- y %>% filter(bullet1 != "Q", bullet2 != "Q")
+  questioned_km <- x %>% filter(bullet1 == "Q"|bullet2 == "Q")
+  
+  output <- list(test_km = test_km, test_knm = test_knm,
+                 questioned_km = questioned_km)
+  
+}, ccf_nonmatched_km, ccf_nonmatched_knm)
+
+nonmatched_test_questioned_sets[[1]]
+
+nonmatched_case_by_case_models <- lapply(nonmatched_test_questioned_sets, FUN = function(x) {
+  # the starting values are those from the full data models
+  km_model <- mine_betamix(data = x$test_km$ccf, 
+                           par = c(0.419, 7.37, 8.45, 14.03, 4.45),
+                           k = 2,
+                           control = list(maxit = 3000),
+                           hessian = FALSE)
+  knm_model <- mine_betamix(data = x$test_knm$ccf, 
+                            par = c(0.666, 11.23, 20.33, 7.06, 7.22),
+                            k = 2,
+                            control = list(maxit = 3000),
+                            hessian = FALSE)
+  
+  threshold_equal_pdf <- find_cross(km_model, knm_model,start = 0.2,end = 0.9, step = 0.0001)
+  output <- list(km_model = km_model, knm_model = knm_model, threshold_equal_pdf = threshold_equal_pdf)
+  output
+})
+
+# Similarly, check the convergence
+# KM convergence results, 1 indicates not converged
+nonmatched_case_by_case_models %>% map_dbl(.f = function(x) x$km_model$convergence)
+# KNM convergence results
+nonmatched_case_by_case_models %>% map_dbl(.f = function(x) x$knm_model$convergence)
+# The ones we can used: (both knm and km are converged)
+nonmatched_converged_index <- nonmatched_case_by_case_models %>% map_dbl(.f = function(x) x$km_model$convergence)==0 &
+  nonmatched_case_by_case_models %>% map_dbl(.f = function(x) x$knm_model$convergence) == 0
+
+
+nonmatched_case_by_case_classifcation <- Map(function(x, y) {
+  # True: identification; False: elimination
+  class <- x$questioned_km$ccf > y$threshold_equal_pdf
+  class
+}, nonmatched_test_questioned_sets, nonmatched_case_by_case_models)
+
+# The above code is for case-specific scenario. Now for the database scenario==================
+test_km_sets <- ccf_km_full_data %>%
+  filter(as.character(FAU1) %in% as.character(test_index)) %>%
+  split(f = .$FAU1)
+
+database_matchedB_km <- mine_betamix(data = ccf_km_full_data %>%
+                                       filter(!as.character(FAU1) %in% as.character(test_index)) %>%
+                                       as.data.frame() %>%
+                                       pull(ccf),
+                                     par = c(0.419, 7.36, 8.45, 14, 4.45),
+                                     k = 2,
+                                     hessian = FALSE,
+                                     control = list(maxit = 1000))
+database_matchedB_km$converge 
+database_matchedB_km
+
+database_matchedB_knm <- mine_betamix(data = ccf_knm_full_data %>%
+                                       filter(!as.character(FAU1) %in% as.character(test_index)) %>%
+                                       as.data.frame() %>%
+                                       pull(ccf),
+                                      par = c(0.666, 11.23, 20.33, 7.065, 7.22),
+                                      k = 2,
+                                      hessian = FALSE,
+                                      control = list(maxit = 1000))
+
+
+database_matchedB_knm$converge 
+database_matchedB_knm
+
+database_threshold <- find_cross(m1 = database_matchedB_km, m2 = database_matchedB_knm)
+###
+
+database_matchedB_km_result <- lapply(test_questioned_sets, 
+                                      FUN = function(x) x$questioned_km$ccf > database_threshold)
+
+database_matchedB_km_result %>% subset(converged_index) %>% unlist() %>% sum() 
+
+
+# non-matched bullets
+database_nonmatchedB_result <- lapply(nonmatched_test_questioned_sets, FUN = function(x) x$questioned_km$ccf > database_threshold )
 
 
 
