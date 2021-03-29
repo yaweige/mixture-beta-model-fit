@@ -51,6 +51,8 @@ library(ggplot2)
 library(readr)
 library(stringr)
 library(kableExtra)
+library(xtable)
+library(tables)
 theme_set(theme_bw())
 knitr::opts_chunk$set(echo = FALSE, cache = TRUE)
 ```
@@ -822,11 +824,11 @@ Test to show some result
 
 `r param_km_c1$a` `r param_km_c1`
 
-Reproduce Table 1 with `kableExtra`
+Reproduce Table 1 (now 3) with `kableExtra`
 
 ```{r}
 table1_data <- data.frame(Model = c("Beta", "2-comp", "2-comp", rep("3-comp", 3)),
-                          `Component Prior Probability` = c(" ", 
+                          `Prior Probability` = c(" ", 
                                                             as.character(round(param_km_c2$p1, digits = 2)),
                                                             as.character(round(1-param_km_c2$p1, digits =2)),
                                                             as.character(round(param_km_c3$p1, digits = 2)),
@@ -844,12 +846,54 @@ table1_data <- data.frame(Model = c("Beta", "2-comp", "2-comp", rep("3-comp", 3)
                                  round(param_km_c3$phi1, digits = 2), 
                                  round(param_km_c3$phi2, digits = 2),
                                  round(param_km_c3$phi3, digits = 2)))
-names(table1_data) <- c("Model", "Component Prior Probability", "$\\mu$", "$\\phi$")
+names(table1_data) <- c("Model", "Prior Probability", "$\\mu$", "$\\phi$")
 
-kbl(table1_data, booktabs = T, align = "c", escape = F) %>%
+kbl(table1_data, booktabs = T, align = "c", escape = F, caption = "aaaaaaaa") %>%
+  column_spec(1, bold = T) %>%
+  collapse_rows(columns = 1, latex_hline = "major", valign = "middle") %>%
+  footnote(general = "Firearm examination is an important topic in forensic science to answer the questions, if two pieces of firearm evidence are from a same source. This examination is based on class and individual characteristics left by the firearm on bullets and cartridge cases.  Under current state of the art, these examinations are executed", general_title = "Note", threeparttable = T, footnote_as_chunk = T)
+
+xtable(table1_data, caption = "aaaaaaaaaaa") %>%
+  xtable2kable() %>%
   column_spec(1, bold = T) %>%
   collapse_rows(columns = 1, latex_hline = "major", valign = "middle")
+
+xtable1 <- xtable(table1_data, caption = "aaaaaaaaaaa")
+
 ```
+
+```{r, results="asis"}
+print(xtable1, 
+      include.rownames = FALSE, 
+      type = "latex", 
+      comment = FALSE, 
+      timestamp = FALSE,
+      sanitize.text.function = function(x) {x})
+```
+
+```{r}
+mydf <- data.frame(rowFactor1 = sample(letters[1:2], 100, replace = TRUE), 
+                colFactor1 = sample(LETTERS[1:2], 100, replace = TRUE), 
+                x = rnorm(100), 
+                rowFactor2 = sample(1:2, 100, replace = TRUE), 
+                colFactor2 = sample(1:2, 100, replace = TRUE))
+
+tab1 <- tabular(Heading()*RowFactor(rowFactor2, spacing = 1, 
+                        levelnames = c("rowLabel1", "rowLabel2"))*
+                Heading()*RowFactor(rowFactor1, 
+                        levelnames = c("b1", "b2")) ~ 
+                Heading()*Factor(colFactor2, 
+                        levelnames = c("colLabel1", "colLabel2") )*
+                Heading()*Factor(colFactor1, 
+                        levelnames = c("a1", "a2"))*
+                Heading()*(x)*Heading()*(mean), 
+        data = mydf)
+```
+
+```{r, results="asis"}
+tables::latex.tabular(tab1)
+```
+
 
 Introduction
 ====================================
