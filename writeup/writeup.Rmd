@@ -960,11 +960,11 @@ Random variable $X$ is said to follow a Beta distribution, $X \sim B(\mu, \phi)$
 f(x;\mu, \phi) =  \frac{\Gamma(\phi)}{\Gamma(\mu\phi)\Gamma\left((1-\mu)\phi\right)}x^{\mu\phi-1}(1-x)^{(1-\mu)\phi-1},
 \end{align*}
 where $\Gamma(.)$ is the Gamma function.In this parameterization, $E[X] = \mu$ and Var$[X] = \mu(1-\mu) / (\phi +1)$.
-\hh{$\mu$ is the location parameter of the distribution, $\phi$ is called the `sample size' or precision. }
+\hh{$\mu$ is the location parameter of the distribution, $\phi$ is called the precision or dispersion parameter \citep{Ferrari_Cribari-Neto_2004}. }
 \end{definition}
 
 
-Note that we are using the mean and precision parameterization of beta distributions which simplifies the math in calculation and is more intuitive. This parameterization is equivalent to the more  usual  parameterization using shape parameters $\alpha$ and $\beta$ through the following transformation:
+Note that we are using the mean and precision parameterization of beta distributions. This parameterization simplifies the mathematical expressions and is also more intuitive. \hh{The mean and precision parameterization} is equivalent to the more  usual  parameterization using shape parameters $\alpha$ and $\beta$ through the following transformation:
 
 \begin{align*}
 \mu = \frac{\alpha}{\alpha+\beta}\ \ \ \text{ and } \ \ \ 
@@ -1032,15 +1032,24 @@ comdata %>%
 
 
 
+\hh{XXX it's generally better to avoid describing anything as 'our' - that creates distance to the reader.}
+\hh{Note, that we assume different beta mixture distributions ...}
 
 \yg{Note that in our applications, we assume different beta mixture distributions for KM and KNM cases. And within each case, the scores are assumed independent and identically distributed.}
+\hh{XXX Comment a bit on the i.i.d.\ assumption in the discussion. Put in a teaser here.}
 
 Error rate analysis
 -----------------------------------------
 
-Estimating the underlying theoretical error rates is a fundamental challenge in the forensic science [@PCAST2016; @PCAST2016addendum]. The estimation process becomes more straightforward after we finished the distribution estimation. There are many types of error rates can be defined. We focused on the four most used ones, i.e. 1) False positive rate (FPR), 2) False negative rate (FNR), 3) False identification rate (FIR), 4) False exclusion rate (FER), as defined in Table \ref{Error rate table}. FPR and FNR are considered source-specific assessment. They are both probabilities given the ground truth to make false conclusions, which is useful especially when we evaluate an algorithm. FIR and FER are considered decision-specific assessment. They are both probabilities given the algorithm decisions to false claim the actual source, which is useful in real cases when jury is presented with the forensic conclusions to make judgment.
+\hh{XXX for the next section, please switch to present tense. Present tense is used when you describe something that is constant. Past tense describes a process that is finished. We do not want to focus on that process, but we want to focus on the truth we have found. In that vein, also avoid any chronological descriptions }
 
-The error rates are also affected by the threshold selected to make decisions. In an extreme example, if we are very conservative in making identifications, we can set the threshold to be large enough, say CCF >= 0.99, then the FPR will be 0. But at the same time, the FNR will be 1. It's clear that there are trade-offs between the error rates. So, to make these error rates comparable and consistent, for the current paper, we refer the threshold as the value where the probability densities of KM and KNM distributions equal with each other. This is not a bad choice, since it has good statistical meaning that at this value, the likelihood ratio equals 1 and any deviation from 1 would give preference to a certain decision (as if a threshold). For the two component beta mixture distributions we estimated in last section, this threshold is 0.529. In the application of the algorithms, the threshold need to be carefully chosen where the study of associated error rates will in turn be essential guiding that process.
+https://depts.washington.edu/engl/askbetty/tenses.php#:~:text=Verb%20tenses%20tell%20readers%20when,or%20effects%20of%20an%20action.
+
+
+Estimating the underlying theoretical error rates \hh{XXX of what? } is a fundamental challenge in  forensic science [@PCAST2016; @PCAST2016addendum]. The estimation process \hh{XXX of what?} becomes more straightforward \sout{after} \hh{XXX don't emphasize the process} we finished the distribution estimation. 
+There are many types of error rates can be defined.\hh{xxx grammar?}  We focus\sout{ed} on the four most used ones, i.e. 1) False positive rate (FPR), 2) False negative rate (FNR), 3) False identification rate (FIR), 4) False exclusion rate (FER), as defined in \autoref{Error rate table}. \hh{XXX Move the error rate table from page 14 to this section} FPR and FNR are considered source-specific assessment. \hh{XXX cite - this is not something that is well known} They are both probabilities given the ground truth to make false conclusions, which is useful especially when we evaluate an algorithm. FIR and FER are considered decision-specific assessment. They are both probabilities given the algorithm decisions to false claim the actual source, which is useful in real cases when jury is presented with the forensic conclusions to make judgment.
+
+The error rates are also affected by the threshold selected to make decisions. In an extreme example, if we are very conservative in making identifications, we can set the threshold to be large enough, say CCF >= 0.99, then the FPR \sout{will be} \hh{is}  0. But at the same time, the FNR \sout{will be} \hh{is} 1. It's clear that there are trade-offs between the error rates. So, to make these error rates comparable and consistent, for the current paper, we refer the threshold as the value where the probability densities of KM and KNM distributions equal with each other. This is not a bad choice, since it has good statistical meaning that at this value, the likelihood ratio equals 1 and any deviation from 1 would give preference to a certain decision (as if a threshold). For the two component beta mixture distributions we estimated in last section, this threshold is 0.529. \hh{XXX where do these numbers come from? Give the example a number and refer to that number.} In the application of the algorithms, the threshold need to be carefully chosen where the study of associated error rates will in turn be essential guiding that process.
 
 Data
 -----------------------------------------
