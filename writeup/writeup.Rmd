@@ -900,7 +900,7 @@ Random variable $X$ is said to follow a Beta distribution, $X \sim B(\mu, \phi)$
 f(x;\mu, \phi) =  \frac{\Gamma(\phi)}{\Gamma(\mu\phi)\Gamma\left((1-\mu)\phi\right)}x^{\mu\phi-1}(1-x)^{(1-\mu)\phi-1},
 \end{align*}
 where $\Gamma(.)$ is the Gamma function. In this parameterization, $E[X] = \mu$ and Var$[X] = \mu(1-\mu) / (\phi +1)$.
-\hh{$\mu$ is the location parameter of the distribution, $\phi$ is called the precision or dispersion parameter }\citep{Ferrari2004}.
+\hh{$\mu$ is the location parameter of the distribution, $\phi$ is called the precision or dispersion parameter }[@Ferrari2004].
 \end{definition}
 
 
@@ -929,7 +929,7 @@ $\mu_{l}$ and $\phi_{l}$ are distribution parameters for $l^{\text{th}}$ compone
 \end{align*}
 \end{definition}
 
-```{r betamixFig, out.width="70%", fig.align="center", fig.cap="Two component beta-mixture distribution illustration examples. One component with (mu = 0.759, phi = 18.476) is held fixed, and the other component with (phi = 15.812) \\hh{The exact parameters of mu and phi are not of interest} has mu changing from 0.1 to 0.466 with the mode moving from left to right at the same time. The prior probability p1 is fixed at 0.419. With the increase of the varying mu, the two modes gradually get closer to form an ideal shape for the KM distribution. The parameters are inspired by the later section estimation", fig.pos="h"}
+```{r betamixFig, out.width="\\textwidth", fig.align="center", fig.cap="Two component beta-mixture distribution illustration examples. One component with (mu = 0.759, phi = 18.476) is held fixed, and the other component with (phi = 15.812) \\hh{The exact parameters of mu and phi are not of interest, let's keep just the names} has mu changing from 0.1 to 0.466 with the mode moving from left to right at the same time. The prior probability p1 is fixed at 0.419. With the increase of the varying mu, the two modes gradually get closer to form an ideal shape for the KM distribution. The parameters are inspired by the later section estimation", fig.pos="h"}
 
 p1 <- 0.419
 mu1 <- 0.466
@@ -957,13 +957,33 @@ comdata <- lapply(seq_along(seq_mu1), FUN = function(i) {
   output
 }) %>% bind_rows(.id = "id")
 
+params$id <- 1:nrow(params)
+
+comdata <- comdata %>%
+  mutate(
+        id = parse_number(id)
+  ) %>%
+  left_join(params, by="id")
+
+comdata <- comdata %>%
+  mutate(
+    mu1_label = factor(mu1)
+  ) 
+levels(comdata$mu1_label) <- paste("mu[1] =",levels(comdata$mu1_label))
+
 comdata %>%
-  ggplot(aes(x = x, y = y, group = id, color = as.numeric(id))) + 
+  ggplot(aes(x = x, y = y, group = id)) + 
+  geom_vline(aes(xintercept=mu1), colour = "grey60") +
+  geom_vline(aes(xintercept=mu2), colour = "grey60") +
+  geom_text(aes(x=mu1+.1, y = 2.5), hjust=1, label=expression(mu[1]), colour = "grey60") +
+  geom_text(aes(x=mu2+.1, y = 0.5), hjust=1, label=expression(mu[2]), colour = "grey60") +
   geom_line() + 
   scale_color_gradient2(low = "black", mid = "grey", high = "darkorange", midpoint = 4) +
   ylab("Density") + 
   xlab("Value") +
-  guides(color = guide_none())
+#  guides(color = guide_none()) + # whenever you are tempted to remove a legend, just don' but re-think your approach
+  facet_wrap(~mu1_label, labeller = "label_parsed") 
+  
 
 ```
 
@@ -1011,7 +1031,7 @@ In the application of the algorithms, the threshold need to be carefully chosen 
 Data
 -----------------------------------------
 
-For the following sections of the paper, we will base our analysis on a large reference database of four firings from each of 625 Beretta 92 F/FS collected by Srinivasan Rathinam from the Los Angeles Police Department. Subsequently, high-resolution 3d topographic scans of the land-engraved areas of these bullets were acquired at the Iowa State Roy J.\ Carver Microscopy facility. These scans form the basis of the investigation here and will be referred to as the **LAPD data**. These scans are publicly available through the NIST Ballistics Toolmark Research Database \citep{nist}.
+For the following sections of the paper, we will base our analysis on a large reference database of four firings from each of 625 Beretta 92 F/FS collected by Srinivasan Rathinam from the Los Angeles Police Department. Subsequently, high-resolution 3d topographic scans of the land-engraved areas of these bullets were acquired at the Iowa State Roy J.\ Carver Microscopy facility. These scans form the basis of the investigation here and will be referred to as the **LAPD data**. These scans are publicly available through the NIST Ballistics Toolmark Research Database [@nist].
 
 It is the first time such a large data set available to the researchers, which makes it possible for a statistical analysis for the distributions of similarity scores. For the firearms used, there are 6 lands in each barrel which will leave 6 LEAs on the bullets for comparisons. We follow the aforementioned standard procejure to generate CCFs as similarity scores (include the procedure). There are 6 different bullet comparisons within a set of 4 bullets for a barrel. There are 6 same source land comparisons and 30 distinct different source land comparisons in each of those 6 bullet comparisons. In total, for a single barrel, there are 36 same source land to land comparisons. For the different source land to land comparisons, we have much more cases. If we limit the scope within each barrel, there will be $30\times 6 + 15 \times 4 = 240$ land to land comparisons for which we also take the comparisons among lands on a same bullet into consideration.
 
