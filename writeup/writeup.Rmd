@@ -742,45 +742,6 @@ bd_part2 <- lapply(1001:2000, FUN = function(i) {
 change_size_sequence_data$bd <- c(bd_part1, bd_part2)
 ```
 
-```{r prepare-data}
-# two-component betamix
-myfit1_simulation <- data.frame(ccf = (1:99)/100, 
-                                y1 = dbeta((1:99)/100, shape1 = 7.366, shape2 = 8.450),
-                                y2 = dbeta((1:99)/100, shape1 = 14.026, shape2 = 4.451))
-
-myfit1_simulation <- myfit1_simulation %>% mutate(y = 0.41938*y1 + (1-0.41938)*y2)
-
-myfit2_simulation <- data.frame(ccf = (1:99)/100, 
-                                y1 = dbeta((1:99)/100, shape1 = 11.0696, shape2 = 19.8388),
-                                y2 = dbeta((1:99)/100, shape1 = 6.5794, shape2 = 6.745))
-
-myfit2_simulation <- myfit2_simulation %>% mutate(y = 0.6737*y1 + (1-0.6737)*y2)
-
-myfit1n2_simulation <- bind_rows(myfit1_simulation, myfit2_simulation, .id = "Class")
-
-# single beta
-# one component
-myfit3_simulation <- data.frame(ccf = (1:99)/100, 
-                                y = dbeta((1:99)/100, shape1 = 4.1447, shape2 = 2.384))
-
-myfit4_simulation <- data.frame(ccf = (1:99)/100, 
-                                y = dbeta((1:99)/100, shape1 = 6.38, shape2 = 9.42))
-
-myfit3n4_simulation <- bind_rows(myfit3_simulation, myfit4_simulation, .id = "Class")
-```
-
-```{r prepare-data2}
-ccf_km_full <- readRDS("../data/organized data/ccf-related/ccf_km_full.rds")
-ccf_knm_full <- readRDS("../data/organized data/ccf-related/ccf_knm_full.rds")
-
-ccf_km_full_data <- bind_rows(ccf_km_full)
-ccf_knm_full_data <- bind_rows(ccf_knm_full)
-
-# Currently, we removed these lands (some of them are known to be mis-scanned)
-# only 29 knms out of 106080 knms are greater than 0.9, remove those
-ccf_knm_full_data <- ccf_knm_full_data %>% filter(ccf < 0.90)
-```
-
 \hh{Next steps:}
 
 1.  for any image that you include with include_graphics("image.png") write a ggsave("image.png") in the code
@@ -968,8 +929,6 @@ $\mu_{l}$ and $\phi_{l}$ are distribution parameters for $l^{\text{th}}$ compone
 \end{align*}
 \end{definition}
 
-\hh{\autoref{fig:betamixFig} is orphaned. You need to refer to it in the text.}
-
 ```{r betamixFig, out.width="70%", fig.align="center", fig.cap="Two component beta-mixture distribution illustration examples. One component with (mu = 0.759, phi = 18.476) is held fixed, and the other component with (phi = 15.812) \\hh{The exact parameters of mu and phi are not of interest} has mu changing from 0.1 to 0.466 with the mode moving from left to right at the same time. The prior probability p1 is fixed at 0.419. With the increase of the varying mu, the two modes gradually get closer to form an ideal shape for the KM distribution. The parameters are inspired by the later section estimation", fig.pos="h"}
 
 p1 <- 0.419
@@ -1045,7 +1004,9 @@ We focus on the four most used ones, i.e. 1) False positive rate (FPR), 2) False
 
 \end{table}
 
-The error rates are also affected by the threshold selected to make decisions. In an extreme example, if we are very conservative in making identifications, we can set the threshold to be large enough, say CCF >= 0.99, then the FPR is 0. But at the same time, the FNR is 1. It's clear that there are trade-offs between the error rates. So, to make these error rates comparable and consistent, for the current paper, we refer the threshold as the value where the probability densities of KM and KNM distributions equal to each other. This is not a bad choice, since it has good statistical meaning that at this value, the likelihood ratio equals 1 and any deviation from 1 would give preference to a certain decision. For the two component beta mixture distributions we estimated in last section, this threshold is `r round(cutoff1, digits = 2)`. In the application of the algorithms, the threshold need to be carefully chosen where the study of associated error rates will in turn be essential guiding that process.
+The error rates are also affected by the threshold selected to make decisions. In an extreme example, if we are very conservative in making identifications, we can set the threshold to be large enough, say CCF >= 0.99, then the FPR is 0. But at the same time, the FNR is 1. It's clear that there are trade-offs between the error rates. So, to make these error rates comparable and consistent, for the current paper, we refer the threshold as the value where the probability densities of KM and KNM distributions equal to each other. This is not a bad choice, since it has good statistical meaning that at this value, the likelihood ratio equals 1 and any deviation from 1 would give preference to a certain decision. 
+<!-- For the two component beta mixture distributions we estimated in last section, this threshold is `r round(cutoff1, digits = 2)`.  -->
+In the application of the algorithms, the threshold need to be carefully chosen where the study of associated error rates will in turn be essential guiding that process.
 
 Data
 -----------------------------------------
