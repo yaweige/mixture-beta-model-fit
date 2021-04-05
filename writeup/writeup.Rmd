@@ -929,7 +929,7 @@ $\mu_{l}$ and $\phi_{l}$ are distribution parameters for $l^{\text{th}}$ compone
 \end{align*}
 \end{definition}
 
-```{r betamixFig, out.width="\\textwidth", fig.align="center", fig.cap="Two component beta-mixture distribution illustration examples. One component with (mu = 0.759, phi = 18.476) is held fixed, and the other component with (phi = 15.812) \\hh{The exact parameters of mu and phi are not of interest, let's keep just the names} has mu changing from 0.1 to 0.466 with the mode moving from left to right at the same time. The prior probability p1 is fixed at 0.419. With the increase of the varying mu, the two modes gradually get closer to form an ideal shape for the KM distribution. The parameters are inspired by the later section estimation", fig.pos="h"}
+```{r betamixFig, out.width="\\textwidth", fig.align="center", fig.cap="Two component beta-mixture distribution illustration examples.  One component with ($\\mu_2 = 0.759, \\phi_2 = 18.476$) is held fixed, and the other component with ($\\phi_1 = 15.812$) \\hh{XXX phi1 now changes} \\hh{The exact parameters of mu and phi are not of interest, let's keep just the names} has $\\mu$ changing from 0.1 to 0.466 with the mode moving from left to right at the same time. The prior probability p1 is fixed at 0.419. With the increase of the varying mu, the two modes gradually get closer to form an ideal shape for the KM distribution. The parameters are inspired by the later section estimation", fig.pos="h", warning = FALSE}
 
 p1 <- 0.419
 mu1 <- 0.466
@@ -938,16 +938,21 @@ mu2 <- 0.759
 phi2 <- 18.476
 
 simdata <- function(p1, a1, b1, a2, b2) {
-  dcomp1 <- dbeta(0:1000/1000, shape1 = a1, shape2 = b1)
-  dcomp2 <- dbeta(0:1000/1000, shape1 = a2, shape2 = b2)
+  dcomp1 <- dbeta(1:999/1000, shape1 = a1, shape2 = b1)
+  dcomp2 <- dbeta(1:999/1000, shape1 = a2, shape2 = b2)
   
-  output <- data.frame(x = 0:1000/1000, y = p1*dcomp1 + (1-p1)*dcomp2)
+  output <- data.frame(x = 1:999/1000, y = p1*dcomp1 + (1-p1)*dcomp2)
   output
 }
 
-seq_mu1 <- seq(from = 0.1, to = 0.466, length.out = 7)
-params <- data.frame(p1 = p1, mu1 = seq_mu1, phi1 = phi1, mu2 = mu2, phi2 = phi2)
-comdata <- lapply(seq_along(seq_mu1), FUN = function(i) {
+# seq_mu1 <- seq(from = 0.1, to = 0.466, length.out = 7)
+seq_mu1 <- seq(from = 0.1, to = 0.466, length.out = 3)
+seq_phi1 <- c(15.812^.75, 15.812, 15.812^1.5)
+
+params <- data.frame(p1 = p1, 
+                     expand.grid(mu1 = seq_mu1, phi1= seq_phi1), 
+                     mu2 = mu2, phi2 = phi2)
+comdata <- lapply(1:nrow(params), FUN = function(i) {
   p1 <- params$p1[i]
   mu1 <- params$mu1[i]
   phi1 <- params$phi1[i]
@@ -967,29 +972,33 @@ comdata <- comdata %>%
 
 comdata <- comdata %>%
   mutate(
-    mu1_label = factor(mu1)
+    mu1_label = factor(mu1),
+    phi1_label = factor(phi1)
   ) 
-levels(comdata$mu1_label) <- paste("mu[1] =",levels(comdata$mu1_label))
+levels(comdata$mu1_label) <- c("mu[1]: low", "mu[1]: medium", "mu[1]: high")
+levels(comdata$phi1_label) <- c("phi[1]: low", "phi[1]: medium", "phi[1]: high")
 
 comdata %>%
   ggplot(aes(x = x, y = y, group = id)) + 
-  geom_vline(aes(xintercept=mu1), colour = "grey60") +
-  geom_vline(aes(xintercept=mu2), colour = "grey60") +
-  geom_text(aes(x=mu1+.1, y = 2.5), hjust=1, label=expression(mu[1]), colour = "grey60") +
-  geom_text(aes(x=mu2+.1, y = 0.5), hjust=1, label=expression(mu[2]), colour = "grey60") +
+  geom_vline(aes(xintercept=mu1), colour = "grey70", data = comdata %>% select(mu1, mu1_label, phi1_label, id) %>% unique()) +
+  geom_vline(aes(xintercept=mu2), colour = "grey70", data = comdata %>% select(mu2, id) %>% unique()) +
+  geom_text(aes(x=mu1+.1), y = 0.4, hjust=1, label=expression(mu[1]), colour = "grey60", data = comdata %>% select(mu1, mu1_label, phi1_label, id) %>% unique()) +
+  geom_text(aes(x=mu2+.1), y = 0.4, hjust=1, label=expression(mu[2]), colour = "grey60", data = comdata %>% select(mu2, id) %>% unique()) +
   geom_line() + 
   scale_color_gradient2(low = "black", mid = "grey", high = "darkorange", midpoint = 4) +
   ylab("Density") + 
   xlab("Value") +
 #  guides(color = guide_none()) + # whenever you are tempted to remove a legend, just don' but re-think your approach
-  facet_wrap(~mu1_label, labeller = "label_parsed") 
+  facet_grid(phi1_label~mu1_label, labeller = "label_parsed", scale="free_y") +
+  xlab("y")
   
 
 ```
 
 <!-- \hh{XXX Comment a bit on the i.i.d.\ assumption in the discussion. Put in a teaser here.} -->
 
-\yg{\autoref{fig:betamixFig} shows examples of beta-mixture distributions, where the two modes are gradually moving closer to form a similar shape of the KM distribution. Note that we assume different beta-mixture distributions for KM and KNM cases. Within each case, the scores are assumed independent and identically distributed. That means we assume there is no dependence structure among the LEA comparisons and the scores within each class of same-source and different-source comparisons follow a same distribution.}
+\autoref{fig:betamixFig} shows some examples of two-component beta-mixture densities. One of the modes is fixed, a second mode changes location ($\mu_1$) and precision ($\phi_1$). The panel in the second row on the right form a density similar to what we see for the distribution of the KMs. Note, that we assume different beta-mixture distributions for KM and KNM cases. Within each case,  we assume that scores are  independent and identically distributed, i.e.\  we assume that there is no dependence structure among  LEA comparisons and  scores within each class  follow the same distribution.
+
 
 Error rate analysis
 -----------------------------------------
