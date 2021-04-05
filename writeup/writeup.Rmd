@@ -929,7 +929,7 @@ $\mu_{l}$ and $\phi_{l}$ are distribution parameters for $l^{\text{th}}$ compone
 \end{align*}
 \end{definition}
 
-```{r betamixFig, out.width="\\textwidth", fig.align="center", fig.cap="Two component beta-mixture distribution illustration examples.  One component with ($\\mu_2 = 0.759, \\phi_2 = 18.476$) is held fixed, and the other component with ($\\phi_1 = 15.812$) \\hh{XXX phi1 now changes} \\hh{The exact parameters of mu and phi are not of interest, let's keep just the names} has $\\mu$ changing from 0.1 to 0.466 with the mode moving from left to right at the same time. The prior probability p1 is fixed at 0.419. With the increase of the varying mu, the two modes gradually get closer to form an ideal shape for the KM distribution. The parameters are inspired by the later section estimation", fig.pos="h", warning = FALSE}
+```{r betamixFig, out.width="\\textwidth", fig.align="center", fig.cap="Examples illustrating two component beta-mixture densities. The component on the right is held fixed at $\\mu_2 = 0.759, \\phi_2 = 18.476$. The other component with parameters $\\mu_1$ and $\\phi_1$ changes the location $\\mu_1$ in horizontal direction from 0.1 to 0.466 (low to high), and dispersion $\\phi_1$ changes in vertical direction from $15.8^{3/4}$ to $15.8^{3/2}$ (low to high).  The prior probability $p_1$ is fixed at 0.419. With an increase in $\\mu_1$, the two modes gradually get closer to one another. Smaller dispersion values correspond to wider and flatter peaks. The parameters are inspired by the KM estimation of the 2-component model in section 4.1. ", fig.pos="h", warning = FALSE}
 
 p1 <- 0.419
 mu1 <- 0.466
@@ -984,7 +984,7 @@ comdata %>%
   geom_vline(aes(xintercept=mu2), colour = "grey70", data = comdata %>% select(mu2, id) %>% unique()) +
   geom_text(aes(x=mu1+.1), y = 0.4, hjust=1, label=expression(mu[1]), colour = "grey60", data = comdata %>% select(mu1, mu1_label, phi1_label, id) %>% unique()) +
   geom_text(aes(x=mu2+.1), y = 0.4, hjust=1, label=expression(mu[2]), colour = "grey60", data = comdata %>% select(mu2, id) %>% unique()) +
-  geom_line() + 
+  geom_line(size=1) + 
   scale_color_gradient2(low = "black", mid = "grey", high = "darkorange", midpoint = 4) +
   ylab("Density") + 
   xlab("Value") +
@@ -997,7 +997,7 @@ comdata %>%
 
 <!-- \hh{XXX Comment a bit on the i.i.d.\ assumption in the discussion. Put in a teaser here.} -->
 
-\autoref{fig:betamixFig} shows some examples of two-component beta-mixture densities. One of the modes is fixed, a second mode changes location ($\mu_1$) and precision ($\phi_1$). The panel in the second row on the right form a density similar to what we see for the distribution of the KMs. Note, that we assume different beta-mixture distributions for KM and KNM cases. Within each case,  we assume that scores are  independent and identically distributed, i.e.\  we assume that there is no dependence structure among  LEA comparisons and  scores within each class  follow the same distribution.
+\autoref{fig:betamixFig} shows some examples of two-component beta-mixture densities. One of the modes is fixed, a second mode changes location ($\mu_1$) and precision ($\phi_1$). The panel in the second row on the right form a density similar to what we see for the distribution of the KMs. Note, that we assume different beta-mixture distributions for KM and KNM cases. Within each case,  we assume that scores are  independent and identically distributed, i.e. we assume that there is no dependence structure among  LEA comparisons and  scores within each class  follow the same distribution.
 
 
 Error rate analysis
@@ -1008,10 +1008,17 @@ Error rate analysis
 <!-- https://depts.washington.edu/engl/askbetty/tenses.php#:~:text=Verb%20tenses%20tell%20readers%20when,or%20effects%20of%20an%20action. -->
 
 
-Estimating the underlying theoretical error rates \yg{of identification} is a fundamental challenge in  forensic science [@PCAST2016; @PCAST2016addendum]. \yg{The calculation of the error rates is straightforward with the beta mixture distribution model.}
+Estimating the underlying theoretical error rates for comparisons of pattern evidence is a fundamental challenge in  forensic science [@PCAST2016; @PCAST2016addendum]. \hh{XXX let's please focus on comparisons rather than 'making identifications'. the result of a comparison should be either an identification or an elimination. 'Making identifications' is inherently biased towards the prosecution. }
 <!-- The estimation process \hh{XXX of what?} becomes more straightforward \sout{after} \hh{XXX don't emphasize the process} we finished the distribution estimation.  -->
-\yg{Different types of error rates could be defined to evaluate the performace of an identification process.}
-We focus on the four most used ones, i.e. 1) False positive rate (FPR), 2) False negative rate (FNR), 3) False identification rate (FIR), 4) False exclusion rate (FER), as defined in \autoref{Error rate table}. FPR and FNR are considered source-specific assessment. \hh{XXX cite - this is not something that is well known} They are both probabilities given the ground truth to make false conclusions, which is useful especially when we evaluate an algorithm. FIR and FER are considered decision-specific assessment. They are both probabilities given the algorithm decisions to false claim the actual source, which is useful in real cases when jury is presented with the forensic conclusions to make judgment.
+Different types of error rates are used to evaluate the performance of a decision-making process.
+Here, we focus on  four commonly used error rates as defined in \autoref{Error rate table}:
+  
+  1. The false positive rate (FPR), 
+  2. the false negative rate (FNR), 
+  3. the false identification rate (FIR), and 
+  4. the false exclusion rate (FER). 
+  
+FPR and FNR are considered source-specific assessment [@inconclusives2021]. Both of these are probabilities to make a false conclusion given  ground truth. These error rates are particular useful when we evaluate the process of of decision-making or an algorithm. FIR and FER are considered decision-specific assessment [@inconclusives2021]. These two probabilities assess the risk of a false claim given a decision. These probabilties are useful in real cases when a jury is asked to decide on a defendant's guilt after being presented with conclusions from forensic evidence.
 
 \begin{table}[h]
 \centering
@@ -1033,7 +1040,10 @@ We focus on the four most used ones, i.e. 1) False positive rate (FPR), 2) False
 
 \end{table}
 
-The error rates are also affected by the threshold selected to make decisions. In an extreme example, if we are very conservative in making identifications, we can set the threshold to be large enough, say CCF >= 0.99, then the FPR is 0. But at the same time, the FNR is 1. It's clear that there are trade-offs between the error rates. So, to make these error rates comparable and consistent, for the current paper, we refer the threshold as the value where the probability densities of KM and KNM distributions equal to each other. This is not a bad choice, since it has good statistical meaning that at this value, the likelihood ratio equals 1 and any deviation from 1 would give preference to a certain decision. 
+\yg{The calculation of the error rates is straightforward with the beta mixture distribution model.}
+
+Error rates are also affected by the threshold use to make final decisions. In an extreme example, if we are very conservative in making identifications, we can set the threshold to be large enough, say CCF >= 0.99, then the FPR is 0. But at the same time, the FNR is 1. It's clear that there are trade-offs between the error rates. So, to make these error rates comparable and consistent, for the current paper, we refer the threshold as the value where the probability densities of KM and KNM distributions equal to each other. This is not a bad choice, since it has good statistical meaning that at this value, the likelihood ratio equals 1 and any deviation from 1 would give preference to a certain decision. 
+
 <!-- For the two component beta mixture distributions we estimated in last section, this threshold is `r round(cutoff1, digits = 2)`.  -->
 In the application of the algorithms, the threshold need to be carefully chosen where the study of associated error rates will in turn be essential guiding that process.
 
@@ -1074,7 +1084,7 @@ We design a study to evaluate the effect of data sizes. As in the previous secti
 Results and discussion
 ========================================
 
-Model result
+Model result 
 ------------------------------------
 
 <!-- \yg{For the following sections of the paper, we will base our analysis on the LAPD data[reference]. The data set consists of bullets fired from 626 Beretta F/FS firearms with 4 bullets for each barrel. It is the first time such a large data set available to the researchers, which makes it possible for a statistical analysis for the distributions of similarity scores. For the firearms used, there are 6 lands in each barrel which will leave 6 LEAs on the bullets for comparisons. We follow the aforementioned standard procejure to generate CCFs as similarity scores (include the procedure). There are 6 different bullet comparisons within a set of 4 bullets for a barrel. There are 6 same source land comparisons and 30 distinct different source land comparisons in each of those 6 bullet comparisons. In total, for a single barrel, there are 36 same source land to land comparisons. For the different source land to land comparisons, we have much more cases. If we limit the scope within each barrel, there will be} $30\times 6 + 15 \times 4 = 240$ \yg{land to land comparisons for which we also take the comparisons among lands on a same bullet into consideration.} -->
