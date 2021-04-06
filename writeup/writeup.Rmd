@@ -1035,14 +1035,15 @@ FPR and FNR are considered source-specific assessment [@inconclusives2021]. Both
  Error Rate & False Negative Rate (FN/(FN+TP)) & False Positive Rate (FP/(FP + TN))&\\
  \hline
 \end{tabular}
-\caption{xxxx}
-\label{Error rate table}
+\caption{\label{Error rate table} Definitions for most commonly used error rates in binary decisions of match versus non-match comparisons.}
+
 
 \end{table}
 
+\hh{XXX The next sentence needs to be integrated better into the writeup. You also need the continuous score.}
 \yg{The calculation of the error rates is straightforward with the beta mixture distribution model.}
 
-Error rates are also affected by the threshold use to make final decisions. In an extreme example, if we are very conservative in making identifications, we can set the threshold to be large enough, say CCF >= 0.99, then the FPR is 0. But at the same time, the FNR is 1. It's clear that there are trade-offs between the error rates. So, to make these error rates comparable and consistent, for the current paper, we refer the threshold as the value where the probability densities of KM and KNM distributions equal to each other. This is not a bad choice, since it has good statistical meaning that at this value, the likelihood ratio equals 1 and any deviation from 1 would give preference to a certain decision. 
+Error rates are also affected by the threshold use to make final decisions \hh{XXX thresholds only come into play when there is a latent continuous score in play. Bring that in, then talk about calculating error rates.}. In an extreme example, if we are very conservative in making identifications, we can set the threshold to be large enough, say CCF >= 0.99, then the FPR is 0. But at the same time, the FNR is 1. It's clear that there are trade-offs between the error rates. So, to make these error rates comparable and consistent, for the current paper, we refer the threshold as the value where the probability densities of KM and KNM distributions equal to each other. This is not a bad choice, since it has good statistical meaning that at this value, the likelihood ratio equals 1 and any deviation from 1 would give preference to a certain decision. 
 
 <!-- For the two component beta mixture distributions we estimated in last section, this threshold is `r round(cutoff1, digits = 2)`.  -->
 In the application of the algorithms, the threshold need to be carefully chosen where the study of associated error rates will in turn be essential guiding that process.
