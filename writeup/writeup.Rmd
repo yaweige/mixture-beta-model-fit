@@ -369,7 +369,7 @@ cutoff1 <- find_cross(ccf_km_c2, ccf_knm_c2, 0.4)
 
 # numbers as a reference but changed a little for now
 # FPR: 0.148
-fdr <- 1 - pbetamix2(cutoff1, ccf_knm_c2)
+fpr <- 1 - pbetamix2(cutoff1, ccf_knm_c2)
 # FNR: 0.301
 fnr <- pbetamix2(cutoff1, ccf_km_c2)
 # FIR: 0.212
@@ -1152,7 +1152,7 @@ table2_data <- data.frame(Model = c("Beta", "2-comp", "2-comp", rep("3-comp", 3)
                           LogLik = c(ccf_knm_c1$logLik, ccf_knm_c2$logLik, ccf_knm_c2$logLik,
                                      ccf_knm_c3$logLik, ccf_knm_c3$logLik, ccf_knm_c3$logLik),
                           BIC  = c(bic4, bic5, bic5, bic6, bic6, bic6))
-names(table1_data) <- c("Model", "Prior Probability", "$\\mu$", "$\\phi$",
+names(table2_data) <- c("Model", "Prior Probability", "$\\mu$", "$\\phi$",
                         "LogLik", "BIC")
 
 kbl(table2_data, booktabs = T, align = "l", escape = F, caption = 'Parameter estimations for the Beta distribution (1-component beta mixture distribution), 2-component and 3-component distributions for the KNM CCF. "2-comp" refers to the 2-component beta mixture distribution, and the same for "3-comp". Column "LogLik" is the maximized log likelihood for each distribution.\\label{knmestimation}') %>%
@@ -1315,25 +1315,37 @@ polydata %>%
   ylab("density")
 ```
 
-\begin{table}[h]
-\centering
-\begin{tabular}{ |p{4.5cm}|p{3cm}|}
- \hline
- Type of Error Rates & Estimated Values\\
- \hline
- False positive rate (FPR) & ~~~~~~0.148\\
- \hline
- False negative rate (FNR)& ~~~~~~0.301\\
- \hline
- False identification rate (FIR)& ~~~~~~0.212\\
- \hline
- False exclusion rate (FER)& ~~~~~~0.354\\
- \hline
-\end{tabular}
-\caption{xxxx}
-\label{estimated-error-rates}
+<!-- \begin{table}[h] -->
+<!-- \centering -->
+<!-- \begin{tabular}{ |p{4.5cm}|p{3cm}|} -->
+<!--  \hline -->
+<!--  Type of Error Rates & Estimated Values\\ -->
+<!--  \hline -->
+<!--  False positive rate (FPR) & ~~~~~~0.148\\ -->
+<!--  \hline -->
+<!--  False negative rate (FNR)& ~~~~~~0.301\\ -->
+<!--  \hline -->
+<!--  False identification rate (FIR)& ~~~~~~0.212\\ -->
+<!--  \hline -->
+<!--  False exclusion rate (FER)& ~~~~~~0.354\\ -->
+<!--  \hline -->
+<!-- \end{tabular} -->
+<!-- \caption{xxxx} -->
+<!-- \label{estimated-error-rates} -->
 
-\end{table}
+<!-- \end{table} -->
+
+```{r estimated-error-rates}
+table3_data <- data.frame(col1 = c("False positive rate (FPR)",
+                                   "False negative rate (FNR)",
+                                   "False identification rate (FIR)",
+                                   "False exclusion rate (FER)"),
+                          col2 = c(round(fpr, 2), round(fnr, 2), round(fir, 2), round(fer, 2)))
+
+names(table3_data) <- c("Type of Error Rates", "Estimated Values")
+
+kbl(table3_data, booktabs = T, align = "l", escape = F, caption = 'Estimated error rates.\\label{estimated-error-rates}')
+```
 
 Overall, the error rates are not small enough to give confidence to any conclusions. But remember the current comparison discussed is in the land level. In real cases, we will need to combine the land level conclusions to bullet level ones. And this process of combining multiple pieces of evidence will improve the performance greatly. One of the common ways in computer-based bullet analysis is to calculate the sequential average maximum (SAM) [susan's paper and the original paper of SAM?] of land scores. Next, we are going to making use of the KM and KNM distributions in the land level to explore the error rates of the bullet level.
 
