@@ -757,34 +757,7 @@ Test to show some result
 
 `r param_km_c1$a` `r param_km_c1`
 
-```{r}
-table1_data <- data.frame(Model = c("Beta", "2-comp", "2-comp", rep("3-comp", 3)),
-                          `Prior Probability` = c(" ", 
-                                                            as.character(round(param_km_c2$p1, digits = 2)),
-                                                            as.character(round(1-param_km_c2$p1, digits =2)),
-                                                            as.character(round(param_km_c3$p1, digits = 2)),
-                                                            as.character(round(param_km_c3$p2, digits =2)),
-                                                            as.character(round(1-param_km_c3$p1-param_km_c3$p2, digits = 2))),
-                          mu = c(round(param_km_c1$mu, digits = 2), 
-                                 round(param_km_c2$mu1, digits = 2),
-                                 round(param_km_c2$mu2, digits = 2),
-                                 round(param_km_c3$mu1, digits = 2), 
-                                 round(param_km_c3$mu2, digits = 2),
-                                 round(param_km_c3$mu3, digits = 2)),
-                          phi = c(round(param_km_c1$phi, digits = 2), 
-                                 round(param_km_c2$phi1, digits = 2),
-                                 round(param_km_c2$phi2, digits = 2),
-                                 round(param_km_c3$phi1, digits = 2), 
-                                 round(param_km_c3$phi2, digits = 2),
-                                 round(param_km_c3$phi3, digits = 2)))
-names(table1_data) <- c("Model", "Prior Probability", "$\\mu$", "$\\phi$")
 
-kbl(table1_data, booktabs = T, align = "c", escape = F, caption = "aaaaaaaa") %>%
-  column_spec(1, bold = T) %>%
-  collapse_rows(columns = 1, latex_hline = "major", valign = "middle") %>%
-  footnote(general = "Firearm examination is an important topic in forensic science to answer the questions, if two pieces of firearm evidence are from a same source. This examination is based on class and individual characteristics left by the firearm on bullets and cartridge cases.  Under current state of the art, these examinations are executed", general_title = "Note", threeparttable = T, footnote_as_chunk = T)
-
-```
 
 
 
@@ -888,7 +861,7 @@ myfit3n4_simulation %>%
 \yg{The beta distributions are flexible in capturing unimodal asymmetric densities on the $[0,1]$ interval.}
 <!-- The beta distribution is  often-used in Bayesian analysis to describe a quantity from 0 to 1, such as a probability or proportion quantifying our knowledge for another distribution. ~~And~~ it is very flexible to capture unimodal asymmetric densities in 0 to 1.  -->
 
-However, \hh{a single Beta density might not be sufficient} to explain a heavy tail or  a second mode such as the one in the KM distribution in \autoref{fig:example}. We therefore further consider the beta mixture distribution. <!--which is a more complicated distribution than the beta distribution as a special case.-->
+However, a single Beta density might not be sufficient to explain a heavy tail or  a second mode such as the one in the KM distribution in \autoref{fig:example}. We therefore further consider the beta mixture distribution. <!--which is a more complicated distribution than the beta distribution as a special case.-->
 In the beta mixture distribution, we introduce a set of prior probabilities to combine several beta densities as one:
 
 <!-- we introduce a weighted sum of prior probabilities to combine several beta densities as one: -->
@@ -900,11 +873,11 @@ Random variable $X$ is said to follow a Beta distribution, $X \sim B(\mu, \phi)$
 f(x;\mu, \phi) =  \frac{\Gamma(\phi)}{\Gamma(\mu\phi)\Gamma\left((1-\mu)\phi\right)}x^{\mu\phi-1}(1-x)^{(1-\mu)\phi-1},
 \end{align*}
 where $\Gamma(.)$ is the Gamma function. In this parameterization, $E[X] = \mu$ and Var$[X] = \mu(1-\mu) / (\phi +1)$.
-\hh{$\mu$ is the location parameter of the distribution, $\phi$ is called the precision or dispersion parameter }[@Ferrari2004].
+$\mu$ is the location parameter of the distribution, $\phi$ is called the precision or dispersion parameter[@Ferrari2004].
 \end{definition}
 
 
-Note that we are using the mean and precision parameterization of beta distributions. This parameterization simplifies the mathematical expressions and is also more intuitive. \hh{The mean and precision parameterization} is equivalent to the more  usual  parameterization using shape parameters $\alpha$ and $\beta$ through the following transformation:
+Note that we are using the mean and precision parameterization of beta distributions. This parameterization simplifies the mathematical expressions and is also more intuitive. The mean and precision parameterization is equivalent to the more usual parameterization using shape parameters $\alpha$ and $\beta$ through the following transformation:
 
 \begin{align*}
 \mu = \frac{\alpha}{\alpha+\beta}\ \ \ \text{ and } \ \ \ 
@@ -1092,64 +1065,128 @@ Model result
 
 <!-- We consider cross correlation functions (CCF) for land comparisons, which is produced by calculating the maximized CCF between two signatures extracted from a pair of bullet LEAs. -->
 
-The estimation was done using Nelder-Mead algorithm in R [reference]. This is a general purpose numeric method which works reasonably well for multidimensional optimization problems. In our case, the objective function is the log likelihood function of the beta mixture distribution. Therefore, we finally found the maximum likelihood estimates (MLE). \yg{We started with estimating all single-component, two-component and three-component beta mixture models for both KM and KNM distributions. By comparing the models, we could see how well they fit the data and test if some components are necessary.} The estimated beta mixture distributions for KM and KNM are in Table \ref{Full Data KM Distribution Estimation} and Table \ref{Full Data KNM Distribution Estimation} respectively. For the single-component beta distributions, the KM distribution has a mean at 0.635 and the KNM distribution has a mean at 0.404. We can also see that for the two-component beta mixture distributions for both KM and KNM, there are components with mean around 0.5 and the other components are more separated from each other. This indicates the model successfully accounted for different situations of comparisons involving tank rash and random identification etc., which is an ideal property we would like to see and make use of in explaining the similarity scores. \yg{Another point about the estimates that is worth mentioning is that the $\phi$ of the KM beta distribution is much smaller than any of the two components of the two-component KM beta mixture distribution. This indicates that the two components well accounted for each mode locally with much smaller variation than the overall single-beta distribution which failed to capture the local structure and the heavy tail.}
+The estimation was done using Nelder-Mead algorithm in R [reference]. This is a general purpose numeric method which works reasonably well for multidimensional optimization problems. In our case, the objective function is the log likelihood function of the beta mixture distribution. Therefore, we finally found the maximum likelihood estimates (MLE). \yg{We started with estimating all single-component, two-component and three-component beta mixture models for both KM and KNM distributions. By comparing the models, we could see how well they fit the data and test if some components are necessary.} The estimated beta mixture distributions for KM and KNM are in Table \ref{kmestimation} and Table \ref{knmestimation} respectively. For the single-component beta distributions, the KM distribution has a mean at 0.635 and the KNM distribution has a mean at 0.404. We can also see that for the two-component beta mixture distributions for both KM and KNM, there are components with mean around 0.5 and the other components are more separated from each other. This indicates the model successfully accounted for different situations of comparisons involving tank rash and random identification etc., which is an ideal property we would like to see and make use of in explaining the similarity scores. \yg{Another point about the estimates that is worth mentioning is that the $\phi$ of the KM beta distribution is much smaller than any of the two components of the two-component KM beta mixture distribution. This indicates that the two components well accounted for each mode locally with much smaller variation than the overall single-beta distribution which failed to capture the local structure and the heavy tail.}
 
+<!-- \autoref{kmestimation} -->
+<!-- \ref{kmestimation} -->
 
-\begin{table}[h]
-\centering
-\begin{tabular}{ |p{1.3cm}||p{2.1cm} p{0.8cm} p{0.8cm} p{0.8cm}p {1.2cm} p{1.2cm}|}
- \hline
- \multicolumn{7}{|c|}{Full Data KM Distribution Estimation} \\
- \hline
- Model & Component& $\mu$ & $\phi$ & logLik & p-value& BIC\\
+```{r kmestimation}
+table1_data <- data.frame(Model = c("Beta", "2-comp", "2-comp", rep("3-comp", 3)),
+                          `Prior Probability` = c("1", 
+                                                  as.character(round(param_km_c2$p1, digits = 2)),
+                                                  as.character(round(1-param_km_c2$p1, digits =2)),
+                                                  as.character(round(param_km_c3$p1, digits = 2)),
+                                                  as.character(round(param_km_c3$p2, digits =2)),                                                as.character(round(1-param_km_c3$p1-param_km_c3$p2, digits = 2))),
+                          mu = c(round(param_km_c1$mu, digits = 2), 
+                                 round(param_km_c2$mu1, digits = 2),
+                                 round(param_km_c2$mu2, digits = 2),
+                                 round(param_km_c3$mu1, digits = 2), 
+                                 round(param_km_c3$mu2, digits = 2),
+                                 round(param_km_c3$mu3, digits = 2)),
+                          phi = c(round(param_km_c1$phi, digits = 2), 
+                                 round(param_km_c2$phi1, digits = 2),
+                                 round(param_km_c2$phi2, digits = 2),
+                                 round(param_km_c3$phi1, digits = 2), 
+                                 round(param_km_c3$phi2, digits = 2),
+                                 round(param_km_c3$phi3, digits = 2)),
+                          LogLik = c(ccf_km_c1$logLik, ccf_km_c2$logLik, ccf_km_c2$logLik,
+                                     ccf_km_c3$logLik, ccf_km_c3$logLik, ccf_km_c3$logLik),
+                          BIC  = c(bic1, bic2, bic2, bic3, bic3, bic3))
+names(table1_data) <- c("Model", "Prior Probability", "$\\mu$", "$\\phi$",
+                        "LogLik", "BIC")
 
-       & Prior& & & & &\\
+kbl(table1_data, booktabs = T, align = "l", escape = F, caption = 'Parameter estimations for the Beta distribution (1-component beta mixture distribution), 2-component and 3-component distributions for the KM CCF. "2-comp" refers to the 2-component beta mixture distribution, and the same for "3-comp". Column "LogLik" is the maximized log likelihood for each distribution.\\label{kmestimation}') %>%
+  column_spec(1, bold = T) %>%
+  collapse_rows(columns = c(1, 5, 6), latex_hline = "major", valign = "middle")
 
-       & Probability& & & & & \\
- \hline
- \multirow{3}{*}{3-comp} &  0.247 &0.406&   24.097 & \multirow{3}{*}{6278} & &\multirow{3}{*}{-12479}\\
- & 0.521  & 0.664 & 13.342& & &\\
- & 0.232 &0.819&   33.823 & & &\\
- \hline
- \multirow{2}{*}{2-comp} & 0.419  & 0.466 & 15.812 & \multirow{2}{*}{6243} & \multirow{2}{*}{0}&\multirow{2}{*}{-12438}\\
- & 0.581 &0.759&   18.476 & & &\\
- \hline
- Beta &  & 0.635 & 6.529 & 5712 & 0&-11404\\
- \hline
-\end{tabular}
-\caption{Parameter estimations for the Beta distribution (1-component beta mixture distribution), 2-component and 3-component distributions for the KM CCF. "2-comp" refers to the 2-component beta mixture distribution, and the same for "3-comp". Column "logLik" is the maximized log likelihood for each distribution. Column "p-value" is the p-value for asymptotic likelihood ratio tests between the current model and one-step more complex model, which suffers from the large sample size and the resulting over-stated actual significance}
-\label{Full Data KM Distribution Estimation}
+```
 
-\end{table}
+<!-- \begin{table}[h] -->
+<!-- \centering -->
+<!-- \begin{tabular}{ |p{1.3cm}||p{2.1cm} p{0.8cm} p{0.8cm} p{0.8cm}p {1.2cm} p{1.2cm}|} -->
+<!--  \hline -->
+<!--  \multicolumn{7}{|c|}{Full Data KM Distribution Estimation} \\ -->
+<!--  \hline -->
+<!--  Model & Component& $\mu$ & $\phi$ & logLik & p-value& BIC\\ -->
+
+<!--        & Prior& & & & &\\ -->
+
+<!--        & Probability& & & & & \\ -->
+<!--  \hline -->
+<!--  \multirow{3}{*}{3-comp} &  0.247 &0.406&   24.097 & \multirow{3}{*}{6278} & &\multirow{3}{*}{-12479}\\ -->
+<!--  & 0.521  & 0.664 & 13.342& & &\\ -->
+<!--  & 0.232 &0.819&   33.823 & & &\\ -->
+<!--  \hline -->
+<!--  \multirow{2}{*}{2-comp} & 0.419  & 0.466 & 15.812 & \multirow{2}{*}{6243} & \multirow{2}{*}{0}&\multirow{2}{*}{-12438}\\ -->
+<!--  & 0.581 &0.759&   18.476 & & &\\ -->
+<!--  \hline -->
+<!--  Beta &  & 0.635 & 6.529 & 5712 & 0&-11404\\ -->
+<!--  \hline -->
+<!-- \end{tabular} -->
+<!-- \caption{Parameter estimations for the Beta distribution (1-component beta mixture distribution), 2-component and 3-component distributions for the KM CCF. "2-comp" refers to the 2-component beta mixture distribution, and the same for "3-comp". Column "logLik" is the maximized log likelihood for each distribution. Column "p-value" is the p-value for asymptotic likelihood ratio tests between the current model and one-step more complex model, which suffers from the large sample size and the resulting over-stated actual significance} -->
+<!-- \label{Full Data KM Distribution Estimation} -->
+
+<!-- \end{table} -->
 
 <!-- Parameter estimations for the Beta distribution (1-component beta mixture distribution), 2-component and 3-component distributions for the KM CCF. "2-comp" refers to the 2-component beta mixture distribution, and the same for "3-comp". Column "logLik" is the maximized log likelihood for each distribution. Column "p-value" is the p-value for asymptotic likelihood ratio tests between the current model and one-step more complex model, where 0 indicates that we would reject the hypothesis that the current one is sufficient to decribe the data -->
 
-\begin{table}[h]
-\centering
-\begin{tabular}{ |p{1.3cm}||p{2.1cm} p{0.8cm} p{0.8cm} p{0.8cm}p {1.2cm} p{1.2cm}|}
- \hline
- \multicolumn{7}{|c|}{Full Data KNM Distribution Estimation} \\
- \hline
- Model & Component& $\mu$ & $\phi$ & logLik & p-value& BIC\\
+```{r knmestimation}
+table2_data <- data.frame(Model = c("Beta", "2-comp", "2-comp", rep("3-comp", 3)),
+                          `Prior Probability` = c("1", 
+                                                  as.character(round(param_knm_c2$p1, digits = 2)),
+                                                  as.character(round(1-param_knm_c2$p1, digits =2)),
+                                                  as.character(round(param_knm_c3$p1, digits = 2)),
+                                                  as.character(round(param_knm_c3$p2, digits =2)),                                                as.character(round(1-param_knm_c3$p1-param_knm_c3$p2, digits = 2))),
+                          mu = c(round(param_knm_c1$mu, digits = 2), 
+                                 round(param_knm_c2$mu1, digits = 2),
+                                 round(param_knm_c2$mu2, digits = 2),
+                                 round(param_knm_c3$mu1, digits = 2), 
+                                 round(param_knm_c3$mu2, digits = 2),
+                                 round(param_knm_c3$mu3, digits = 2)),
+                          phi = c(round(param_knm_c1$phi, digits = 2), 
+                                 round(param_knm_c2$phi1, digits = 2),
+                                 round(param_knm_c2$phi2, digits = 2),
+                                 round(param_knm_c3$phi1, digits = 2), 
+                                 round(param_knm_c3$phi2, digits = 2),
+                                 round(param_knm_c3$phi3, digits = 2)),
+                          LogLik = c(ccf_knm_c1$logLik, ccf_knm_c2$logLik, ccf_knm_c2$logLik,
+                                     ccf_knm_c3$logLik, ccf_knm_c3$logLik, ccf_knm_c3$logLik),
+                          BIC  = c(bic4, bic5, bic5, bic6, bic6, bic6))
+names(table1_data) <- c("Model", "Prior Probability", "$\\mu$", "$\\phi$",
+                        "LogLik", "BIC")
 
-       & Prior& & & & &\\
+kbl(table2_data, booktabs = T, align = "l", escape = F, caption = 'Parameter estimations for the Beta distribution (1-component beta mixture distribution), 2-component and 3-component distributions for the KNM CCF. "2-comp" refers to the 2-component beta mixture distribution, and the same for "3-comp". Column "LogLik" is the maximized log likelihood for each distribution.\\label{knmestimation}') %>%
+  column_spec(1, bold = T) %>%
+  collapse_rows(columns = c(1, 5, 6), latex_hline = "major", valign = "middle")
 
-       & Probability& & & & & \\
- \hline
- \multirow{3}{*}{3-comp} &  0.650 &0.345&   35.017 & \multirow{3}{*}{78961} & &\multirow{3}{*}{-157830}\\
- & 0.314  & 0.490 & 24.979& & &\\
- & 0.032 &0.667&   18.454 & & &\\
- \hline
- \multirow{2}{*}{2-comp} & 0.674  & 0.358 & 39.908 & \multirow{2}{*}{78808} & \multirow{2}{*}{0}&\multirow{2}{*}{-157558}\\
- & 0.336 &0.494&   13.324& & &\\
- \hline
- Beta &  & 0.404 & 15.801 & 75349 & 0&-150675\\
- \hline
-\end{tabular}
-\caption{Parameter estimations for the Beta distribution (1-component beta mixture distribution), 2-component and 3-component distributions for the KNM CCF. "2-comp" refers to the 2-component beta mixture distribution, and the same for "3-comp". Column "logLik" is the maximized log likelihood for each distribution. Column "p-value" is the p-value for asymptotic likelihood ratio tests between the current model and one-step more complex model, which suffers from the large sample size and the resulting over-stated actual significance}
-\label{Full Data KNM Distribution Estimation}
+```
 
-\end{table}
+<!-- \begin{table}[h] -->
+<!-- \centering -->
+<!-- \begin{tabular}{ |p{1.3cm}||p{2.1cm} p{0.8cm} p{0.8cm} p{0.8cm}p {1.2cm} p{1.2cm}|} -->
+<!--  \hline -->
+<!--  \multicolumn{7}{|c|}{Full Data KNM Distribution Estimation} \\ -->
+<!--  \hline -->
+<!--  Model & Component& $\mu$ & $\phi$ & logLik & p-value& BIC\\ -->
+
+<!--        & Prior& & & & &\\ -->
+
+<!--        & Probability& & & & & \\ -->
+<!--  \hline -->
+<!--  \multirow{3}{*}{3-comp} &  0.650 &0.345&   35.017 & \multirow{3}{*}{78961} & &\multirow{3}{*}{-157830}\\ -->
+<!--  & 0.314  & 0.490 & 24.979& & &\\ -->
+<!--  & 0.032 &0.667&   18.454 & & &\\ -->
+<!--  \hline -->
+<!--  \multirow{2}{*}{2-comp} & 0.674  & 0.358 & 39.908 & \multirow{2}{*}{78808} & \multirow{2}{*}{0}&\multirow{2}{*}{-157558}\\ -->
+<!--  & 0.336 &0.494&   13.324& & &\\ -->
+<!--  \hline -->
+<!--  Beta &  & 0.404 & 15.801 & 75349 & 0&-150675\\ -->
+<!--  \hline -->
+<!-- \end{tabular} -->
+<!-- \caption{Parameter estimations for the Beta distribution (1-component beta mixture distribution), 2-component and 3-component distributions for the KNM CCF. "2-comp" refers to the 2-component beta mixture distribution, and the same for "3-comp". Column "logLik" is the maximized log likelihood for each distribution. Column "p-value" is the p-value for asymptotic likelihood ratio tests between the current model and one-step more complex model, which suffers from the large sample size and the resulting over-stated actual significance} -->
+<!-- \label{Full Data KNM Distribution Estimation} -->
+
+<!-- \end{table} -->
 
 The estimated beta distributions are shown in \autoref{fig:singlebeta} and the estimated two-component beta mixture distributions are also shown in \autoref{fig:two-component-betamix}. As expected, the estimated distributions show the properties we desire for CCFs. 
 \yg{For a given value 0.5 (which is not a special one), the KNM distribuion put a large probabilitiy for values under 0.5, while the KM distribution put a large probablity for values above 0.5, indicating the degree of seperation could be achieved by the observed values from the two distributions. However, both distributions put some probabilties on the other side of 0.5 where most realizations of the CCFs are from a different distribution. We could then use the likelihood ratio based on the distributions we have to evaluate the results in that case.}
@@ -1186,7 +1223,7 @@ myfit1n2_simulation %>%
   ylab("density")
 ```
 
-Three candidate distributions for each of KM and KNM are considered. For the increasing of complexity, we have single beta, two-component beta mixture and three-component beta mixture distributions. And they are also nested in that order. Naturally, we first look at the maximized log-likelihood of each model, and we can do asymptotic log-likelihood ratio chi-square tests for single beta against two-component beta mixture distributions, and two-component against three-component beta mixture distributions. The p-values of those test are shown in the Table \ref{Full Data KM Distribution Estimation} and Table \ref{Full Data KNM Distribution Estimation} as the column "p-value". Surprisingly (or not), we found all those p-values are 0 which strongly suggests a more complex model when there is one. However, considering the size of the data we are using to fit these models, we can expect the statistical significance will be easily achieved since any small difference of the sufficiency will be detected. So we have to take the sample size effect into consideration. As Bayesian information criterion (BIC) is a well used criterion which takes the model complexity, sufficiency and the sample size (by a log function) into account. As shown in the column "BIC" in the tables, the BICs for the single beta distributions are larger than that of the two-component beta mixtures by relatively large proportions. And the BICs for the two-component beta mixture distributions are a little larger than that of the three-component beta mixture distributions for both KM and KNM. Obviously, we would prefer the two-component beta mixture distributions over the single beta distributions, but we would cast a doubt when it comes to the three-component beta mixture distributions. We still prefer the two-component distributions instead of the three-component distributions. The reasons are: 1) these differences of BICs between two and three component distributions are really small in proportion (by 0.3% for KM and 0.017% for KNM), 2) the estimation cost is not accounted, which will be higher for a more complex model, 3) the BICs still don't take the sample size effect fully into account since the log function for sample size goes to flat when the sample sizes are large. By simple calculation, we can see that the log-likelihood increased by a multiplicative factor more than 10 when the sample sizes increased from KM case to KNM case, however, at the same time, the log of sample size only roughly increased from 9 to 11. So we choose the two-component beta mixture distributions for both KM and KNM. And also as we have seen, these distributions have potential good forensic interpretations. 
+Three candidate distributions for each of KM and KNM are considered. For the increasing of complexity, we have single beta, two-component beta mixture and three-component beta mixture distributions. And they are also nested in that order. Naturally, we first look at the maximized log-likelihood of each model, and we can do asymptotic log-likelihood ratio chi-square tests for single beta against two-component beta mixture distributions, and two-component against three-component beta mixture distributions. \yg{XXX p-values not shown now}The p-values of those test are shown in the Table \ref{kmestimation} and Table \ref{knmestimation} as the column "p-value". Surprisingly (or not), we found all those p-values are 0 which strongly suggests a more complex model when there is one. However, considering the size of the data we are using to fit these models, we can expect the statistical significance will be easily achieved since any small difference of the sufficiency will be detected. So we have to take the sample size effect into consideration. As Bayesian information criterion (BIC) is a well used criterion which takes the model complexity, sufficiency and the sample size (by a log function) into account. As shown in the column "BIC" in the tables, the BICs for the single beta distributions are larger than that of the two-component beta mixtures by relatively large proportions. And the BICs for the two-component beta mixture distributions are a little larger than that of the three-component beta mixture distributions for both KM and KNM. Obviously, we would prefer the two-component beta mixture distributions over the single beta distributions, but we would cast a doubt when it comes to the three-component beta mixture distributions. We still prefer the two-component distributions instead of the three-component distributions. The reasons are: 1) these differences of BICs between two and three component distributions are really small in proportion (by 0.3% for KM and 0.017% for KNM), 2) the estimation cost is not accounted, which will be higher for a more complex model, 3) the BICs still don't take the sample size effect fully into account since the log function for sample size goes to flat when the sample sizes are large. By simple calculation, we can see that the log-likelihood increased by a multiplicative factor more than 10 when the sample sizes increased from KM case to KNM case, however, at the same time, the log of sample size only roughly increased from 9 to 11. So we choose the two-component beta mixture distributions for both KM and KNM. And also as we have seen, these distributions have potential good forensic interpretations. 
 
 It’s also helpful to see how the individual components look like in the beta mixture distributions as in \autoref{fig:components}. The KNM and KM distributions seem to share a common component while keeping the other components far apart from each other. The separated components represent the ideal cases where the bullet land engraved areas preserved the information of the source well and result in clearly distinct separation. The shared components represent the cases where the KM results in lower scores because of some degree of tank rash, pitting, breakoff or other damages on the bullets and the KNM results in higher score because of the random identification effect. According to the estimated prior probabilities, both distributions put less weight on the common component while putting larger weight on the the components characterizing the differences of KM and KNM respectively, which agrees on our expectation that majorities of the distributions are separated while the minorities overlapped. These properties together well explained the observed empirical distribution of similarity scores in our cases. Particularly, the heavier tail of the KM comparisons is explicitly included in the form of the model by one of the components.
 
