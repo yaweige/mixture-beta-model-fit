@@ -806,7 +806,7 @@ Following the process described in @Hare2016, we extract **signatures** \hh{XXX 
 Here, we will employ the cross-correlation function (CCF) to measure similarity.
 The cross-correlation function (CCF) is calculated by maximizing the  correlation of two  signatures under a vertical shift.
 
-Mathematically, CCF is  a value between -1 and 1, with larger values indicating higher similarity between pairs of signatures. Discriminating between same-source and different-source pairs of signatures is based on a cutoff value. Naively, one could assign positive CCF values to indicate same-source pairs and, similarly, negative values to different-source pairs. However, in practice it turns out that values of CCF based on pairs of bullet land signatures are not symmetric around the origin, but mostly positive regardless of source. Negative values are rarely observed for LEA comparisons in practice (and in none of the more than 100k comparisons considered in this paper).
+Mathematically, CCF is  a value between -1 and 1, with larger values indicating higher similarity between pairs of signatures. Deciding between identifications and eliminations based on pairs of signatures is based on a cutoff value of the corresponding maximized CCF value. Naively, one could assign positive CCF values to indicate same-source pairs and, similarly, negative values to different-source pairs. However, in practice it turns out that values of CCF based on pairs of bullet land signatures are not symmetric around the origin, but mostly positive regardless of source. Negative values are rarely observed for LEA comparisons in practice (and in none of the more than 100k comparisons considered in this paper).
 Moreover, different pairings of firearm and ammunition result in different distributions of values, therefore no single CCF value is sufficient to distinguish between same-source and different-source pairs. Alternatively to using scores directly, \hh{XXXX citations XXX} suggest the use of score-based log-likelihood ratios to evaluate the strength of forensic evidence. 
 
 <!--This provides us with a rich tool box and help the field advance, but it comes with issues. For the practitioners not in statistical major who don't fully understand the differences among those algorithms, a same number represents different strength of evidence is extremely confusing. And even in the academic field, we need a unified way to quantify the strength of evidence considering different behaviors of different scores. The score based on likelihood ratios is proposed in forensic science to measure the strength of evidence.-->
@@ -991,7 +991,12 @@ Here, we focus on  four commonly used error rates as defined in \autoref{Error r
   3. the false identification rate (FIR)
   4. the false exclusion rate (FER)
   
-FPR and FNR are considered source-specific assessment [@inconclusives2021]. Both of these are probabilities to make a false conclusion given  ground truth. These error rates are particular useful when we evaluate the process of of decision-making or an algorithm. FIR and FER are considered decision-specific assessment [@inconclusives2021]. These two probabilities assess the risk of a false claim given a decision. These probabilities are useful in real cases when a jury is asked to decide on a defendant's guilt after being presented with conclusions from forensic evidence. \yg{Theoretically, these error rates are calculated as conditional probablilities based on the beta mixture distributions set up in the previous section.}
+\hh{XXX only use either rates or probabilities. Make sure to define probabilities before using them}  
+FPR and FNR are considered source-specific assessment [@inconclusives2021]. Both of these are probabilities to make a false conclusion given  ground truth. These error rates are particular useful when we evaluate the process of of decision-making or an algorithm. FIR and FER are considered decision-specific assessment [@inconclusives2021]. These two rates assess the risk of a false claim given a decision. They are particularly useful in situations, such as when a jury is asked to decide on a defendant's guilt after being presented with conclusions from forensic evidence. 
+
+\yg{Theoretically, these error rates are calculated as conditional probabilities based on the beta mixture distributions set up in the previous section by introducing a threshold $c$ for the CCF values, that distinguishes between identifications ($CCF > c$) and eliminations ($CCF < c$). 
+}
+
 
 \begin{table}[h]
 \centering
@@ -1013,14 +1018,23 @@ FPR and FNR are considered source-specific assessment [@inconclusives2021]. Both
 
 \end{table}
 
-\hh{XXX The next sentence needs to be integrated better into the writeup. You also need the continuous score.}
-\yg{The calculation of the error rates is straightforward with the beta mixture distribution model.}
+\hh{The four decisions in \autoref{Error rate table} are then simply calculated   as:
+\begin{eqnarray*}
+TP &=& P(CCF > c \mid \text{same source}) \\
+FP &=& P(CCF > c \mid \text{different source}) \\
+FN &=& P(CCF < c \mid \text{same source}) \\
+TN &=& P(CCF < c \mid \text{different source}). \\
+\end{eqnarray*}
+}
 
 
-Error rates are also affected by the threshold used to make final decisions \hh{XXX thresholds only come into play when there is a latent continuous score in play. Bring that in, then talk about calculating error rates.}. In an extreme example, if we are very conservative in making identifications, we can set the threshold to be large enough, say CCF >= 0.99, then the FPR is 0. But at the same time, the FNR is 1. It's clear that there are trade-offs between the error rates. So, to make these error rates comparable and consistent, for the current paper, we refer the threshold as the value where the probability densities of KM and KNM distributions equal to each other. This is not a bad choice, since it has good statistical meaning that at this value, the likelihood ratio equals 1 and any deviation from 1 would give preference to a certain decision. 
+Error rates are also affected by the threshold $c$ used to make decisions. In an extreme example, if we are very conservative in making identifications, we can set the threshold to be large enough, say $CCF >= 0.99$, then the FPR is 0. But at the same time, the FNR approaches 1. It is clear that there are trade-offs between the error rates. So, to make these error rates comparable and consistent, for the current paper, we use the threshold $c_{X}$, i.e. the threshold $c$ where the probability densities of the KM and KNM distributions cross each other. At this crossing threshold $c_X$, the likelihood ratio equals 1. 
+<!-- This is not a bad choice, since it has good statistical meaning that at this value, the likelihood ratio equals 1 and any deviation from 1 would give preference to a certain decision. -->
 
 <!-- For the two component beta mixture distributions we estimated in last section, this threshold is `r round(cutoff1, digits = 2)`.  -->
 In the application of the algorithms, the threshold need to be carefully chosen where the study of associated error rates will in turn be essential guiding that process.
+
+\hh{XXX What if this threshold is not unique? - under what assumptions does the KNM density dominate KM?}
 
 Data
 -----------------------------------------
@@ -1030,6 +1044,9 @@ Subsequently, high-resolution 3d topographic scans of the striation marks on the
 These scans form the basis of the investigation here and will be referred to as the **LAPD data**. These scans are publicly available through the NIST Ballistics Toolmark Research Database [@nist].
 
 It is the first time such a large data set available to the researchers, which makes it possible for a statistical analysis for the distributions of similarity scores. For the firearms used, there are 6 lands in each barrel which will leave 6 LEAs on the bullets for comparisons. We follow the aforementioned standard procejure to generate CCFs as similarity scores (include the procedure). There are 6 different bullet comparisons within a set of 4 bullets for a barrel. There are 6 same source land comparisons and 30 distinct different source land comparisons in each of those 6 bullet comparisons. In total, for a single barrel, there are 36 same source land to land comparisons. For the different source land to land comparisons, we have much more cases. If we limit the scope within each barrel, there will be $30\times 6 + 15 \times 4 = 240$ land to land comparisons for which we also take the comparisons among lands on a same bullet into consideration.
+
+
+
 
 Database model v.s. case specific model
 ------------------------------------------
