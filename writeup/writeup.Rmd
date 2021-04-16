@@ -465,42 +465,62 @@ case_by_case_classifcation_converged %>% unlist() %>% length
 ccf_nonmatched_km_data <- ccf_data_part2 %>% filter(source == "KM")
 ccf_nonmatched_knm_data <- ccf_data_part2 %>% filter(source == "KNM")
 
-# For the current coding method, it's not available to get all FAU1 and FAU2
+# For the current coding method, it's not available to get all FAU1 and FAU2 (It is now, but this is still a good way)
 # but the following would work for the purpose of split (the following step) (to get list forms)
 
 # The fau 246 is used, however, it is labeled as 245 in the land names, so we took care of that by using the current way to split.
-ccf_nonmatched_km_data <- ccf_nonmatched_km_data %>% 
-  mutate(FAU1toSplit = str_extract(land1, pattern = "(?<=LAPD - (FAU )?)\\d+"),
-         FAU2toSplit = str_extract(land2, pattern = "(?<=LAPD - (FAU )?)\\d+"),
-         FAUtoSplit = ifelse(is.na(FAU1toSplit), yes = FAU2toSplit, no = FAU1toSplit))
 
-ccf_nonmatched_knm_data <- ccf_nonmatched_knm_data %>% 
-  mutate(FAU1toSplit = str_extract(land1, pattern = "(?<=LAPD - (FAU )?)\\d+"),
-         FAU2toSplit = str_extract(land2, pattern = "(?<=LAPD - (FAU )?)\\d+"),
-         FAUtoSplit = ifelse(is.na(FAU1toSplit), yes = FAU2toSplit, no = FAU1toSplit))
+# ccf_nonmatched_km_data <- ccf_nonmatched_km_data %>%
+#   mutate(FAU1toSplit = str_extract(land1, pattern = "(?<=LAPD - (FAU )?)\\d+"),
+#          FAU2toSplit = str_extract(land2, pattern = "(?<=LAPD - (FAU )?)\\d+"),
+#          FAUtoSplit = ifelse(is.na(FAU1toSplit), yes = FAU2toSplit, no = FAU1toSplit),
+#          FAUtoSplit = ifelse(is.na(FAU1toSplit), yes = FAU2toSplit, no = FAU1toSplit))
+# 
+# ccf_nonmatched_knm_data <- ccf_nonmatched_knm_data %>%
+#   mutate(FAU1toSplit = str_extract(land1, pattern = "(?<=LAPD - (FAU )?)\\d+"),
+#          FAU2toSplit = str_extract(land2, pattern = "(?<=LAPD - (FAU )?)\\d+"),
+#          FAUtoSplit = ifelse(is.na(FAU1toSplit), yes = FAU2toSplit, no = FAU1toSplit))
 
+if (nrow(ccf_nonmatched_km_data)%%36 != 0 | nrow(ccf_nonmatched_knm_data)%%240 != 0) stop("Incorrect dimension in application section for part2 data")
 
 ccf_nonmatched_km <- ccf_nonmatched_km_data %>%
-  split(f = rep(1:98, each = 36))
+  split(f = rep(1:nrow(ccf_nonmatched_km_data)/36, each = 36))
 
 ccf_nonmatched_knm <- ccf_nonmatched_knm_data %>%
-  split(f = rep(1:98, each = 240))
+  split(f = rep(1:nrow(ccf_nonmatched_knm_data)/240, each = 240))
 
-nonmatched_km_fau_names <- lapply(ccf_nonmatched_km, FUN = function(x){
-  output <- unique(x$FAUtoSplit[!is.na(x$FAUtoSplit)])
-  if (length(output) != 1) stop("Incorrect split in application section for part2 data")
-  output
-}) %>% unlist()
 
-nonmatched_knm_fau_names <- lapply(ccf_nonmatched_knm, FUN = function(x){
-  output <- unique(x$FAUtoSplit[!is.na(x$FAUtoSplit)])
-  if (length(output) != 1) stop("Incorrect split in application section for part2 data")
-  output
-}) %>% unlist()
+# nonmatched_km_fau_names <- lapply(ccf_nonmatched_km, FUN = function(x){
+#   output <- unique(x$FAUtoSplit[!is.na(x$FAUtoSplit)])
+#   if (length(output) != 1) stop("Incorrect split in application section for part2 data")
+#   output
+# }) %>% unlist()
+# 
+# nonmatched_knm_fau_names <- lapply(ccf_nonmatched_knm, FUN = function(x){
+#   output <- unique(x$FAUtoSplit[!is.na(x$FAUtoSplit)])
+#   if (length(output) != 1) stop("Incorrect split in application section for part2 data")
+#   output
+# }) %>% unlist()
 
-if (any(nonmatched_km_fau_names != nonmatched_knm_fau_names)) stop("Incorrect split in application section for part2 data")
-names(ccf_nonmatched_km) <- nonmatched_km_fau_names
-names(ccf_nonmatched_knm) <- nonmatched_knm_fau_names
+# if (any(nonmatched_km_fau_names != nonmatched_knm_fau_names)) stop("Incorrect split in application section for part2 data")
+# names(ccf_nonmatched_km) <- nonmatched_km_fau_names
+# names(ccf_nonmatched_knm) <- nonmatched_knm_fau_names
+
+# introduce FAU and bullet
+# ccf_nonmatched_km_data <- ccf_nonmatched_km_data %>% 
+#   mutate(FAU1 = as.numeric(str_extract(land1, pattern = "(?<=LAPD - (FAU )?)\\d+")),
+#          FAU2 = as.numeric(str_extract(land2, pattern = "(?<=LAPD - (FAU )?)\\d+")))
+# 
+# ccf_nonmatched_knm_data <- ccf_nonmatched_knm_data %>% 
+#   mutate(FAU1 = as.numeric(str_extract(land1, pattern = "(?<=LAPD - (FAU )?)\\d+")),
+#          FAU2 = as.numeric(str_extract(land2, pattern = "(?<=LAPD - (FAU )?)\\d+")))
+# 
+# ccf_nonmatched_km <- ccf_nonmatched_km_data %>%
+#   split(f = .$FAU1)
+# 
+# ccf_nonmatched_knm <- ccf_nonmatched_knm_data %>%
+#   split(f = .$FAU1)
+# investigate the ccf extraction (from comp) function to see if it works well with the nonmatched bullets
 
 # To fit the models
 nonmatched_test_questioned_sets <- Map(function(x, y) {
