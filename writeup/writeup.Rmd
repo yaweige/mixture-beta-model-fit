@@ -69,8 +69,11 @@ ccf_data_part2 <- ccf_data %>% filter(usage == "part2")
 # Used for the changing sample size section. These are randomly generated sequences, to reduce the randomness of each run, it is stored
 change_size_sequences <- read.csv("../data/organized data/ccf-related/change_size_sequences.csv")
 
-# The randomly generated test set
-test_fau_bullet_index <- read.csv("../data/organized data/ccf-related/test_fau_bullet_index.csv")
+# The randomly generated database set (complement set is test set) ) (application section)
+database_inex_data <- read.csv("../data/organized data/ccf-related/database_index_data.csv")
+
+# The randomly generated (1) questioned bullet and (3) test bullets pairs (application section)
+test_quesetioned_pairs_data <- read.csv("../data/organized data/ccf-related/test_quesetioned_pairs_data.csv")
 ```
 
 ```{r model-estimation-section, include=FALSE}
@@ -385,8 +388,8 @@ fer <- pbetamix2(cutoff1, ccf_km_c2)/pbetamix2(cutoff1, ccf_knm_c2)
 # the "nonmatched" in the name refer to the case one bullet with a different source compared with three same source bullets. The "KM" and "KNM" as a variable indicating the way we treat those comparisons. "KNM" refers to "KNM" the same as before. "KM" here doesn't mean all of them is known-matched, for those comparisons among the three same source bullets, they are, for those involving the one different bullet, they are not. But the "KM" involving the one different bullet refers to those lands we suspect to be matched in those bullet comparisons.
 
 # Use part1 data: database, same-source comparison (True results: all same source comparisons)=========
-test_index <- test_fau_bullet_index$FAU
-questioned_bullet_index <- test_fau_bullet_index$bullet
+test_index <- test_quesetioned_pairs_data$FAU1
+questioned_bullet_index <- test_quesetioned_pairs_data$bullet1
 
 # introduce FAU and bullet in ccf_km_full_data, ccf_knm_full_data
 ccf_km_full_data <- ccf_km_full_data %>% 
