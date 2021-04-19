@@ -48,11 +48,13 @@ _Text based on elsarticle sample manuscript, see [http://www.elsevier.com/author
 ```{r setup, warning=FALSE,message=FALSE, echo=FALSE}
 library(dplyr)
 library(ggplot2)
+library(purrr)
 library(readr)
 library(stringr)
 library(kableExtra)
 library(xtable)
 library(tables)
+library(gridExtra)
 theme_set(theme_bw())
 knitr::opts_chunk$set(echo = FALSE, cache = TRUE)
 ```
@@ -1233,13 +1235,31 @@ kbl(table2_data, booktabs = T, align = "l", escape = F, caption = 'Parameter est
 
 <!-- \end{table} -->
 
-The estimated beta distributions are shown in \autoref{fig:singlebeta} and the estimated two-component beta mixture distributions are also shown in \autoref{fig:two-component-betamix}. As expected, the estimated distributions show the properties we desire for CCFs. 
+The estimated beta distributions are shown in \autoref{fig:one-two-component-betamix} and the estimated two-component beta mixture distributions are also shown in \autoref{fig:one-two-component-betamix}. As expected, the estimated distributions show the properties we desire for CCFs. 
 For a given value 0.5 (which is not a special one), the KNM distribution put a large probability for values under 0.5, while the KM distribution put a large probability for values above 0.5, indicating the degree of separation could be achieved by the observed values from the two distributions. However, both distributions put some probabilities on the other side of 0.5 where most realizations of the CCFs are from a different distribution. We could then use the likelihood ratio based on the distributions we have to evaluate the results in that case.
 <!-- The majorities of the estimated distributions are apart from each other, while the minority part of the two distributions has some overlap.  -->
 It's worth noting that both curves have heavy tails to the farther boundaries from the modes and the KM curve has a heavier tail compared to KNM. We can see the two-component distributions fit the data very well, while the single beta distributions are not as good as the two-component distributions for both KM and KNM. The single beta distribution for KM clearly failed to capture the potential second mode of the histogram indicating it is not sufficient. The single beta distribution for KNM captured the mode but still failed to capture the distributional information for some parts. This indicates that even though beta distributions are flexible for variables in 0 to 1, they are still too restricted to be able to describe the cases here. The two-component beta mixture distributions are more promising.
 
+```{r one-two-component-betamix, out.width="70%", fig.align="center", fig.cap="Estimated beta mixture distributions for CCFs", fig.keep="hold", fig.pos="h"}
+myfit1234_simulation <- bind_rows(myfit1n2_simulation %>% select(-y1, -y2),
+                                  myfit3n4_simulation,
+                                  .id = "model")
+myfit1234_simulation$model <-ifelse(myfit1234_simulation$model == "1", yes = "Two-component", no = "One-component")
+myfit1234_simulation %>%
+  ggplot(aes(color = Class, fill = Class)) + 
+  geom_line(aes(x = ccf, y = y))  +
+  facet_wrap(~model) +
+  geom_histogram(aes(x = ccf, y = ..density..), bins = 20, color = "gray99",
+                 position = "identity", alpha = 0.5,
+                 data = bind_rows(ccf_km_full_data, ccf_knm_full_data, .id = "Class")) +
+  scale_color_manual(breaks = c("1", "2"), label = c("KM", "KNM"), values = c("darkorange", "darkgrey")) +
+  scale_fill_manual(breaks = c("1", "2"), label = c("KM", "KNM"), values = c("darkorange", "darkgrey")) +
+  ylab("density") +
+  xlab("CCF")
 
-```{r singlebeta, out.width="70%", fig.align="center", fig.cap="Estimated beta distributions for full data", fig.keep="hold", fig.pos="h"}
+```
+
+```{r singlebeta, out.width="70%", fig.align="center", fig.cap="Estimated beta distributions for full data", fig.keep="hold", fig.pos="h", eval = FALSE}
 myfit3n4_simulation %>%
   ggplot(aes(color = Class, fill = Class)) + 
   geom_line(aes(x = ccf, y = y)) + 
@@ -1254,7 +1274,7 @@ myfit3n4_simulation %>%
 ```
 
 
-```{r two-component-betamix, out.width="70%", fig.align="center", fig.cap="Estimated two-component beta mixture distributions for full data", fig.pos="h"}
+```{r two-component-betamix, out.width="70%", fig.align="center", fig.cap="Estimated two-component beta mixture distributions for full data", fig.pos="h", eval = FALSE}
 myfit1n2_simulation %>%
   ggplot(aes(color = Class, fill = Class)) + 
   geom_line(aes(x = ccf, y = y)) + 
