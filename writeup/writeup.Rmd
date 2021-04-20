@@ -1031,9 +1031,9 @@ FPR and FNR are considered source-specific assessment [@inconclusives2021]. Both
  \hline
     & Match & Non-Match&Error Rate\\
  \hline
- Identification &  \bf{True Positives (TP)}: Correctly judged as matches & False Positive (FP): Incorrectly judged as matches& False Identification Rate $FIR = \frac{FP}{TP + FP}$ \\
+ Identification &  {\bf True Positives (TP)}: Correctly judged as matches & {\bf False Positive (FP)}: Incorrectly judged as matches& False Identification Rate $FIR = \frac{FP}{TP + FP}$ \\
  \hline
- Elimination & \bf{False Negative (FN)}: Incorrectly judged as non-matches& True Negative (TN): Correctly identified non-matches&False Exclusion Rate $FER = \frac{FN}{TN + FN}$ \\
+ Elimination & {\bf False Negative (FN)}: Incorrectly judged as non-matches& {\bf True Negative (TN)}: Correctly identified non-matches&False Exclusion Rate $FER = \frac{FN}{TN + FN}$ \\
  \hline
  Error Rate & False Negative Rate $FNR = \frac{FN}{FN + TP}$ & False Positive Rate $FPR = \frac{FP}{FP + TN}$&\\
  \hline
@@ -1097,8 +1097,11 @@ For a similar combination of firearms and ammunition, the similarity scores extr
 \hh{XXX move this paragraph up}
 In either of the two scenarios, we derive scores by comparing test fires and the questioned bullet. The pipeline of the process is as follows: 
 
-1. given a questioned bullet and a suspected firearm, 
-2. conduct test fires with the suspected firearm and collect three test fired bullets, 
+given a questioned bullet and a suspected firearm, 
+\hh{XXX We need to be a bit cautious about how we phrase this. Sometimes there is no suspected firearm. If we want to make this assumption, we are excluding a lot of comparisons}
+
+
+1. conduct test fires with the suspected firearm and collect three test fired bullets, 
 3. for every pair of bullets (including the questioned), conduct all possible land comparisons and get 36 land comparison scores (6 land engraved areas on each bullet), 
 4. among 36 comparisons within a pair of bullets,  select the six comparisons as KM comparisons (for comparisons among test fired bullets) or questioned land comparisons (for comparisons between the questioned bullet and any test fired bullet) by SAM [reference] due to the nature order of land engraved areas produced by a same barrels, \hh{XXX instead of SAM, use the 'in-phase' citation from NIST}
 5.  KNM scores are only extracted from comparisons within the test fired bullets. 
