@@ -1031,11 +1031,11 @@ FPR and FNR are considered source-specific assessment [@inconclusives2021]. Both
  \hline
     & Match & Non-Match&Error Rate\\
  \hline
- Identification & Correctly judged as matches, True Positives (TP) & Incorrectly judged as matches, False Positive (FP)&False ~~~~~~~~~~~~~Identification Rate (FP/(TP + FP))\\
+ Identification &  \bf{True Positives (TP)}: Correctly judged as matches & False Positive (FP): Incorrectly judged as matches& False Identification Rate $FIR = \frac{FP}{TP + FP}$ \\
  \hline
- Elimination & Incorrectly judged as non-matches, False Negative (FN)& Correctly judged as non-matches, True Negative (TN)&False Exclusion Rate (FN/(TN + FN))\\
+ Elimination & \bf{False Negative (FN)}: Incorrectly judged as non-matches& True Negative (TN): Correctly identified non-matches&False Exclusion Rate $FER = \frac{FN}{TN + FN}$ \\
  \hline
- Error Rate & False Negative Rate (FN/(FN+TP)) & False Positive Rate (FP/(FP + TN))&\\
+ Error Rate & False Negative Rate $FNR = \frac{FN}{FN + TP}$ & False Positive Rate $FPR = \frac{FP}{FP + TN}$&\\
  \hline
 \end{tabular}
 \caption{\label{Error rate table} Definitions for most commonly used error rates in binary decisions of match versus non-match comparisons.}
@@ -1053,7 +1053,9 @@ TN &=& P(CCF < c \mid \text{different source}). \\
 }
 
 
-Error rates are also affected by the threshold $c$ used to make decisions. In an extreme example, if we are very conservative in making identifications, we can set the threshold to be large enough, say $CCF >= 0.99$, then the FPR is 0. But at the same time, the FNR approaches 1. It is clear that there are trade-offs between the error rates. So, to make these error rates comparable and consistent, for the current paper, we use the threshold $c_{X}$, i.e. the threshold $c$ where the probability densities of the KM and KNM distributions cross each other. At this crossing threshold $c_X$, the likelihood ratio equals 1. 
+Error rates are \hh{therefore} affected by the threshold $c$ used to make decisions. \hh{Error rates are also depending on each other, i.e. we can not optimize all at the same time, but we have to make trade-offs. } In an extreme example, we \hh{can set a} very conservative threshold of $CCF >= 0.99$ to make identifications. \hh{This yields a False positive rate (FPR) of zero.} But at the same time, the False negative rate (FNR) approaches 1. 
+To make  error rates comparable and consistent we \hh{base the decision threshold here on the likelihood ratio and use} threshold $c_{X}$ where the probability densities of the KM and KNM distributions cross each other. At this crossing threshold $c_X$, the likelihood ratio equals 1. 
+\hh{XXX do we have citations to the literature where this threshold is used?}
 <!-- This is not a bad choice, since it has good statistical meaning that at this value, the likelihood ratio equals 1 and any deviation from 1 would give preference to a certain decision. -->
 
 <!-- For the two component beta mixture distributions we estimated in last section, this threshold is `r round(cutoff1, digits = 2)`.  -->
@@ -1064,8 +1066,8 @@ In the application of the algorithms, the threshold need to be carefully chosen 
 Data
 -----------------------------------------
 
-For the following sections of the paper, we will base our analysis on a large reference database of four firings from each of 625 Beretta 92 F/FS collected by Srinivasan Rathinam from the Los Angeles Police Department. 
-Subsequently, high-resolution 3d topographic scans of the striation marks on the land-engraved areas of fired bullets were acquired at the Iowa State Roy J.\ Carver Microscopy facility. 
+Our analysis is based on a large reference database of four firings from each of 625 Beretta 92 F/FS collected by Srinivasan Rathinam from the Los Angeles Police Department. 
+High-resolution 3d topographic scans of the striation marks on the land-engraved areas of fired bullets were acquired at the Iowa State Roy J.\ Carver Microscopy facility. 
 These scans form the basis of the investigation here and will be referred to as the **LAPD data**. These scans are publicly available through the NIST Ballistics Toolmark Research Database [@nist].
 
 It is the first time such a large data set available to the researchers, which makes it possible for a statistical analysis for the distributions of similarity scores. For the firearms used, there are 6 lands in each barrel which will leave 6 LEAs on the bullets for comparisons. We follow the aforementioned standard procejure to generate CCFs as similarity scores (include the procedure). There are 6 different bullet comparisons within a set of 4 bullets for a barrel. There are 6 same source land comparisons and 30 distinct different source land comparisons in each of those 6 bullet comparisons. In total, for a single barrel, there are 36 same source land to land comparisons. For the different source land to land comparisons, we have much more cases. If we limit the scope within each barrel, there will be $30\times 6 + 15 \times 4 = 240$ land to land comparisons for which we also take the comparisons among lands on a same bullet into consideration.
@@ -1078,14 +1080,30 @@ Database model v.s. case specific model
 
 ### Study Design
 
-In the current practice, FTEs  fire two or three test bullets from a suspected firearm using ammunition that matches the evidence found on the crime scene as closely as possible.
-Test fires are checked for consistency of striation marks between fires. Generally, the bullet with the more well expressed striations is used to compare to the evidence. With an automated algorithm in these cases as a tool helping the examiners, we make use of all those available test bullets and lands to generate similarity scores. Those scores are then used to get score-based likelihood ratios which quantify the strength of evidence supporting either hypothesis from the prosecution side or the defendant side. The critical step of producing likelihood ratio is to get estimations of the distributions of both KM and KNM scores.
+In the current practice, FTEs  fire two or three test bullets from a suspected firearm using ammunition that  matches the evidence found on the crime scene as closely as possible.
+Test fires are checked for consistency of striation marks between fires. Generally, the bullet with the better expressed striation marks is used to compare to the evidence. 
+In an automated algorithm, we can make use of all available test bullets and lands to assess similarity. Similarity scores (CCF) are used to get score-based likelihood ratios which quantify the strength of evidence supporting either hypothesis from the prosecution side or the defendant side. The critical step of producing these likelihood ratios is to estimate the distributions for KM and KNM similarity scores.
 
-We distinguish between two scenarios: 1) use scores from comparisons of test fires to estimate densities for same source and different source, and 2) use scores with known provenance from a database of similar ammunition and firearms to estimate densities. 
+We distinguish between two scenarios \hh{depending on the reference used for comparisons}: \hh{XXX give these scenarios names}
+\begin{enumerate}
+\item \hh{within-case:} use scores from comparisons of test fires to estimate densities for same source and different source, and 
+\item \hh{reference database:} use scores with known provenance from a database of similar ammunition and firearms to estimate densities. 
+\end{enumerate}
 <!-- The second scenario is where our analysis of the theoretical distributions of the relevant population of similarity scores stand out.  -->
+
+\hh{The next paragraph disrupts the flow - there's good ideas, but we need a different order. }
 For a similar combination of firearms and ammunition, the similarity scores extracted through a same algorithm are considered identically distributed and comprise the relevant population. In real cases, as stated, we can only make use of similarity scores from two or three test fires. This is good enough to produce valid comparisons but likely not good enough to estimate the distributions which generate the likelihood ratios. Besides the likelihood ratio calculation, the reference distributions are also important in deciding thresholds and control the error rates. For thresholds specifically, we choose the point where the likelihood ratio is 1 which has no preference for either hypothesis.
 
-In either of the two scenarios, we derive scores by comparing test fires and the questioned bullet. The pipeline of the process is as follows: 1) given a questioned bullet and a suspected firearm, 2) conduct test fires with the suspected firearm and collect three test fired bullets, 3) for every pair of bullets (including the questioned), we conduct all possible land comparisons and get 36 land comparison scores (6 land engraved areas on each bullet), 4) among 36 comparisons within a pair of bullets, we select the six comparisons as KM comparisons (for comparisons among test fired bullets) or questioned land comparisons (for comparisons between the questioned bullet and any test fired bullet) by SAM [reference] due to the nature order of land engraved areas produced by a same barrels, 5) KNM scores are only extracted from comparisons within the test fired bullets. Then, for the first scenario, the KM and KNM distributions will be estimated with the KM and KNM similarity scores among the test fired bullets respectively. While for the second scenario, the distributions are estimated with a database of the similarity scores from similar firearms and ammunition where all four bullets in each set are considered as test fired with a known source to fit the above pipeline.
+\hh{XXX move this paragraph up}
+In either of the two scenarios, we derive scores by comparing test fires and the questioned bullet. The pipeline of the process is as follows: 
+
+1. given a questioned bullet and a suspected firearm, 
+2. conduct test fires with the suspected firearm and collect three test fired bullets, 
+3. for every pair of bullets (including the questioned), conduct all possible land comparisons and get 36 land comparison scores (6 land engraved areas on each bullet), 
+4. among 36 comparisons within a pair of bullets,  select the six comparisons as KM comparisons (for comparisons among test fired bullets) or questioned land comparisons (for comparisons between the questioned bullet and any test fired bullet) by SAM [reference] due to the nature order of land engraved areas produced by a same barrels, \hh{XXX instead of SAM, use the 'in-phase' citation from NIST}
+5.  KNM scores are only extracted from comparisons within the test fired bullets. 
+
+Then, for the first scenario, the KM and KNM distributions will be estimated with the KM and KNM similarity scores among the test fired bullets respectively. While for the second scenario, the distributions are estimated with a database of the similarity scores from similar firearms and ammunition where all four bullets in each set are considered as test fired with a known source to fit the above pipeline.
 
 Finally, we compare the classification results for the two scenarios to show the usefulness of the relevant population and the better distribution estimations and classification performance by using a database.
 
