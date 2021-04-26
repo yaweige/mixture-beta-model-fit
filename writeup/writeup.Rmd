@@ -828,7 +828,7 @@ For firearms, there is rifling machined into the internal of the barrels aiming 
 For bullet evidence, in particular, striations on land engraved areas (LEAs) are used by firearms and toolmarks examiners to determine same source of two pieces of evidence [@AFTE1992]. <!--The grooves engraved area (GEAs) are the markings left by the grooves between two lands. We usually don't use GEAs directly for the identification purpose but we usually need to distinguish between GEAs and LEAs especially for the computer based algorithms.-->
 For computer based algorithms, 3D scans of the LEAs are used. <!-- to carry more information than traditional 2D scans.-->
 Following the process described in @Hare2016, we extract **signatures** \hh{XXX pictures!} from these scans. Various  scores are used in the literature to describe the similarity between two signatures [@ma2004; @nichols1997; @nichols2003; @Hare2016].
-Here, we will employ the cross-correlation function (CCF) to measure similarity.
+Here, we  employ the cross-correlation function (CCF) to measure similarity.
 The cross-correlation function (CCF) is calculated by maximizing the  correlation of two  signatures under a vertical shift.
 
 Mathematically, CCF is  a value between -1 and 1, with larger values indicating higher similarity between pairs of signatures. Deciding between identifications and eliminations based on pairs of signatures is based on a cutoff value of the corresponding maximized CCF value. Naively, one could assign positive CCF values to indicate same-source pairs and, similarly, negative values to different-source pairs. However, in practice it turns out that values of CCF based on pairs of bullet land signatures are not symmetric around the origin, but mostly positive regardless of source. Negative values are rarely observed for LEA comparisons in practice (and in none of the more than 100k comparisons considered in this paper).
@@ -1015,10 +1015,7 @@ Here, we focus on  four commonly used error rates as defined in \autoref{Error r
 FPR and FNR are considered source-specific assessment [@inconclusives2021]. Both of these are rates to make a false conclusion given  ground truth. These error rates are particular useful when we evaluate the process of decision-making or an algorithm. FIR and FER are considered decision-specific assessment [@inconclusives2021]. These two rates assess the risk of a false claim given a decision. They are particularly useful in situations, such as when a jury is asked to decide on a defendant's guilt after being presented with conclusions from forensic evidence. 
 
 Theoretically, these error rates are calculated as conditional probabilities based on the beta mixture distributions set up in the previous section 
-\yg{given a standard decision making procedure. In cases studied in the current paper, we make decisions by introducing a threshold $c$ for the CCF values, that distinguishes between identifications ($CCF > c$) and eliminations ($CCF < c$). }
-
-<!-- by introducing a threshold $c$ for the CCF values, that distinguishes between identifications ($CCF > c$) and eliminations ($CCF < c$).  -->
-
+given a standard decision making procedure. In the current paper, we make decisions by introducing a threshold $c$ for the CCF values, that distinguishes between identifications ($CCF > c$) and eliminations ($CCF < c$). 
 
 \begin{table}[h]
 \centering
@@ -1042,30 +1039,28 @@ Theoretically, these error rates are calculated as conditional probabilities bas
 
 
 
-\yg{The probabilities of making the four decisions in \autoref{Error rate table} are then simply expressed in conditional probability as:
+The probabilities of making the four decisions in \autoref{Error rate table} are then simply expressed as conditional probabilities:
 \begin{eqnarray*}
 P(TP) &=& P(CCF > c \mid \text{same source})        \\
 P(FP) &=& P(CCF > c \mid \text{different source})   \\
 P(FN) &=& P(CCF < c \mid \text{same source})        \\
 P(TN) &=& P(CCF < c \mid \text{different source}).  \\
 \end{eqnarray*}
-}
 
-\yg{The theoretical values of the four type of error rates are expressed in probability form as:
-\begin{eqnarray*}
-E(FNR) &=& \frac{P(FN)}{P(FN) + P(TP)}\\
-E(FPR) &=& \frac{P(FP)}{P(FP) + P(TN)}\\
-E(FIR) &=& \frac{P(FP)}{P(TP) + P(FP)}\\
-E(FER) &=& \frac{P(FN)}{P(TN) + P(FN)}\\
-\end{eqnarray*}
-}
 
-Error rates are therefore affected by the threshold $c$ used to make decisions. Error rates are also depending on each other, i.e. we can not optimize all at the same time, but we have to make trade-offs. In an extreme example, we can set a very conservative threshold of $CCF >= 0.99$ to make identifications. This yields a false positive rate (FPR) of zero. But at the same time, the False negative rate (FNR) approaches one. 
+The theoretical values of the four type of error rates are the expressed in probability form as: \hh{XXXX I'm not sure that we need table 1 anymore - everything that was included in the table is now included in the text. Space is one of the most valuable commodities in a paper - we need to save it. Either the table needs to go or the text :(}
+\begin{eqnarray}\label{eq:theoretical}
+E(FNR) &=& \frac{P(FN)}{P(FN) + P(TP)}\\\nonumber
+E(FPR) &=& \frac{P(FP)}{P(FP) + P(TN)}\\\nonumber
+E(FIR) &=& \frac{P(FP)}{P(TP) + P(FP)}\\\nonumber
+E(FER) &=& \frac{P(FN)}{P(TN) + P(FN)}
+\end{eqnarray}
+
+
+Error rates are therefore affected by the threshold $c$. Error rates  also depend on each other, i.e. we can not optimize all at the same time, but we have to make trade-offs. In an extreme example, we can set a very conservative threshold of $CCF >= 0.99$ to make identifications. This yields a false positive rate (FPR) of zero. But at the same time, the False negative rate (FNR) approaches one. 
 To make  error rates comparable and consistent, we base the decision threshold here on the likelihood ratio and use threshold $c_{X}$ where the probability densities of the KM and KNM distributions cross each other. At this crossing threshold $c_X$, the likelihood ratio equals 1. 
 \hh{XXX do we have citations to the literature where this threshold is used?}
-<!-- This is not a bad choice, since it has good statistical meaning that at this value, the likelihood ratio equals 1 and any deviation from 1 would give preference to a certain decision. -->
 
-<!-- For the two component beta mixture distributions we estimated in last section, this threshold is `r round(cutoff1, digits = 2)`.  -->
 In the application of the algorithms, the threshold need to be carefully chosen where the study of associated error rates will in turn be essential guiding that process.
 
 \hh{XXX What if this threshold is not unique? - under what assumptions does the KNM density dominate KM?}
@@ -1073,11 +1068,19 @@ In the application of the algorithms, the threshold need to be carefully chosen 
 Data
 -----------------------------------------
 
-Our analysis is based on a large reference database of four firings from each of 625 Beretta 92 F/FS collected by Srinivasan Rathinam from the Los Angeles Police Department. 
+Our analysis is based on a large reference database of four firings from each of 625 Beretta 92 F/FS collected by Srinivasan Rathinam from the Los Angeles Police Department. \hh{XXX Need to look up info on which ammunition was used.}
 High-resolution 3d topographic scans of the striation marks on the land-engraved areas of fired bullets were acquired at the Iowa State Roy J.\ Carver Microscopy facility. 
 These scans form the basis of the investigation here and will be referred to as the **LAPD data**. These scans are publicly available through the NIST Ballistics Toolmark Research Database [@nist].
 
-It is the first time such a large data set available to the researchers, which makes it possible for a statistical analysis for the distributions of similarity scores. For the firearms used, there are 6 lands in each barrel which will leave 6 LEAs on the bullets for comparisons. We follow the aforementioned standard procejure to generate CCFs as similarity scores (include the procedure). There are 6 different bullet comparisons within a set of 4 bullets for a barrel. There are 6 same source land comparisons and 30 distinct different source land comparisons in each of those 6 bullet comparisons. In total, for a single barrel, there are 36 same source land to land comparisons. For the different source land to land comparisons, we have much more cases. If we limit the scope within each barrel, there will be $30\times 6 + 15 \times 4 = 240$ land to land comparisons for which we also take the comparisons among lands on a same bullet into consideration.
+It is the first time such a large data set available to the researchers, which makes it possible for a statistical analysis for the distributions of similarity scores. \hh{The barrel of the Beretta 92 F/FS is traditionally rifled, consisting of a spiral of six alternating grooves and lands.} \hh{When a bullet is fired, a}  barrel therefore leaves six land-engraved areas (LEAs) on a bullet. \hh{Striation marks on LEAs are usually used to determine which barrel a bullet has been fired from. 
+For each land-to-land comparison, we assign a CCF  score to quantify the similarity between signatures.  following the procedure described by @Hare2016. This yields $6 x 6$ pairs of comparisons for each bullet-to-bullet comparison.} 
+
+We follow the \hh{XXX the method described is not standard - be careful about how you use that word. Standards are something a committee in a discipline agrees upon. @Hare2016 is a publication.} ~~aforementioned standard~~ procedure to generate CCFs as similarity scores (\hh{XXX describe the procedure in 'Background'} include the procedure). 
+
+\hh{XXX How about we add two 6 by 6 tiles with comparisons of bullet-to-bullet comparisons?}
+
+
+There are 6 different bullet comparisons within a set of 4 bullets for a barrel. There are 6 same source land comparisons and 30 distinct different source land comparisons in each of those 6 bullet comparisons. In total, for a single barrel, there are 36 same source land to land comparisons. For the different source land to land comparisons, we have much more cases. If we limit the scope within each barrel, there will be $30\times 6 + 15 \times 4 = 240$ land to land comparisons for which we also take the comparisons among lands on a same bullet into consideration.
 
 
 
