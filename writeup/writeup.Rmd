@@ -1016,11 +1016,14 @@ Here, we focus on  four commonly used error rates as defined in \autoref{Error r
   3. the false identification rate (FIR)
   4. the false exclusion rate (FER)
   
-\hh{XXX only use either rates or probabilities. Make sure to define probabilities before using them}  
-FPR and FNR are considered source-specific assessment [@inconclusives2021]. Both of these are probabilities to make a false conclusion given  ground truth. These error rates are particular useful when we evaluate the process of of decision-making or an algorithm. FIR and FER are considered decision-specific assessment [@inconclusives2021]. These two rates assess the risk of a false claim given a decision. They are particularly useful in situations, such as when a jury is asked to decide on a defendant's guilt after being presented with conclusions from forensic evidence. 
+<!-- \hh{XXX only use either rates or probabilities. Make sure to define probabilities before using them} -->
 
-\yg{Theoretically, these error rates are calculated as conditional probabilities based on the beta mixture distributions set up in the previous section by introducing a threshold $c$ for the CCF values, that distinguishes between identifications ($CCF > c$) and eliminations ($CCF < c$). 
-}
+FPR and FNR are considered source-specific assessment [@inconclusives2021]. Both of these are rates to make a false conclusion given  ground truth. These error rates are particular useful when we evaluate the process of decision-making or an algorithm. FIR and FER are considered decision-specific assessment [@inconclusives2021]. These two rates assess the risk of a false claim given a decision. They are particularly useful in situations, such as when a jury is asked to decide on a defendant's guilt after being presented with conclusions from forensic evidence. 
+
+Theoretically, these error rates are calculated as conditional probabilities based on the beta mixture distributions set up in the previous section 
+\yg{given a standard decision making procedure. In cases studied in the current paper, we make decisions by introducing a threshold $c$ for the CCF values, that distinguishes between identifications ($CCF > c$) and eliminations ($CCF < c$). }
+
+<!-- by introducing a threshold $c$ for the CCF values, that distinguishes between identifications ($CCF > c$) and eliminations ($CCF < c$).  -->
 
 
 \begin{table}[h]
@@ -1043,18 +1046,28 @@ FPR and FNR are considered source-specific assessment [@inconclusives2021]. Both
 
 \end{table}
 
-\hh{The four decisions in \autoref{Error rate table} are then simply calculated   as:
+
+
+\yg{The probabilities of making the four decisions in \autoref{Error rate table} are then simply expressed in conditional probability as:
 \begin{eqnarray*}
-TP &=& P(CCF > c \mid \text{same source}) \\
-FP &=& P(CCF > c \mid \text{different source}) \\
-FN &=& P(CCF < c \mid \text{same source}) \\
-TN &=& P(CCF < c \mid \text{different source}). \\
+P(TP) &=& P(CCF > c \mid \text{same source})        \\
+P(FP) &=& P(CCF > c \mid \text{different source})   \\
+P(FN) &=& P(CCF < c \mid \text{same source})        \\
+P(TN) &=& P(CCF < c \mid \text{different source}).  \\
 \end{eqnarray*}
 }
 
+\yg{The theoretical values of the four type of error rates are expressed in probability form as:
+\begin{eqnarray*}
+E(FNR) &=& \frac{P(FN)}{P(FN) + P(TP)}\\
+E(FPR) &=& \frac{P(FP)}{P(FP) + P(TN)}\\
+E(FIR) &=& \frac{P(FP)}{P(TP) + P(FP)}\\
+E(FER) &=& \frac{P(FN)}{P(TN) + P(FN)}\\
+\end{eqnarray*}
+}
 
-Error rates are \hh{therefore} affected by the threshold $c$ used to make decisions. \hh{Error rates are also depending on each other, i.e. we can not optimize all at the same time, but we have to make trade-offs. } In an extreme example, we \hh{can set a} very conservative threshold of $CCF >= 0.99$ to make identifications. \hh{This yields a False positive rate (FPR) of zero.} But at the same time, the False negative rate (FNR) approaches 1. 
-To make  error rates comparable and consistent we \hh{base the decision threshold here on the likelihood ratio and use} threshold $c_{X}$ where the probability densities of the KM and KNM distributions cross each other. At this crossing threshold $c_X$, the likelihood ratio equals 1. 
+Error rates are therefore affected by the threshold $c$ used to make decisions. Error rates are also depending on each other, i.e. we can not optimize all at the same time, but we have to make trade-offs. In an extreme example, we can set a very conservative threshold of $CCF >= 0.99$ to make identifications. This yields a false positive rate (FPR) of zero. But at the same time, the False negative rate (FNR) approaches one. 
+To make  error rates comparable and consistent, we base the decision threshold here on the likelihood ratio and use threshold $c_{X}$ where the probability densities of the KM and KNM distributions cross each other. At this crossing threshold $c_X$, the likelihood ratio equals 1. 
 \hh{XXX do we have citations to the literature where this threshold is used?}
 <!-- This is not a bad choice, since it has good statistical meaning that at this value, the likelihood ratio equals 1 and any deviation from 1 would give preference to a certain decision. -->
 
@@ -1087,32 +1100,43 @@ In an automated algorithm, we can make use of all available test bullets and lan
 \hh{For the remainder of this paper we are going to assume that the comparison under investigation is whether a questioned bullet originated from a particular firearm. 
 We will discuss the applicability of our method on situations without a suspected firearm at the end. XXX}
 
-We distinguish between two scenarios \hh{depending on the reference used for comparisons}: \hh{XXX give these scenarios names}
+We distinguish between two scenarios depending on the reference used for comparisons:
 \begin{enumerate}
-\item \hh{case-specific:} use scores from comparisons of test fires to estimate densities for same source and different source, and 
-\item \hh{reference database:} use scores with known provenance from a database of similar ammunition and firearms to estimate densities. 
+\item case-specific: use scores from comparisons of test fires to estimate densities for the same source and the different source scores, and 
+\item reference database: use scores with known provenance from a database of similar ammunition and firearms to estimate densities. 
 \end{enumerate}
 <!-- The second scenario is where our analysis of the theoretical distributions of the relevant population of similarity scores stand out.  -->
 
-\hh{The next paragraph disrupts the flow - there's good ideas, but we need a different order. }
-For a similar combination of firearms and ammunition, the similarity scores extracted through a same algorithm are considered identically distributed and comprise the relevant population. In real cases, as stated, we can only make use of similarity scores from two or three test fires. This is good enough to produce valid comparisons but likely not good enough to estimate the distributions which generate the likelihood ratios. Besides the likelihood ratio calculation, the reference distributions are also important in deciding thresholds and control the error rates. For thresholds specifically, we choose the point where the likelihood ratio is 1 which has no preference for either hypothesis.
-
-\hh{XXX move this paragraph up}
 In either of the two scenarios, we derive scores by comparing test fires and the questioned bullet. The pipeline of the process is as follows: 
 
-For a questioned bullet and a suspected firearm, 
-
+<!-- For a questioned bullet and a suspected firearm,  -->
 
 1. conduct test fires with the suspected firearm and collect three test fired bullets, 
-2. calculate reference distributions of KMs and KNMs by comparing all lands from pairs of test fires. In our example, six land-to-land comparisons correspond to known matches, the other 30 correspond to known non-matches for each pair of test fired bullets. 
-\hh{Note, we can assume that all comparisons involving test fires are already included in the reference database. }
-3. get comparison scores for the questioned bullet compared to each one of the test-fired bullets. We will designate the six scores identified by SAM as the best possible phase-match as 'candidate KM'. \hh{XXX we discard the rest - we could add a discussion item at the end on this. }\hh{XXX instead of SAM, use the 'in-phase' citation from NIST}
-4. Score-based LR are then calculated as ...
+<!-- 2. calculate reference distributions of KMs and KNMs by  -->
+2. compare all lands from pairs of test fires for reference distributions. In our example, six land-to-land comparisons correspond to known matches, the other 30 correspond to known non-matches for each pair of test fired bullets. Note, we can assume that all comparisons involving test fires are already included in the reference database.
 
-\hh{XXX Notes: case-specific advantage: the only firarm involved is the suspected firearm. Distributions of scores should be close, as long as the ammunition matches the questioned bullet. (removing any  variability due to different firearms)
-disadvantage: we need the firearm; there are not many scores that the densitiy is based -suffers both from over-fitting and possibly high variability (within firearm). Ideally we would like to get a lot of reference shots - unrealistic, time-consuming and cost-expensive.}
+3. get comparison scores for the questioned bullet compared to each one of the test-fired bullets. We will designate the six scores identified by SAM as the best possible phase-match as 'candidate KM'. \hh{XXX we discard the rest - we could add a discussion item at the end on this. }
 
-Then, for the first scenario, the KM and KNM distributions will be estimated with the KM and KNM similarity scores among the test fired bullets respectively. While for the second scenario, the distributions are estimated with a database of the similarity scores from similar firearms and ammunition where all four bullets in each set are considered as test fired with a known source to fit the above pipeline.
+<!-- \hh{XXX instead of SAM, use the 'in-phase' citation from NIST} -->
+<!-- 4. Score-based LR are then calculated as ... -->
+
+Then, for the first scenario, the KM and KNM distributions are estimated with the KM and KNM similarity scores among the test fired bullets respectively. While for the second scenario, the distributions are estimated with a database of the similarity scores from similar firearms and ammunition where all four bullets in each set are considered as test fired with a known source to fit the above pipeline.
+
+\yg{We estimate the reference distributions of KM and KNM based on the reference data. Denote the questioned comparison score as} $y$, the estimated KM and KNM distributions as $f(\cdot|KM)$ and $f(\cdot|KNM)$ respectively. The score-based likelihood ratios (SLR) are then calculated as:
+
+$$SLR = \frac{f(y|KM)}{f(y|KNM)}$$
+
+<!-- \hh{The next paragraph disrupts the flow - there's good ideas, but we need a different order. } -->
+For a similar combination of firearms and ammunition, the similarity scores extracted through a same algorithm are considered identically distributed and comprise the relevant population. In real cases, as stated, we can only make use of similarity scores from two or three test fires. This is good enough to produce valid comparisons but likely not good enough to estimate the distributions which generate the likelihood ratios. Besides the likelihood ratio calculation, the reference distributions are also important in deciding thresholds and to control the error rates.
+
+<!-- For thresholds specifically, we choose the point where the likelihood ratio is 1 which has no preference for either hypothesis. -->
+
+
+
+\hh{XXX Notes: case-specific advantage: the only firearm involved is the suspected firearm. Distributions of scores should be close, as long as the ammunition matches the questioned bullet. (removing any  variability due to different firearms)
+disadvantage: we need the firearm; there are not many scores that the density is based -suffers both from over-fitting and possibly high variability (within firearm). Ideally we would like to get a lot of reference shots - unrealistic, time-consuming and cost-expensive.}
+
+<!-- Then, for the first scenario, the KM and KNM distributions will be estimated with the KM and KNM similarity scores among the test fired bullets respectively. While for the second scenario, the distributions are estimated with a database of the similarity scores from similar firearms and ammunition where all four bullets in each set are considered as test fired with a known source to fit the above pipeline. -->
 
 Finally, we compare the classification results for the two scenarios to show the usefulness of the relevant population and the better distribution estimations and classification performance by using a database.
 
