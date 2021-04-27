@@ -1072,15 +1072,64 @@ Our analysis is based on a large reference database of four firings from each of
 High-resolution 3d topographic scans of the striation marks on the land-engraved areas of fired bullets were acquired at the Iowa State Roy J.\ Carver Microscopy facility. 
 These scans form the basis of the investigation here and will be referred to as the **LAPD data**. These scans are publicly available through the NIST Ballistics Toolmark Research Database [@nist].
 
-It is the first time such a large data set available to the researchers, which makes it possible for a statistical analysis for the distributions of similarity scores. \hh{The barrel of the Beretta 92 F/FS is traditionally rifled, consisting of a spiral of six alternating grooves and lands.} \hh{When a bullet is fired, a}  barrel therefore leaves six land-engraved areas (LEAs) on a bullet. \hh{Striation marks on LEAs are usually used to determine which barrel a bullet has been fired from. 
-For each land-to-land comparison, we assign a CCF  score to quantify the similarity between signatures.  following the procedure described by @Hare2016. This yields $6 x 6$ pairs of comparisons for each bullet-to-bullet comparison.} 
+It is the first time such a large data set available to the researchers, which makes it possible for a statistical analysis for the distributions of similarity scores. \hh{The barrel of the Beretta 92 F/FS is traditionally rifled, consisting of a spiral of six alternating grooves and lands.} \hh{When a bullet is fired, a}  barrel therefore leaves six land-engraved areas (LEAs) on a bullet. Striation marks on LEAs are usually used to determine which barrel a bullet has been fired from. 
+For each land-to-land comparison, we assign a CCF  score to quantify the similarity between signatures  following the procedure described by @Hare2016. This yields $6 x 6$ pairs of comparisons for each bullet-to-bullet comparison, as shown at the example of a known-matching and a known-non-matching pair of bullets in \autoref{fig:tileplot}.
 
+<!--
 We follow the \hh{XXX the method described is not standard - be careful about how you use that word. Standards are something a committee in a discipline agrees upon. @Hare2016 is a publication.} ~~aforementioned standard~~ procedure to generate CCFs as similarity scores (\hh{XXX describe the procedure in 'Background'} include the procedure). 
+-->
 
-\hh{XXX How about we add two 6 by 6 tiles with comparisons of bullet-to-bullet comparisons?}
+```{r create-small-data, echo=FALSE, warning = FALSE, message = FALSE}
+library(tidyverse)
+ccfplus <- ccf_data %>% separate(land1, into = c("b1", "study","br1", "foo1","l1","foo2", "foo3", "foo4", "foo5", "foo6", "foo7"), 
+                            sep="-", remove = FALSE) %>% select(-starts_with("foo")) %>%
+  separate(land2, into = c("b2", "foo10","br2", "foo11","l2","foo12", "foo13", "foo14", "foo15", "foo16", "foo17"), 
+           sep="-", remove = FALSE) %>% select(-starts_with("foo"))  
 
+ccfplus <- ccfplus %>% 
+  mutate(
+   br1 = parse_number(br1),
+   br2 = parse_number(br2),
+   l1 = paste0("L",parse_number(l1)),
+   l2 = paste0("L",parse_number(l2)),
+   b1 = gsub("ullet ","", b1),
+   b2 = gsub("ullet ","", b2)
+  )
 
-There are 6 different bullet comparisons within a set of 4 bullets for a barrel. There are 6 same source land comparisons and 30 distinct different source land comparisons in each of those 6 bullet comparisons. In total, for a single barrel, there are 36 same source land to land comparisons. For the different source land to land comparisons, we have much more cases. If we limit the scope within each barrel, there will be $30\times 6 + 15 \times 4 = 240$ land to land comparisons for which we also take the comparisons among lands on a same bullet into consideration.
+small <- ccfplus %>% 
+  filter((br1==20 & br2 == 20 & b2=="BA"& b1=="BB") | (br1==20 & br2 == 622 & b1 == "BB"))
+```
+
+```{r tileplot, fig.cap="Overview of all 36 land-to-land comparisons of two pairs of bullets. Left: the bullets are known to be from the same source. Right: the bullets were fired from two different bullets.", out.width=".8\\textwidth", fig.align="center", fig.height = 4}
+km <- small %>% 
+  filter(usage=="part1") %>%
+  mutate(l2 = factor(l2, level=paste0("L",c(5:6, 1:4)))) %>%
+  ggplot(aes(x = l1, y = l2, fill=ccf)) + 
+  geom_tile() + 
+  scale_fill_gradient2(low="darkgrey", high="darkorange", 
+                       midpoint = 0.6, limit=c(0,1)) + 
+  ggtitle("Known match") +
+  xlab("Lands of Bullet B, Barrel FAU 020") +
+  ylab("Lands of Bullet A, Barrel FAU 020") +
+  theme(legend.position = "bottom",
+        aspect.ratio = 1) 
+knm <- small %>% 
+  filter(usage=="part2") %>%
+  ggplot(aes(x = l1, y = l2, fill=ccf)) + 
+  geom_tile() + 
+  scale_fill_gradient2(low="darkgrey", high="darkorange", 
+                       midpoint = 0.6, limit=c(0,1)) + 
+  ggtitle("Known non-match") +
+  xlab("Lands of Bullet B, Barrel FAU 020") +
+  ylab("Lands of Bullet B, Barrel FAU 622") +
+  theme(legend.position = "bottom",
+        aspect.ratio = 1)
+
+grid.arrange(km, knm, ncol=2)
+```
+
+For each pair of bullets from the same source, there are six land-to-land scores corresponding to matching lands, and 30 scores from non-matching lands. For a set of four bullets from a single barrel there are six pairs of bullets yielding a total of 36 scores from same-source land-to-land comparisons. 
+For  different-source land-to-land comparisons, we have many more cases. If we limit the scope of different-source comparisons to within a single barrel, there are  $\underbrace{30\times 6}_{\text{different bullets}} + \underbrace{15 \times 4}_{\text{same bullet}} = 240$ scores from land-to-land comparisons.
 
 
 
@@ -1295,7 +1344,7 @@ For a given value 0.5 (which is not a special one), the KNM distribution put a l
 <!-- The majorities of the estimated distributions are apart from each other, while the minority part of the two distributions has some overlap.  -->
 It's worth noting that both curves have heavy tails to the farther boundaries from the modes and the KM curve has a heavier tail compared to KNM. We can see the two-component distributions fit the data very well, while the single beta distributions are not as good as the two-component distributions for both KM and KNM. The single beta distribution for KM clearly failed to capture the potential second mode of the histogram indicating it is not sufficient. The single beta distribution for KNM captured the mode but still failed to capture the distributional information for some parts. This indicates that even though beta distributions are flexible for variables in 0 to 1, they are still too restricted to be able to describe the cases here. The two-component beta mixture distributions are more promising.
 
-```{r one-two-component-betamix, out.width="70%", fig.align="center", fig.cap="Estimated beta mixture distributions for CCFs", fig.keep="hold", fig.pos="h"}
+```{r one-two-component-betamix, out.width="100%", fig.align="center", fig.cap="Estimated beta mixture distributions for CCFs", fig.keep="hold", fig.pos="h", fig.height = 3}
 myfit1234_simulation <- bind_rows(myfit1n2_simulation %>% select(-y1, -y2),
                                   myfit3n4_simulation,
                                   .id = "model")
