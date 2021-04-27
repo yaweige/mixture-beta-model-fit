@@ -1073,7 +1073,7 @@ High-resolution 3d topographic scans of the striation marks on the land-engraved
 These scans form the basis of the investigation here and will be referred to as the **LAPD data**. These scans are publicly available through the NIST Ballistics Toolmark Research Database [@nist].
 
 It is the first time such a large data set available to the researchers, which makes it possible for a statistical analysis for the distributions of similarity scores. \hh{The barrel of the Beretta 92 F/FS is traditionally rifled, consisting of a spiral of six alternating grooves and lands.} \hh{When a bullet is fired, a}  barrel therefore leaves six land-engraved areas (LEAs) on a bullet. Striation marks on LEAs are usually used to determine which barrel a bullet has been fired from. 
-For each land-to-land comparison, we assign a CCF  score to quantify the similarity between signatures  following the procedure described by @Hare2016. This yields $6 x 6$ pairs of comparisons for each bullet-to-bullet comparison, as shown at the example of a known-matching and a known-non-matching pair of bullets in \autoref{fig:tileplot}.
+For each land-to-land comparison, we assign a CCF  score to quantify the similarity between signatures  following the procedure described by @Hare2016. This yields $6 \times 6$ pairs of comparisons for each bullet-to-bullet comparison, as shown at the example of a known-matching and a known-non-matching pair of bullets in \autoref{fig:tileplot}.
 
 <!--
 We follow the \hh{XXX the method described is not standard - be careful about how you use that word. Standards are something a committee in a discipline agrees upon. @Hare2016 is a publication.} ~~aforementioned standard~~ procedure to generate CCFs as similarity scores (\hh{XXX describe the procedure in 'Background'} include the procedure). 
@@ -1143,8 +1143,12 @@ In the current practice, FTEs  fire two or three test bullets from a suspected f
 Test fires are checked for consistency of striation marks between fires. Generally, the bullet with the better expressed striation marks is used to compare to the evidence. 
 In an automated algorithm, we can make use of all available test bullets and lands to assess similarity. Similarity scores (CCF) are used to get score-based likelihood ratios which quantify the strength of evidence supporting either hypothesis from the prosecution side or the defendant side. The critical step of producing these likelihood ratios is to estimate the distributions for KM and KNM similarity scores.
 
+
+
 \hh{For the remainder of this paper we are going to assume that the comparison under investigation is whether a questioned bullet originated from a particular firearm. 
 We will discuss the applicability of our method on situations without a suspected firearm at the end. XXX}
+
+
 
 We distinguish between two scenarios depending on the reference used for comparisons:
 \begin{enumerate}
@@ -1153,7 +1157,11 @@ We distinguish between two scenarios depending on the reference used for compari
 \end{enumerate}
 <!-- The second scenario is where our analysis of the theoretical distributions of the relevant population of similarity scores stand out.  -->
 
-In either of the two scenarios, we derive scores by comparing test fires and the questioned bullet. The pipeline of the process is as follows: 
+In either of the two scenarios, we derive scores by comparing test fires and the questioned bullet. 
+
+\hh{XXX Let's sketch out this process separately for each scenario and describe the reference data/distribution in each case.}
+
+The pipeline of the process is as follows: 
 
 <!-- For a questioned bullet and a suspected firearm,  -->
 
@@ -1168,9 +1176,9 @@ In either of the two scenarios, we derive scores by comparing test fires and the
 
 Then, for the first scenario, the KM and KNM distributions are estimated with the KM and KNM similarity scores among the test fired bullets respectively. While for the second scenario, the distributions are estimated with a database of the similarity scores from similar firearms and ammunition where all four bullets in each set are considered as test fired with a known source to fit the above pipeline.
 
-\yg{We estimate the reference distributions of KM and KNM based on the reference data. Denote the questioned comparison score as} $y$, the estimated KM and KNM distributions as $f(\cdot|KM)$ and $f(\cdot|KNM)$ respectively. The score-based likelihood ratios (SLR) are then calculated as:
+\yg{We estimate the reference distributions of KM and KNM based on the reference data. Denote the questioned comparison score as} $y$, the estimated KM and KNM distributions as $f_{KM}(.) = f_{KM}(.; p_{KM}, \mu_{KM}, \phi_{KM})$ and $f_{KM}(.) = f_{KNM}(.; p_{KNM}, \mu_{KNM}, \phi_{KNM})$ respectively. The score-based likelihood ratios (SLR) are then calculated as:
 
-$$SLR = \frac{f(y|KM)}{f(y|KNM)}$$
+$$SLR = \frac{f_{KM}(y)}{f_{KNM}(y)}$$
 
 <!-- \hh{The next paragraph disrupts the flow - there's good ideas, but we need a different order. } -->
 For a similar combination of firearms and ammunition, the similarity scores extracted through a same algorithm are considered identically distributed and comprise the relevant population. In real cases, as stated, we can only make use of similarity scores from two or three test fires. This is good enough to produce valid comparisons but likely not good enough to estimate the distributions which generate the likelihood ratios. Besides the likelihood ratio calculation, the reference distributions are also important in deciding thresholds and to control the error rates.
