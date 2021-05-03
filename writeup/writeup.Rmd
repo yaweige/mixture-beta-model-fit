@@ -1139,7 +1139,19 @@ Database model v.s. case specific model
 
 ### Study Design
 
-In the current practice, FTEs  fire two or three test bullets from a suspected firearm using ammunition that  matches the evidence found on the crime scene as closely as possible.
+\hh{There are two major scenarios that firearms examiners come across in case work} [@ommen18]: 
+\begin{itemize}
+\item determine whether a questioned bullet was fired from a specific firearm (specific source problem)
+\item determine whether two questioned bullets were fired from the same firearm (common source).
+\end{itemize}
+
+
+
+\hh{The approach described below works in both of these scenarios. }
+
+
+\hh{If }
+In current practice, FTEs  fire two or three test bullets from a suspected firearm using ammunition that  matches the evidence found on the crime scene as closely as possible.
 Test fires are checked for consistency of striation marks between fires. Generally, the bullet with the better expressed striation marks is used to compare to the evidence. 
 In an automated algorithm, we can make use of all available test bullets and lands to assess similarity. Similarity scores (CCF) are used to get score-based likelihood ratios which quantify the strength of evidence supporting either hypothesis from the prosecution side or the defendant side. The critical step of producing these likelihood ratios is to estimate the distributions for KM and KNM similarity scores.
 
