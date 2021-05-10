@@ -1068,7 +1068,7 @@ In the application of the algorithms, the threshold need to be carefully chosen 
 Data
 -----------------------------------------
 
-Our analysis is based on a large reference database of four firings from each of 625 Beretta 92 F/FS collected by Srinivasan Rathinam from the Los Angeles Police Department. \hh{XXX Need to look up info on which ammunition was used.}
+Our analysis is based on a large reference database of four firings from each of 625 Beretta 92 F/FS collected by Srinivasan Rathinam from the Los Angeles Police Department. \hh{The bullets used in the study are copper full metal jacketed 9 mm Winchester.}
 High-resolution 3d topographic scans of the striation marks on the land-engraved areas of fired bullets were acquired at the Iowa State Roy J.\ Carver Microscopy facility. 
 These scans form the basis of the investigation here and will be referred to as the **LAPD data**. These scans are publicly available through the NIST Ballistics Toolmark Research Database [@nist].
 
