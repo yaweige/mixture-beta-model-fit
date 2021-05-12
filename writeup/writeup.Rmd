@@ -767,6 +767,12 @@ bd_part2 <- lapply(1001:2000, FUN = function(i) {
 change_size_sequence_data$bd <- c(bd_part1, bd_part2)
 ```
 
+```{r generated-values-calculation, include=FALSE}
+# to get those values needed in text, but avoid the rerun of the core sections
+# quick and easy changes here
+123
+```
+
 \hh{Next steps:}
 
 1.  for any image that you include with include_graphics("image.png") write a ggsave("image.png") in the code
@@ -1225,8 +1231,6 @@ To address the question that how many test fires we need to reach good estimatio
 
 We design a study to evaluate the effect of data sizes. As in the previous sections, we are using the LAPD data. And set the unit of data size as a set of four same source bullets as in the case of LAPD and in general, the way of forming a data base. It's worth noting that any meaningful statistical results rely on replications. But we must be careful that as the used sample size in a single trial increases, the replications can require very large data sets. Otherwise, the heavy reuse of data could cause high dependence among the results and lead to false conclusions. We are using a approach that is adopted in machine learning field of dealing with this issue. Instead of using different samples at each fixed sample size to achieve replications, we are adding new data to the existing pool of used data to achieve replications by sequentially fitting the model. This also meets the sequential convergence pattern in a statistical sense perfectly. When the addition of new data doesn't significantly change some adopted measurements of our goal, then we find the minimum number of sample size reaching that stage. And additionally, we also repeat the above process with ten randomly selected sequences, which further investigates the data specific effect in the process and it is harder to see all the sequences converged uniformly to a same reasonable small interval. So we also introduce different levels of convergence to formulate the conclusions.
 
-\yg{need to move the selected measurements of convergence up too, which is now mixed with the results...}
-
 Results and discussion
 ========================================
 
@@ -1237,7 +1241,7 @@ Model result
 
 <!-- We consider cross correlation functions (CCF) for land comparisons, which is produced by calculating the maximized CCF between two signatures extracted from a pair of bullet LEAs. -->
 
-The estimation is done using Nelder-Mead algorithm in R [reference]. This is a general purpose numeric method which works reasonably well for multidimensional optimization problems. In our case, the objective function is the log likelihood function of the beta mixture distribution. Therefore, we finally found the maximum likelihood estimates (MLE). We start with estimating all single-component, two-component and three-component beta mixture models for both KM and KNM distributions. By comparing the models, we could see how well they fit the data and test if some components are necessary. The estimated beta mixture distributions for KM and KNM are in Table \ref{kmestimation} and Table \ref{knmestimation} respectively. For the single-component beta distributions, the KM distribution has a mean at 0.635 and the KNM distribution has a mean at 0.404. We can also see that for the two-component beta mixture distributions for both KM and KNM, there are components with mean around 0.5 and the other components are more separated from each other. This indicates the model successfully accounted for different situations of comparisons involving tank rash and random identification etc., which is an ideal property we would like to see and make use of in explaining the similarity scores. Another point about the estimates that is worth mentioning is that the $\phi$ of the KM beta distribution is much smaller than any of the two components of the two-component KM beta mixture distribution. This indicates that the two components well accounted for each mode locally with much smaller variation than the overall single-beta distribution which fails to capture the local structure and the heavy tail.
+The estimation is done using Nelder-Mead algorithm in R [reference]. This is a general purpose numeric method which works reasonably well for multidimensional optimization problems. In our case, the objective function is the log likelihood function of the beta mixture distribution. Therefore, we finally found the maximum likelihood estimates (MLE). We start with estimating all single-component, two-component and three-component beta mixture models for both KM and KNM distributions. By comparing the models, we could see how well they fit the data and test if some components are necessary. The estimated beta mixture distributions for KM and KNM are in Table \ref{kmestimation} and Table \ref{knmestimation} respectively. For the single-component beta distributions, the KM distribution has a mean at `r round(param_km_c1$mu, digits = 2)` and the KNM distribution has a mean at `r round(param_knm_c1$mu, digits = 2)`. We can also see that for the two-component beta mixture distributions for both KM and KNM, there are components with mean around 0.5 and the other components are more separated from each other. This indicates the model successfully accounted for different situations of comparisons involving tank rash and random identification etc., which is an ideal property we would like to see and make use of in explaining the similarity scores. Another point about the estimates that is worth mentioning is that the $\phi$ of the KM beta distribution is much smaller than any of the two components of the two-component KM beta mixture distribution. This indicates that the two components well accounted for each mode locally with much smaller variation than the overall single-beta distribution which fails to capture the local structure and the heavy tail.
 
 <!-- \autoref{kmestimation} -->
 <!-- \ref{kmestimation} -->
@@ -1415,7 +1419,7 @@ myfit1n2_simulation %>%
 
 Three candidate distributions for each of KM and KNM are considered. For the increasing of complexity, we have single beta, two-component beta mixture and three-component beta mixture distributions. They are also nested in that order. Naturally, we first look at the maximized log-likelihood of each model, and we can do asymptotic log-likelihood ratio chi-square tests for single beta against two-component beta mixture distributions, and two-component against three-component beta mixture distributions.
 <!-- \yg{XXX p-values not shown now}The p-values of those test are shown in the Table \ref{kmestimation} and Table \ref{knmestimation} as the column "p-value". -->
-Surprisingly (or not), all the p-values are less than 0.001 which strongly suggest a more complex model when there is one. However, considering the size of the data we are using to fit these models, we can expect the statistical significance can be easily achieved since any small difference of the sufficiency can be detected. So we have to take the sample size effect into consideration. As Bayesian information criterion (BIC) is a well used criterion which takes the model complexity, sufficiency and the sample size (by a log function) into account. As shown in the column "BIC" in the tables, the BICs for the single beta distributions are larger than that of the two-component beta mixtures by relatively large proportions. The BICs for the two-component beta mixture distributions are a little larger than that of the three-component beta mixture distributions for both KM and KNM. Obviously, we would prefer the two-component beta mixture distributions over the single beta distributions, but we would cast a doubt when it comes to the three-component beta mixture distributions. We still prefer the two-component distributions instead of the three-component distributions. The reasons are: 1) these differences of BICs between two and three component distributions are really small in proportion (by 0.3% for KM and 0.017% for KNM), 2) the estimation cost is not accounted, which will be higher for a more complex model, 3) the BICs still don't take the sample size effect fully into account since the log function for sample size goes to flat when the sample sizes are large. By simple calculation, we can see that the log-likelihood increased by a multiplicative factor more than 10 when switched from the KM case to the KNM case which is mainly due to the sample size difference, however, at the same time, the log of sample size only roughly increased from 10 to 12. So we choose the two-component beta mixture distributions for both KM and KNM. As we have seen, these distributions also have potential good forensic interpretations. 
+Surprisingly (or not), all the p-values are less than 0.001 which strongly suggest a more complex model when there is one. However, considering the size of the data we are using to fit these models, we can expect the statistical significance can be easily achieved since any small difference of the sufficiency can be detected. So we have to take the sample size effect into consideration. As Bayesian information criterion (BIC) is a well used criterion which takes the model complexity, sufficiency and the sample size (by a log function) into account. As shown in the column "BIC" in the tables, the BICs for the single beta distributions are larger than that of the two-component beta mixtures by relatively large proportions. The BICs for the two-component beta mixture distributions are a little larger than that of the three-component beta mixture distributions for both KM and KNM. Obviously, we would prefer the two-component beta mixture distributions over the single beta distributions, but we would cast a doubt when it comes to the three-component beta mixture distributions. We still prefer the two-component distributions instead of the three-component distributions. The reasons are: 1) these differences of BICs between two and three component distributions are really small in proportion (by `r round((bic3-bic2)/bic2*100, digits = 2)`% for KM and `r round((bic6-bic5)/bic5*100, digits = 2)`% for KNM), 2) the estimation cost is not accounted, which will be higher for a more complex model, 3) the BICs still don't take the sample size effect fully into account since the log function for sample size goes to flat when the sample sizes are large. By simple calculation, we can see that the log-likelihood increased by a multiplicative factor more than 10 when switched from the KM case to the KNM case which is mainly due to the sample size difference, however, at the same time, the log of sample size only roughly increased from 10 to 12. So we choose the two-component beta mixture distributions for both KM and KNM. As we have seen, these distributions also have potential good forensic interpretations. 
 
 It’s also helpful to see how the individual components look like in the beta mixture distributions as in \autoref{fig:components}. The KNM and KM distributions seem to share a common component while keeping the other components far apart from each other. The separated components represent the ideal cases where the bullet land engraved areas preserved the information of the source well and result in clearly distinct separation. The shared components represent the cases where the KM results in lower scores because of some degree of tank rash, pitting, breakoff or other damages on the bullets and the KNM results in higher score because of the random identification effect. According to the estimated prior probabilities, both distributions put less weight on the common component while putting larger weight on the the components characterizing the differences of KM and KNM respectively, which agrees with the expectation that majorities of the distributions are separated while the minorities shared in terms of the modes. These properties together well explained the observed empirical distribution of similarity scores in the studied cases. Particularly, the heavier tail of the KM comparisons is explicitly included in the form of the model by one of the components.
 
@@ -1440,7 +1444,7 @@ Error rate result
 
 <!-- The error rates are also affected by the threshold selected to make decisions. In an extreme example, if we are very conservative in making identifications, we can set the threshold to be large enough, say CCF >= 0.99, then the FPR will be 0. But at the same time, the FNR will be 1. It's clear that there are trade-offs between the error rates. So, to make these error rates comparable and consistent, for the current paper, we refer the threshold as the value where the probability densities of KM and KNM distributions equal with each other. This is not a bad choice, since it has good statistical meaning that at this value, the likelihood ratio equals 1 and any deviation from 1 would give preference to a certain decision (as if a threshold). For the two component beta mixture distributions we estimated in last section, this threshold is 0.529. In the application of the algorithms, the threshold need to be carefully chosen where the study of associated error rates will in turn be essential guiding that process. -->
 
-The four theoretical error rates under the distributions estimated in last section are shown in \autoref{fig:fnr-fpr} and \autoref{fig:fir-fer}. The estimated values of the error rates are reported in Table \ref{estimated-error-rates}. The FPR is 0.148, while the FNR is 0.301 which is much larger. This means for the given threshold value 0.529, the algorithm has probability 0.148 to misclssify an actual different-sourced pair of land engraved areas (LEAs) into identifications. At the same time, the algorithm has a probability 0.301 to misclassify an actual same-sourced pair of land engraved areas (LEAs) into eliminations. The fact that FNR is larger than FPR implies that for the current threshold, we are more likely to misclassify an pair of KM LEAs instead of KNM LEAs. This is partly due to the fact that the KNM distribution is more concentrated than the KM distribution. The FPR will decrease rapidly when increasing the threshold, while the FNR will be small only when the threshold is very low at great cost of FPR. And similar pattern can be observed from FIR and FER. However, these error rates are explained in a totally different view. FIR is 0.212 which means when the algorithm reports an identification, the algorithm could have made wrong claim at probability 0.212. As we aforementioned, the FPR and FNR are used to evaluate algorithms overall while the FIR and FER are used to evaluate a certain result reported.
+The four theoretical error rates under the distributions estimated in last section are shown in \autoref{fig:fnr-fpr} and \autoref{fig:fir-fer}. The estimated values of the error rates are reported in Table \ref{estimated-error-rates}. The FPR is `r round(fpr, digits = 2)`, while the FNR is `r round(fnr, digits = 2)` which is much larger. This means for the given threshold value `r round(cutoff1, digits = 2)`, the algorithm has probability `r round(fpr, digits = 2)` to misclssify an actual different-sourced pair of land engraved areas (LEAs) into identifications. At the same time, the algorithm has a probability `r round(fnr, digits = 2)` to misclassify an actual same-sourced pair of land engraved areas (LEAs) into eliminations. The fact that FNR is larger than FPR implies that for the current threshold, we are more likely to misclassify an pair of KM LEAs instead of KNM LEAs. This is partly due to the fact that the KNM distribution is more concentrated than the KM distribution. The FPR will decrease rapidly when increasing the threshold, while the FNR will be small only when the threshold is very low at great cost of FPR. And similar pattern can be observed from FIR and FER. However, these error rates are explained in a totally different view. FIR is `r round(fir, digits = 2)` which means when the algorithm reports an identification, the algorithm could have made wrong claim at probability `r round(fir, digits = 2)`. As we aforementioned, the FPR and FNR are used to evaluate algorithms overall while the FIR and FER are used to evaluate a certain result reported.
 
 <!-- 1) False positive rate -->
 <!-- 2) False negative rate -->
@@ -1451,41 +1455,41 @@ The four theoretical error rates under the distributions estimated in last secti
 ```{r fnr-fpr, out.width="70%", fig.align="center", fig.cap="False Negative Rate(FNR) and False Positive Rate(FPR)", fig.keep="hold", fig.pos="h"}
 # prepare the polygon
 polydata_fnr <- myfit1n2_simulation %>% 
-  filter(ccf<=0.53, Class == "1") %>%
+  filter(ccf<=round(cutoff1, digits = 2), Class == "1") %>%
   select(ccf, y) %>%
-  bind_rows(data.frame(ccf = 0.53, y = 0))
+  bind_rows(data.frame(ccf = round(cutoff1, digits = 2), y = 0))
 polydata_fpr <- myfit1n2_simulation %>% 
-  filter(ccf>=0.53, Class == "2") %>%
+  filter(ccf>=round(cutoff1, digits = 2), Class == "2") %>%
   select(ccf, y) %>%
-  bind_rows(data.frame(ccf = 0.53, y = 0))
+  bind_rows(data.frame(ccf = round(cutoff1, digits = 2), y = 0))
 polydata_fnrfpr <- bind_rows(polydata_fnr, polydata_fpr, .id = "Class")
 
 myfit1n2_simulation %>%
   ggplot() + 
   geom_polygon(aes(x = ccf, y = y, fill = Class), data = polydata_fnrfpr, alpha = 0.5) +
-  geom_vline(xintercept = 0.529, linetype = 2) +
+  geom_vline(xintercept = cutoff1, linetype = 2) +
   geom_line(aes(x = ccf, y = y, color = Class)) +  
-  geom_text(aes(x = ccf, y = y, label = label), data = data.frame(ccf = 0.72, y = 3, label = "Threshold = 0.529")) + 
+  geom_text(aes(x = ccf, y = y, label = label), data = data.frame(ccf = 0.72, y = 3, label = "Threshold = 0.52")) + 
   geom_text(aes(x = ccf, y = y, label = label), data = data.frame(ccf = c(0.375, 0.6), y = c(0.5, 0.45), label = c("FNR", "FPR"))) + 
   # scale_color_discrete(breaks = c("1", "2"), label = c("KM", "KNM")) + 
   # scale_fill_discrete(breaks = c("1", "2"), label = c("KM", "KNM")) +
   scale_color_manual(breaks = c("1", "2"), label = c("KM", "KNM"), values = c("darkorange", "darkgrey")) +
   scale_fill_manual(breaks = c("1", "2"), label = c("KM", "KNM"), values = c("darkorange", "darkgrey")) +
-  ylab("density")
+  ylab("density") 
 ```
 
 
 ```{r fir-fer, out.width="70%", fig.align="center", fig.cap="False Indentification Rate(FIR) and False Exclusion Rate(FER)", fig.keep="hold", fig.pos="h"}
 # prepare the polygon
 polydata_part3 <- myfit1n2_simulation %>%
-  filter(ccf<=0.53)
+  filter(ccf<=round(cutoff1, digits = 2))
 
-polydata_part3[1:53,] <- polydata_part3[1:53,] %>% arrange(desc(ccf))
+polydata_part3[1:52,] <- polydata_part3[1:52,] %>% arrange(desc(ccf))
 
 polydata_part4 <- myfit1n2_simulation %>%
-  filter(ccf>=0.53) 
+  filter(ccf>=round(cutoff1, digits = 2)) 
 
-polydata_part4[1:47,] <- polydata_part4[1:47,] %>% arrange(desc(ccf))
+polydata_part4[1:48,] <- polydata_part4[1:48,] %>% arrange(desc(ccf))
 
 polydata_part34 <- bind_rows(polydata_part3 %>% select(ccf, y), polydata_part4 %>% select(ccf, y), .id = "Class")
 polydata_part34 <- polydata_part34 %>% mutate(Class = as.character(as.numeric(Class) + 2))
@@ -1498,8 +1502,8 @@ polydata %>%
   geom_text(aes(x = ccf, y = y, label = label), 
             data = data.frame(ccf = c(0.375, 0.6, 0.375, 0.75), y = c(0.5, 0.45, 2, 1), label = c("A1", "A2", "A3", "A4"))) + 
   geom_line(aes(x = ccf, y = y, color = Class), data = myfit1n2_simulation) +
-  geom_vline(xintercept = 0.529, linetype = 2) +
-  geom_text(aes(x = ccf, y = y, label = label), data = data.frame(ccf = 0.72, y = 3, label = "Threshold = 0.529")) + 
+  geom_vline(xintercept = cutoff1, linetype = 2) +
+  geom_text(aes(x = ccf, y = y, label = label), data = data.frame(ccf = 0.72, y = 3, label = "Threshold = 0.52")) + 
   geom_text(aes(x = ccf, y = y, label = label), 
             data = data.frame(ccf = c(0.15, 0.15), y = c(3.5, 3.2), label = c("FIR = A2/(A2+A4)", "FER = A1/(A1+A3)")))+
   # scale_color_discrete(breaks = c("1", "2"), label = c("KM", "KNM")) + 
@@ -1557,7 +1561,13 @@ Database model v.s. case specific model result
 
 <!-- Following the above procedure, we have 100 questioned bullets (same bullets in same and different source cases), 100 same source question-test pairs, 100 different source question-test pairs. For each questioned bullet in either case (same or different source), we have 18 questioned land comparisons. For the database scenario, we have 342x36 = 12312 known matched land comparisons, and 342x240 = 82080 known non-matched land comparisons. For the individual case scenario, we have 18 known matched land comparisons (among test bullets), and 125 known non-matched land comparisons. [may be summarized in a table, and for the specific counts, we will provide details of that when introducing the LAPD data] -->
 
-The results of the experiment show us how the database scenario with well established density estimations improve the over-all accuracy. As shown in \autoref{fig:matched-km}, the left boxplot represents the the individual case scenario where everything is calculated and predicted based on one questioned bullet and three test fired bullets. The right boxplot represents the database scenario where the similarity scores among one questioned bullet and three test fired bullets are evaluated based on a relevant database. \autoref{fig:matched-km} is based on the matched bullets, in which case all the comparisons of lands are actually matches. For each boxplot, there are one hundred points (number of questioned bullets), and each point represents the proportion of correct predictions (i.e. matched lands) of one questioned bullet and the corresponding three test fired bullets based on total eighteen land-land comparisons as shown in y-axis. \autoref{fig:non-matched-result} is formed similar to \autoref{fig:matched-km}, but all the land-land comparisons are non-matched comparisons based on non-matched bullets. And in \autoref{fig:non-matched-result} the y-axis is the proportion of correctly predicted non-matched lands. The results of the experiments are very strong support of making use of a relevant database for automated algorithms. In \autoref{fig:matched-km}, the evaluation based on an individual set are a little better than using of the database because of its more aggressive and data specific way of calculating likelihood ratio and selection of thresholds. But that improvement is little comparing with the significant loss of the accuracy in correctly identifying the non-matched land-land comparisons. \autoref{fig:non-matched-result} implies that it makes no sense of using the individual case calculation to do prediction for non-matched bullet comparisons, while the database scenario works much better and even better than the two results of the matched bullet case, which meets our expectation of a more concentrated KNM distribution than the KM distribution.
+The results of the experiment show us how the database scenario with well established density estimations improve the over-all accuracy. As shown in \autoref{fig:matched-km}, the left boxplot represents the case-specific scenario where everything is calculated and predicted based on one questioned bullet and three test fired bullets. The right boxplot represents the database scenario where the similarity scores between one questioned bullet and three test fired bullets are evaluated based on a relevant database. \autoref{fig:matched-km} is based on the matching bullets, in which case all the comparisons of lands are actually matches. For each boxplot, there are one hundred data points (number of questioned bullets), and each point represents the proportion of correct predictions (i.e. matching lands) of one questioned bullet and the corresponding three test fired bullets based on total eighteen land-land comparisons.
+\yg{XXXneed to change to predefined error rates}
+\autoref{fig:non-matched-result} is formed similar to \autoref{fig:matched-km}, but all the land-land comparisons are non-matching comparisons based on non-matching bullets. The y-axis in \autoref{fig:non-matched-result} is the proportion of correctly predicted non-matched lands. 
+\yg{XXXneed to change to predefined error rates}
+The results of the experiments are very strong support of making use of a relevant database for automated algorithms. In \autoref{fig:matched-km}, the evaluation based on an individual set are slightly better than using of the database because of its more aggressive and case specific way of calculating likelihood ratio and selecting thresholds. But that improvement is little compared with the significant loss of the accuracy in correctly identifying the non-matching land-land comparisons. \autoref{fig:non-matched-result} implies that it makes no sense of using only the individual case calculation to do prediction for non-matching bullet comparisons in SLR, while the database scenario works much better and even better than the two results of the matching bullet case, which meets our expectation of a more concentrated KNM distribution than the KM distribution.
+
+\yg{XXXcombine the two figures in the section when updating the data}
 
 ```{r matched-km, out.width="70%", fig.align="center", fig.cap="matched-km", fig.keep="hold", fig.pos="h"}
 knitr::include_graphics("../code/organized code/generated figures/matched_km.png")
@@ -1567,26 +1577,6 @@ knitr::include_graphics("../code/organized code/generated figures/matched_km.png
 knitr::include_graphics("../code/organized code/generated figures/nonmatched_result.png")
 ```
 
-[boxplot for KM and KNM, two scenarios, error rates]
-
-[overall confusion table]
-
-[compare this section with nex section, for KM, they are pretty close]
-
-[what about thresholds and likelihood ratios themselves]
-
-
-
-In this paper, we use the CCF as the similarity score..
-
-We evaluate the accuracy under each scenario by using a comparable set of tests with questioned bullets of known origin. 
-
-\hh{As test set we are using bullets from the LAPD bullet set: 626 barrels with four fired bullets each. }
-
-\yg{Should we consider a binomial decison rule to get a bullet comparison results? if that works well here...}
-
-
-
 
 Sample size effect and convergence result
 ------------------------------------------------
@@ -1595,11 +1585,16 @@ Sample size effect and convergence result
 
 <!-- We design a study to evaluate the effect of data sizes. As in the previous sections, we are using the LAPD datas. And set the unit of data size as a set of four same source bullets as in the case of LAPD and in general, the way of forming a data base. It's worth noting that any meaningful statistical results rely on replications. But we must be careful that as the used sample size in a single trial increases, the replications can require very large data sets. Otherwise, the heavy reuse of data could cause high dependence among the results and lead to false conclusions. We are using a approach that is adopted in machine learning field of dealing with this issue. Instead of using different samples at each fixed sample size to achieve replications, we are adding new data to the existing pool of used data to achieve replications by sequentially fitting the model. This also meets the sequential convergence pattern in a statistical sense perfectly. When the addition of new data doesn't significantly change some adopted measurements of our goal, then we find the minimum number of sample size reaching that stage. And additionally, we also repeat the above process with ten randomly selected sequences, which further investigates the data specific effect in the process and it is harder to see all the sequences converged uniformly to a same reasonable small interval. So we also introduce different levels of convergence to formulate the conclusions. -->
 
-\autoref{fig:bd} shows the Bhattacharyya distance between each estimated distribution and the full data distribution in both KM and KNM cases for the ten sequence of randomly selected data. Bhattacharyya distance is associated with the the amount of overlap of two distributions. The lower it is, the more overlapped area there is for the two distributions. From \autoref{fig:bd}, the Bhattacharyya distance decreases rapidly with the increase of the size of the used data at the beginning, and it also reveals that those those distributional estimations with one or two sets of data just don't make sense in producing a stable results. But as the sample size increases to about 5 sets of data, the estimations are pretty stable and close the theoretical distributions, and when it increase to about 40 sets of data, the the estimations essentially converged. It's worth noting that the KNM distribution estimations do have outliers in the early stage, which could be the result of the using of the two-component distributions since the two-component distributions are better with large data as in the previous analysis but with less data, this improvement could be less the cost of estimating a more complex model.(So we will also need to check the single beta) So for the KNM distribution, we might need more data to achieve stable estimations of the two-components distributions, but we do have smaller distance for KNM than KM for estimations with more than 40 sets of data even though both of them are small.
+\autoref{fig:bd} shows the Bhattacharyya distance between each estimated distribution and the full data distribution in both KM and KNM cases for the ten sequence of randomly selected data. Bhattacharyya distance is associated with the the amount of overlap of two distributions. The lower it is, the more overlapped under-curve area there is for the two distributions. From \autoref{fig:bd}, the Bhattacharyya distance decreases rapidly with the increase of the size of the used data at the beginning, and it also reveals that those distributional estimations with one or two sets of data just don't make sense in producing a stable results. But as the sample size increases to about 5 sets of data, the estimations are pretty stable and close the theoretical distributions, and when it increases to about 40 sets of data, the the estimations essentially converged.
+<!-- It's worth noting that the KNM distribution estimations do have outliers in the early stage, which could be the result of the using of the two-component distributions since the two-component distributions are better with large data as in the previous analysis but with less data, this improvement could be less the cost of estimating a more complex model.(So we will also need to check the single beta)  -->
+For the KNM distribution, we might need more data to achieve stable estimations of the two-components distributions since the two components are not so clearly separable as the KM distribution, but we do have smaller distance for KNM than KM for estimations with more than 40 sets of data even though both of them are small.
 
-\autoref{fig:threshold} shows the thresholds we calculated from using the pair of KM and KM distributions with increasing sample size and the red line is the threshold we calculated with the full data distributions (considerred as theoretical ones). Similar to the case of Bhattacharyya distance, the thresholds are restricted to a small interval after the extreme variation in the first couple of estimations. This is good since we can quickly reach the point to get reasonable thresholds. But it also reveals that the further convergence of the thresholds are difficult. Unlike the Bhattacharyya distance, the thresholds will converge to a smaller interval approximately from 0.52 to 0.55 but not a point. However, if we focus on each sequence (line), we can find that after 60 sets of data, they all almost converged to a point. This reveals the different level of convergence, i.e. the convergence of estimations for a particular data base and the convergence of estimations of different databases. The latter is obviously more demanding. But finally, these are all in a reasonable small interval. Another point worth pointing out is that the thresholds seem to require more data than the Bhattacharyya distance. It is expected that the statistical convergence (Bhattacharyya distance) is more strict than the practical convergence (the thresholds), but it is not the case. Since the thresohlds are calculated base on both distributions, the convergence of the thresolds depends on the convergence of both KM and KNM distributions. And it enlarges the variation.
+\autoref{fig:threshold} shows the thresholds calculated from using the pair of KM and KM distributions with increasing sample size and the red line is the threshold calculated with the full data distributions. Similar to the case of Bhattacharyya distance, the thresholds are restricted to a small interval after the extreme variation in the first couple of estimations. This is good since we can quickly reach the point to get reasonable thresholds. But it also reveals that the further convergence of the thresholds are difficult. Unlike the Bhattacharyya distance, the thresholds will converge to a smaller interval approximately from 0.52 to 0.55 but not a point. However, if we focus on each sequence (line), we can find that after 60 sets of data, they all almost converged to a point. This reveals the different level of convergence, i.e. the convergence of estimations for a particular data base and the convergence of estimations of different databases. The latter is obviously more demanding. But finally, these are all in a reasonable small interval. Another point worth pointing out is that the thresholds seem to require more data than the Bhattacharyya distance. It is expected that the statistical convergence (Bhattacharyya distance) is more strict than the practical convergence (the thresholds), but it is not the case. Since the thresholds are calculated based on both distributions, the convergence of the thresholds depends on the convergence of both KM and KNM distributions.
 
-\autoref{fig:error} shows the false negative error rates and the false positive error rates. Similar to the thresholds behavior, the error rate has two stages of converges at about 5 sets and 60 sets of data. But in this figure, the y-axis has the exact practical meaning of error rates and we can quantify how large that variation related to the sample sizes means to us. And after 60 sets of data, the error rates are in reasonably small intervals and the cost of further improvement is high. And we also stress the point of different levels of convergence, a database with 60 sets of data can give predictions almost converged to a number and tens of sets of additional data won't change that significantly. The further convergence of different databases to a same number is more demanding and pretty slow. The range of the interval after 60 sets of data is about 0.045 which means that the most extreme difference of the error rates achieved with different database is 0.04 (larger in false positive and smaller in false negative error rates) for each land to land comparison.
+\yg{XXXwhat is the "error rates" in this section}
+
+\autoref{fig:error} shows the false negative error rates and the false positive error rates.
+Similar to the thresholds behavior, the error rate has two stages of converges at about 5 sets and 60 sets of data. In this figure, the y-axis has the exact practical meaning of error rates and we can quantify how large that variation related to the sample sizes means to us. After 60 sets of data used, the error rates are in reasonably small intervals and the cost of further improvement is high. We also emphasis the point of different levels of convergence, a database with 60 sets of data can give predictions almost converged to a number and tens of sets of additional data won't change that significantly. The further convergence of different databases to a same number is more demanding and pretty slow. The range of the interval after 60 sets of data is about 0.045 which means that the most extreme difference of the error rates achieved with different database is 0.045 (larger in false positive and smaller in false negative error rates) for each land to land comparison.
 
 
 ```{r bd, out.width="70%", fig.align="center", fig.cap="Bhattacharyya Distance", fig.keep="hold", fig.pos="h"}
@@ -1619,19 +1614,7 @@ knitr::include_graphics("../code/organized code/generated figures/error.png")
 To conclude the section, we might ask for 5 sets of bullets as the minimum requirement of a meaningful database. Further, 60 sets of bullets could significantly improve the performance. But further improvement can be very expensive.
 
 
-
-
-
-
-
-
-(try different model for KNM? like one component?)
-
-(In the study of the both types of convergence, we also study the behaviors of the two components and evaluate the functional form of the distributions as well.)
-
-(The convergence of thresholds depends on the convergence of both curves, more demanding)
-
-(We will reproduce the some results in the previous sections: 1. application section?)
+<!-- (The convergence of thresholds depends on the convergence of both curves, more demanding) -->
 
 \clearpage
 
