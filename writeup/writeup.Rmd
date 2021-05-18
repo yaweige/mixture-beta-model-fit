@@ -807,7 +807,7 @@ One less well investigated aspect of the cross-correlation measure, however, is 
 
 Due to  limitations of sample sizes and study designs, sound distributional assumptions about the resulting similarity scores are not well established in the bullet comparison field for automated matching algorithms. Therefore, error rates are generally estimated empirically. This estimation is often based on only dozens of bullets from a selected few firearms. <!--originally used in case studies to estimate the current lab practice's error rates. -->
 <!-- \hh{I'm not sure how the next factoid is relevant} And many of those tests are also criticized for the closed-set design and potential information provided to the examiners as pointed out by PCAST [@PCAST2016; @PCAST2016addendum].-->
-To estimate the theoretical error rates of any automatic algorithm, it is important to understand the underlying distributions of the similarity scores. \hh{XXX add a few citations for papers discussing score-based likelihood ratios.} These distributions also play a key role in an analysis of  score-based likelihood ratios (SLR) \yg{which becomes more and more prevalent in forensic science to quantify the strength of  similarities and unify the measurement of strength of evidence.} @eu2016 \yg{endorsed likelihood methods to evaluate the forensic evidence in their published guidelines for evaluatetion, interpretation and reporting of scientific evidence. @ommen18 formally set up the framework of the likelihood ratios in forensic science}. @Nate2020 \yg{showed the implementation of score based likelihood with good performance in practice}. @RIVA2020110363 and @HEPLER2012129 \yg{showed the importance of the proper estimation of the denominator distributions in score based likelihood analysis in cartridge case and handwriting evidence respectively}. 
+To estimate the theoretical error rates of any automatic algorithm, it is important to understand the underlying distributions of the similarity scores. These distributions also play a key role in an analysis of  score-based likelihood ratios (SLR) \yg{which becomes more and more prevalent in forensic science to quantify the strength of  similarities and unify the measurement of strength of evidence.} @eu2016 \yg{endorsed likelihood methods to evaluate the forensic evidence in their published guidelines for evaluatetion, interpretation and reporting of scientific evidence. @ommen18 formally set up the framework of the likelihood ratios in forensic science}. @Nate2020 \yg{showed the implementation of score based likelihood with good performance in practice}. @RIVA2020110363 and @HEPLER2012129 \yg{showed the importance of the proper estimation of the denominator distributions in score based likelihood analysis in cartridge case and handwriting evidence respectively}. 
 <!-- used to quantify the strength of  similarities and unify the measurement of strength of evidence.  -->
 In this paper, we build beta mixture distribution models for the cross-correlation function (CCF) to provide a framework for error rate estimations and score-based likelihood ratio analysis of the output of automatic algorithms. We also evaluate the size of data needed to reach good estimations for the distributions. We show the size of the data is crucial in applying score-based likelihood ratios and thus, relevant reference databases are needed and required to exceed the minimal number of specimens.
 
@@ -815,9 +815,6 @@ In this paper, we build beta mixture distribution models for the cross-correlati
 <!-- \hh{Don't start sentences with `And`. I am also not sure, what you refer to by `that`. }
 And that also helps later \hh{in this paper?} to choose proper thresholds for the methods to reduce the overall error rates instead of simply choosing a threshold to distinguish between same and different sources. \hh{first define thresholds and the need to get from scores to actionable conclusions.}
 -->
-
-
-\hh{XXX Let's end the introduction here with a  paragraph on the structure of the rest of the paper.}
 
 In section 2... In section 3...
 
@@ -1010,7 +1007,7 @@ Error rate analysis
 Estimating the underlying theoretical error rates for comparisons of pattern evidence is a fundamental challenge in  forensic science [@PCAST2016; @PCAST2016addendum]. 
 <!-- \hh{XXX let's please focus on comparisons rather than 'making identifications'. the result of a comparison should be either an identification or an elimination. 'Making identifications' is inherently biased towards the prosecution. } -->
 Different types of error rates are used to evaluate the performance of a decision-making process.
-Here, we focus on  four commonly used error rates as defined in \autoref{Error rate table}:
+Here, we focus on  four commonly used error rates as defined in \autoref{Error rate table2}:
   
   1. the false positive rate (FPR)
   2. the false negative rate (FNR)
@@ -1044,24 +1041,44 @@ given a standard decision making procedure. In the current paper, we make decisi
 
 \end{table}
 
+\begin{table}[h]
+\footnotesize
+\centering
+\begin{tabular}{ |p{1.5cm}|p{3.7cm} |p{3.7cm}| p{1.7cm}|}
+ \hline
+ &\multicolumn{2}{c|}{Ground Truth}&  \\
+ \hline
+    & Same-Source(SS) & Different Source(DS)&Error Rate\\
+ \hline
+ Identification & $P(TP)= P(CCF > c \mid \text{SS})$ & $P(FP) = P(CCF > c \mid \text{DS})$& $FIR = \frac{P(FP)}{P(TP) + P(FP)}$ \\
+ \hline
+ Elimination & $P(FN)=P(CCF < c \mid\text{SS})$&$P(TN)=P(CCF<c\mid\text{DS})$& $FER = \frac{P(FN)}{P(TN) + P(FN)}$ \\
+ \hline
+ Error Rate & $FNR = \frac{P(FN)}{P(FN) + P(TP)}$ & $FPR = \frac{P(FP)}{P(FP) + P(TN)}$&\\
+ \hline
+\end{tabular}
+\caption{\label{Error rate table2} Probability definitions for most commonly used error rates in binary decisions of same source versus different source comparisons. The notations are: TP for true positive, FP for false positive, FN for false negative, TN for true negative.}
 
 
-The probabilities of making the four decisions in \autoref{Error rate table} are then simply expressed as conditional probabilities:
-\begin{eqnarray*}
-P(TP) &=& P(CCF > c \mid \text{same source})        \\
-P(FP) &=& P(CCF > c \mid \text{different source})   \\
-P(FN) &=& P(CCF < c \mid \text{same source})        \\
-P(TN) &=& P(CCF < c \mid \text{different source}).  \\
-\end{eqnarray*}
+\end{table}
 
+<!-- The probabilities of making the four decisions in \autoref{Error rate table2} are then simply expressed as conditional probabilities: -->
+<!-- \begin{eqnarray*} -->
+<!-- P(TP) &=& P(CCF > c \mid \text{same source})        \\ -->
+<!-- P(FP) &=& P(CCF > c \mid \text{different source})   \\ -->
+<!-- P(FN) &=& P(CCF < c \mid \text{same source})        \\ -->
+<!-- P(TN) &=& P(CCF < c \mid \text{different source}).  \\ -->
+<!-- \end{eqnarray*} -->
 
-The theoretical values of the four type of error rates are the expressed in probability form as: \hh{XXXX I'm not sure that we need table 1 anymore - everything that was included in the table is now included in the text. Space is one of the most valuable commodities in a paper - we need to save it. Either the table needs to go or the text :(}
-\begin{eqnarray}\label{eq:theoretical}
-E(FNR) &=& \frac{P(FN)}{P(FN) + P(TP)}\\\nonumber
-E(FPR) &=& \frac{P(FP)}{P(FP) + P(TN)}\\\nonumber
-E(FIR) &=& \frac{P(FP)}{P(TP) + P(FP)}\\\nonumber
-E(FER) &=& \frac{P(FN)}{P(TN) + P(FN)}
-\end{eqnarray}
+\yg{XXX make decisions for the table}
+
+<!-- The theoretical values of the four type of error rates are the expressed in probability form as: \hh{XXXX I'm not sure that we need table 1 anymore - everything that was included in the table is now included in the text. Space is one of the most valuable commodities in a paper - we need to save it. Either the table needs to go or the text :(} -->
+<!-- \begin{eqnarray}\label{eq:theoretical} -->
+<!-- E(FNR) &=& \frac{P(FN)}{P(FN) + P(TP)}\\\nonumber -->
+<!-- E(FPR) &=& \frac{P(FP)}{P(FP) + P(TN)}\\\nonumber -->
+<!-- E(FIR) &=& \frac{P(FP)}{P(TP) + P(FP)}\\\nonumber -->
+<!-- E(FER) &=& \frac{P(FN)}{P(TN) + P(FN)} -->
+<!-- \end{eqnarray} -->
 
 
 Error rates are therefore affected by the threshold $c$. Error rates  also depend on each other, i.e. we can not optimize all at the same time, but we have to make trade-offs. In an extreme example, we can set a very conservative threshold of $CCF >= 0.99$ to make identifications. This yields a false positive rate (FPR) of zero. But at the same time, the False negative rate (FNR) approaches one. 
