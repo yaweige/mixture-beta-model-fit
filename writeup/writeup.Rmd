@@ -809,7 +809,9 @@ Due to  limitations of sample sizes and study designs, sound distributional assu
 <!-- \hh{I'm not sure how the next factoid is relevant} And many of those tests are also criticized for the closed-set design and potential information provided to the examiners as pointed out by PCAST [@PCAST2016; @PCAST2016addendum].-->
 To estimate the theoretical error rates of any automatic algorithm, it is important to understand the underlying distributions of the similarity scores. These distributions also play a key role in an analysis of  score-based likelihood ratios (SLR) \yg{which becomes more and more prevalent in forensic science to quantify the strength of  similarities and unify the measurement of strength of evidence.} @eu2016 \yg{endorsed likelihood methods to evaluate the forensic evidence in their published guidelines for evaluatetion, interpretation and reporting of scientific evidence. @ommen18 formally set up the framework of the likelihood ratios in forensic science}. @Nate2020 \yg{showed the implementation of score based likelihood with good performance in practice}. @RIVA2020110363 and @HEPLER2012129 \yg{showed the importance of the proper estimation of the denominator distributions in score based likelihood analysis in cartridge case and handwriting evidence respectively}. 
 <!-- used to quantify the strength of  similarities and unify the measurement of strength of evidence.  -->
-In this paper, we build beta mixture distribution models for the cross-correlation function (CCF) to provide a framework for error rate estimations and score-based likelihood ratio analysis of the output of automatic algorithms. We also evaluate the size of data needed to reach good estimations for the distributions. We show the size of the data is crucial in applying score-based likelihood ratios and thus, relevant reference databases are needed and required to exceed the minimal number of specimens.
+\hh{XXX the following description needs to get away from a descriptive mode 'this is what we have done' to a description of results 'this is what we have found'.}
+In this paper, we build beta mixture distribution models for the cross-correlation function (CCF) to provide a framework for error rate estimations and score-based likelihood ratio analysis of the output of automatic algorithms. We also evaluate the size of data needed to reach good estimations for the distributions. 
+We show the size of the data is crucial in applying score-based likelihood ratios and thus, relevant reference databases are needed and required to exceed the minimal number of specimens.
 
 
 <!-- \hh{Don't start sentences with `And`. I am also not sure, what you refer to by `that`. }
@@ -1132,7 +1134,7 @@ km <- small %>%
   ggplot(aes(x = l1, y = l2, fill=ccf)) + 
   geom_tile() + 
   scale_fill_gradient2(low="darkgrey", high="darkorange", 
-                       midpoint = 0.6, limit=c(0,1)) + 
+                       midpoint = 0.5, limit=c(0,1)) + 
   ggtitle("Known match") +
   xlab("Lands of Bullet B, Barrel FAU 020") +
   ylab("Lands of Bullet A, Barrel FAU 020") +
@@ -1143,7 +1145,7 @@ knm <- small %>%
   ggplot(aes(x = l1, y = l2, fill=ccf)) + 
   geom_tile() + 
   scale_fill_gradient2(low="darkgrey", high="darkorange", 
-                       midpoint = 0.6, limit=c(0,1)) + 
+                       midpoint = 0.5, limit=c(0,1)) + 
   ggtitle("Known non-match") +
   xlab("Lands of Bullet B, Barrel FAU 020") +
   ylab("Lands of Bullet B, Barrel FAU 622") +
@@ -1164,43 +1166,36 @@ Database model v.s. case specific model
 
 ### Study Design
 
+<!--
 \hh{There are two major scenarios that firearms examiners come across in case work} [@ommen18]: 
 \begin{itemize}
 \item determine whether a questioned bullet was fired from a specific firearm (specific source problem)
 \item determine whether two questioned bullets were fired from the same firearm (common source).
 \end{itemize}
+-->
 
 
 
-\hh{The approach described below works in both of these scenarios. }
+\hh{The approach in this paper investigates two scenarios. Scenario I is modelled after current practice when a suspected firearm is available:}
 
-
-\hh{If }
 In current practice, FTEs  fire two or three test bullets from a suspected firearm using ammunition that  matches the evidence found on the crime scene as closely as possible.
 Test fires are checked for consistency of striation marks between fires. Generally, the bullet with the better expressed striation marks is used to compare to the evidence. 
 In an automated algorithm, we can make use of all available test bullets and lands to assess similarity. Similarity scores (CCF) are used to get score-based likelihood ratios which quantify the strength of evidence supporting either hypothesis from the prosecution side or the defendant side. The critical step of producing these likelihood ratios is to estimate the distributions for KM and KNM similarity scores.
 
+\hh{For Scenario II we assume, that a reference database of scores is available for comparison. This approach is similar to what has been described by Zheng et al in their presentation at AAFS 2019 (A Pathway Toward Firearm Population Statistics). Zheng et al (2019) described the identification of breech faces. Here, we are investigating an assessment of similarities of bullets based on 3d LEA scans. When dealing with reference databases, the FTE would, similar to current work in labs, include all known information into the system, such as ammunition and type of the firearm. }
 
-
-\hh{For the remainder of this paper we are going to assume that the comparison under investigation is whether a questioned bullet originated from a particular firearm. 
-We will discuss the applicability of our method on situations without a suspected firearm at the end. XXX}
-
+\hh{For the remainder of the paper, we  investigate the difference in algorithmic scores between scenarios I and II. We also address the question on how big the reference sample has to be to enable valid inference.}
 
 
 We distinguish between two scenarios depending on the reference used for comparisons:
 \begin{enumerate}
-\item case-specific: use scores from comparisons of test fires to estimate densities for the same source and the different source scores, and 
-\item reference database: use scores with known provenance from a database of similar ammunition and firearms to estimate densities. 
+\item {\bf Scenario I} (case-specific): use scores from comparisons of test fires to estimate densities for the same source and the different source scores, and 
+\item {\bf Scenario II} (reference database): use scores with known provenance from a database of similar ammunition and firearms to estimate densities. 
 \end{enumerate}
-<!-- The second scenario is where our analysis of the theoretical distributions of the relevant population of similarity scores stand out.  -->
 
 In either of the two scenarios, we derive scores by comparing test fires and the questioned bullet. 
 
-\hh{XXX Let's sketch out this process separately for each scenario and describe the reference data/distribution in each case.}
-
-The pipeline of the process is as follows: 
-
-<!-- For a questioned bullet and a suspected firearm,  -->
+\hh{Under scenario I}, the pipeline of the process is as follows: 
 
 1. conduct test fires with the suspected firearm and collect three test fired bullets, 
 <!-- 2. calculate reference distributions of KMs and KNMs by  -->
@@ -1208,10 +1203,13 @@ The pipeline of the process is as follows:
 
 3. get comparison scores for the questioned bullet compared to each one of the test-fired bullets. We will designate the six scores identified by SAM as the best possible phase-match as 'candidate KM'. \hh{XXX we discard the rest - we could add a discussion item at the end on this. }
 
-<!-- \hh{XXX instead of SAM, use the 'in-phase' citation from NIST} -->
-<!-- 4. Score-based LR are then calculated as ... -->
+The KM and KNM distributions are then estimated based on KM and KNM similarity scores derived from the test fired bullets, respectively. 
 
-Then, for the first scenario, the KM and KNM distributions are estimated with the KM and KNM similarity scores among the test fired bullets respectively. While for the second scenario, the distributions are estimated with a database of the similarity scores from similar firearms and ammunition where all four bullets in each set are considered as test fired with a known source to fit the above pipeline.
+\hh{Under scenario II, ...}
+
+\hh{XXX I'm still not quite sure how this comparison is supposed to work.}
+
+While for the second scenario, the distributions are estimated with a database of the similarity scores from similar firearms and ammunition where all four bullets in each set are considered as test fired with a known source to fit the above pipeline.
 
 \yg{We estimate the reference distributions of KM and KNM based on the reference data. Denote the questioned comparison score as} $y$, the estimated KM and KNM distributions as $f_{KM}(.) = f_{KM}(.; p_{KM}, \mu_{KM}, \phi_{KM})$ and $f_{KM}(.) = f_{KNM}(.; p_{KNM}, \mu_{KNM}, \phi_{KNM})$ respectively. The score-based likelihood ratios (SLR) are then calculated as:
 
