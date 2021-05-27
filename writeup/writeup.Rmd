@@ -139,12 +139,81 @@ mine_betamix <- function(data, par, k, control = list(), hessian = FALSE){
     a3 <- par[7]
     b3 <- par[8]
     
-    beta_1 <- dbeta(data, shape1 = a1, shape2 = b1)
-    beta_2 <- dbeta(data, shape1 = a2, shape2 = b2)
-    beta_3 <- dbeta(data, shape1 = a3, shape2 = b3)
+    if (p1 < 0|p2 < 0|p1 > 1|p2 > 1|p1+p2>1) {
+      output <- Inf
+    } else if ((a1/(a1 + b1))>=(a2/(a2 + b2))|(a2/(a2 + b2))>=(a3/(a3 + b3))) {
+      output <- Inf
+    } else {
+      beta_1 <- dbeta(data, shape1 = a1, shape2 = b1)
+      beta_2 <- dbeta(data, shape1 = a2, shape2 = b2)
+      beta_3 <- dbeta(data, shape1 = a3, shape2 = b3)
+      output <- -sum(log(p1*beta_1 + p2*beta_2 + (1-p1-p2)*beta_3))
+    }
     
-    output <- -sum(log(p1*beta_1 + p2*beta_2 + (1 - p1 - p2)*beta_3))
+    output
   }
+  
+  beta_c4_likelihood <- function(par, data) {
+    p1 <- par[1]
+    p2 <- par[2]
+    p3 <- par[3]
+    a1 <- par[4]
+    b1 <- par[5]
+    a2 <- par[6]
+    b2 <- par[7]
+    a3 <- par[8]
+    b3 <- par[9]
+    a4 <- par[10]
+    b4 <- par[11]
+        
+    if (p1 < 0|p2 < 0|p3 < 0|p1 > 1|p2 > 1|p3 > 1|p1+p2+p3>1) {
+      output <- Inf
+    } else if ((a1/(a1 + b1))>=(a2/(a2 + b2))|(a2/(a2 + b2))>=(a3/(a3 + b3))|(a3/(a3 + b3))>=(a4/(a4 + b4))) {
+      output <- Inf
+    } else {
+      beta_1 <- dbeta(data, shape1 = a1, shape2 = b1)
+      beta_2 <- dbeta(data, shape1 = a2, shape2 = b2)
+      beta_3 <- dbeta(data, shape1 = a3, shape2 = b3)
+      beta_4 <- dbeta(data, shape1 = a4, shape2 = b4)
+      output <- -sum(log(p1*beta_1 + p2*beta_2 + p3*beta_3 + (1-p1-p2-p3)*beta_4))
+    }
+    
+    output
+  }
+  
+    beta_c5_likelihood <- function(par, data) {
+    p1 <- par[1]
+    p2 <- par[2]
+    p3 <- par[3]
+    p4 <- par[4]
+    a1 <- par[5]
+    b1 <- par[6]
+    a2 <- par[7]
+    b2 <- par[8]
+    a3 <- par[9]
+    b3 <- par[10]
+    a4 <- par[11]
+    b4 <- par[12]
+    a5 <- par[13]
+    b5 <- par[14]
+        
+    if (p1 < 0|p2 < 0|p3 < 0|p4 < 0|p1 > 1|p2 > 1|p3 > 1|p4 > 1|p1+p2+p3+p4>1) {
+      output <- Inf
+    } else if ((a1/(a1 + b1))>=(a2/(a2 + b2))|(a2/(a2 + b2))>=(a3/(a3 + b3))|(a3/(a3 + b3))>=(a4/(a4 + b4))|(a4/(a4 + b4))>=(a5/(a5 + b5))) {
+      output <- Inf
+    } else {
+      beta_1 <- dbeta(data, shape1 = a1, shape2 = b1)
+      beta_2 <- dbeta(data, shape1 = a2, shape2 = b2)
+      beta_3 <- dbeta(data, shape1 = a3, shape2 = b3)
+      beta_4 <- dbeta(data, shape1 = a4, shape2 = b4)
+      beta_5 <- dbeta(data, shape1 = a5, shape2 = b5)
+      output <- -sum(log(p1*beta_1 + p2*beta_2 + p3*beta_3 + p4*beta_4 + (1-p1-p2-p3-p4)*beta_5))
+    }
+    
+    output
+  }
+  
+  
   
   if (k == 1) {
     output <- optim(par = par, fn = beta_likelihood, 
@@ -158,6 +227,16 @@ mine_betamix <- function(data, par, k, control = list(), hessian = FALSE){
                     hessian = hessian)
   } else if (k == 3) {
     output <- optim(par = par, fn = beta_c3_likelihood, 
+                    data = data,
+                    control = control,
+                    hessian = hessian)
+  } else if (k == 4) {
+    output <- optim(par = par, fn = beta_c4_likelihood, 
+                    data = data,
+                    control = control,
+                    hessian = hessian)
+  } else if (k == 5) {
+    output <- optim(par = par, fn = beta_c5_likelihood, 
                     data = data,
                     control = control,
                     hessian = hessian)
@@ -199,7 +278,7 @@ ccf_knm_c2$convergence
 # three-component beta mixture========================
 
 ccf_km_c3 <- mine_betamix(data = ccf_km_full_data$ccf,
-                          par = c(0.548, 0.2, 7.5, 4.19, 10.69, 17, 26, 6),
+                          par = c(0.2, 0.548, 10.69, 17, 7.5, 4.19, 26, 6),
                           k = 3,
                           control = list(maxit = 3000))
 ccf_km_c3$convergence
@@ -209,6 +288,33 @@ ccf_knm_c3 <- mine_betamix(data = ccf_knm_full_data$ccf,
                            k = 3,
                            control = list(maxit = 3000))
 ccf_knm_c3$convergence
+# four-component beta mixture=========================
+ccf_km_c4 <- mine_betamix(data = ccf_km_full_data$ccf,
+                          par = c(0.3, 0.3, 0.3, 10.69, 17, 7.5, 4.19, 26, 6, 30, 5),
+                          k = 4,
+                          control = list(maxit = 3000))
+ccf_km_c4$convergence
+
+ccf_knm_c4 <- mine_betamix(data = ccf_knm_full_data$ccf,
+                           par = c(0.3, 0.3, 0.3, 12, 23, 12.5, 12.5, 12.3, 6.2, 12, 4),
+                           k = 4,
+                           control = list(maxit = 3000))
+ccf_knm_c4$convergence
+
+# five-component beta mixture=========================
+ccf_km_c5 <- mine_betamix(data = ccf_km_full_data$ccf,
+                          par = c(0.3, 0.2, 0.2, 0.2, 10, 20, 10, 15, 7, 4, 26, 6, 30, 5),
+                          k = 5,
+                          control = list(maxit = 5000))
+ccf_km_c5$convergence
+
+ccf_knm_c5 <- mine_betamix(data = ccf_knm_full_data$ccf,
+                           par = c(0.3, 0.2, 0.2, 0.2, 12, 23, 12, 18, 12, 12, 12, 6, 12, 4),
+                           k = 5,
+                           control = list(maxit = 5000))
+ccf_knm_c5$convergence
+
+
 # summary model params================================
 #par = c(a, b) when k = 1,
 #par = c(p1, a1, b1, a2, b2), when k = 2
@@ -250,6 +356,51 @@ param_extract <- function(model) {
                                 phi2 = a2+b2,
                                 mu3 = a3/(a3+b3),
                                 phi3 = a3+b3)
+  } else if (nparam == 11) {
+    output <- data.frame(p1 = par[1],
+                         p2 = par[2],
+                         p3 = par[3],
+                         a1 = par[4],
+                         b1 = par[5],
+                         a2 = par[6],
+                         b2 = par[7],
+                         a3 = par[8],
+                         b3 = par[9],
+                         a4 = par[10],
+                         b4 = par[11])
+    output <- output %>% mutate(mu1 = a1/(a1+b1),
+                                phi1 = a1+b1,
+                                mu2 = a2/(a2+b2),
+                                phi2 = a2+b2,
+                                mu3 = a3/(a3+b3),
+                                phi3 = a3+b3,
+                                mu4 = a4/(a4+b4),
+                                phi4 = a4+b4)
+  } else if (nparam == 14) {
+    output <- data.frame(p1 = par[1],
+                         p2 = par[2],
+                         p3 = par[3],
+                         p4 = par[4],
+                         a1 = par[5],
+                         b1 = par[6],
+                         a2 = par[7],
+                         b2 = par[8],
+                         a3 = par[9],
+                         b3 = par[10],
+                         a4 = par[11],
+                         b4 = par[12],
+                         a5 = par[13],
+                         b5 = par[14])
+    output <- output %>% mutate(mu1 = a1/(a1+b1),
+                                phi1 = a1+b1,
+                                mu2 = a2/(a2+b2),
+                                phi2 = a2+b2,
+                                mu3 = a3/(a3+b3),
+                                phi3 = a3+b3,
+                                mu4 = a4/(a4+b4),
+                                phi4 = a4+b4,
+                                mu5 = a5/(a5+b5),
+                                phi5 = a5+b5)
   } else {
     stop("The function can't handle this case")
   }
@@ -262,7 +413,10 @@ param_km_c2 <- param_extract(ccf_km_c2)
 param_knm_c2 <- param_extract(ccf_knm_c2)
 param_km_c3 <- param_extract(ccf_km_c3)
 param_knm_c3 <- param_extract(ccf_knm_c3)
-
+param_km_c4 <- param_extract(ccf_km_c4)
+param_knm_c4 <- param_extract(ccf_knm_c4)
+param_km_c5 <- param_extract(ccf_km_c5)
+param_knm_c5 <- param_extract(ccf_knm_c5)
 # simulation to plot===================================
 
 # two-component betamix
@@ -326,6 +480,11 @@ bic4 <- 2*log(nrow(ccf_knm_full_data))- 2*ccf_knm_c1$logLik
 bic5 <- 5*log(nrow(ccf_knm_full_data))- 2*ccf_knm_c2$logLik
 bic6 <- 8*log(nrow(ccf_knm_full_data))- 2*ccf_knm_c3$logLik
 
+bic7 <- 11*log(nrow(ccf_km_full_data))- 2*ccf_km_c4$logLik
+bic8 <- 14*log(nrow(ccf_km_full_data))- 2*ccf_km_c5$logLik
+
+bic9 <- 11*log(nrow(ccf_knm_full_data))- 2*ccf_knm_c4$logLik
+bic10 <- 14*log(nrow(ccf_knm_full_data))- 2*ccf_knm_c5$logLik
 ```
 
 ```{r error-rate-section, include=FALSE}
@@ -1267,27 +1426,58 @@ The estimation is done using Nelder-Mead algorithm in R [reference]. This is a g
 <!-- \ref{kmestimation} -->
 
 ```{r kmestimation}
-table1_data <- data.frame(Model = c("Beta", "2-comp", "2-comp", rep("3-comp", 3)),
+
+table1_data <- data.frame(Model = c("Beta", "2-comp", "2-comp", rep("3-comp", 3), rep("4-comp", 4), rep("5-comp", 5)),
                           `Prior Probability` = c("1", 
                                                   as.character(round(param_km_c2$p1, digits = 2)),
                                                   as.character(round(1-param_km_c2$p1, digits =2)),
                                                   as.character(round(param_km_c3$p1, digits = 2)),
-                                                  as.character(round(param_km_c3$p2, digits =2)),                                                as.character(round(1-param_km_c3$p1-param_km_c3$p2, digits = 2))),
+                                                  as.character(round(param_km_c3$p2, digits =2)),                                                as.character(round(1-param_km_c3$p1-param_km_c3$p2, digits = 2)),
+                                                  as.character(round(param_km_c4$p1, digits = 2)),
+                                                  as.character(round(param_km_c4$p2, digits = 2)),
+                                                  as.character(round(param_km_c4$p3, digits = 2)),
+                                                  as.character(round(1-param_km_c4$p1 - param_km_c4$p2 - param_km_c4$p3, digits = 2)),
+                                                  as.character(round(param_km_c5$p1, digits = 2)),
+                                                  as.character(round(param_km_c5$p2, digits = 2)),
+                                                  as.character(round(param_km_c5$p3, digits = 2)),
+                                                  as.character(round(param_km_c5$p4, digits = 2)),
+                                                  as.character(round(1-param_km_c5$p1 - param_km_c5$p2 - param_km_c5$p3 - param_km_c5$p4, digits = 2))),
                           mu = c(round(param_km_c1$mu, digits = 2), 
                                  round(param_km_c2$mu1, digits = 2),
                                  round(param_km_c2$mu2, digits = 2),
                                  round(param_km_c3$mu1, digits = 2), 
                                  round(param_km_c3$mu2, digits = 2),
-                                 round(param_km_c3$mu3, digits = 2)),
+                                 round(param_km_c3$mu3, digits = 2),
+                                 round(param_km_c4$mu1, digits = 2), 
+                                 round(param_km_c4$mu2, digits = 2),
+                                 round(param_km_c4$mu3, digits = 2),
+                                 round(param_km_c4$mu4, digits = 2),
+                                 round(param_km_c5$mu1, digits = 2), 
+                                 round(param_km_c5$mu2, digits = 2),
+                                 round(param_km_c5$mu3, digits = 2),
+                                 round(param_km_c5$mu4, digits = 2),
+                                 round(param_km_c5$mu5, digits = 2)),
                           phi = c(round(param_km_c1$phi, digits = 2), 
                                  round(param_km_c2$phi1, digits = 2),
                                  round(param_km_c2$phi2, digits = 2),
                                  round(param_km_c3$phi1, digits = 2), 
                                  round(param_km_c3$phi2, digits = 2),
-                                 round(param_km_c3$phi3, digits = 2)),
+                                 round(param_km_c3$phi3, digits = 2),
+                                 round(param_km_c4$phi1, digits = 2), 
+                                 round(param_km_c4$phi2, digits = 2),
+                                 round(param_km_c4$phi3, digits = 2),
+                                 round(param_km_c4$phi4, digits = 2),
+                                 round(param_km_c5$phi1, digits = 2), 
+                                 round(param_km_c5$phi2, digits = 2),
+                                 round(param_km_c5$phi3, digits = 2),
+                                 round(param_km_c5$phi4, digits = 2),
+                                 round(param_km_c5$phi5, digits = 2)),
                           LogLik = c(ccf_km_c1$logLik, ccf_km_c2$logLik, ccf_km_c2$logLik,
-                                     ccf_km_c3$logLik, ccf_km_c3$logLik, ccf_km_c3$logLik),
-                          BIC  = c(bic1, bic2, bic2, bic3, bic3, bic3))
+                                     ccf_km_c3$logLik, ccf_km_c3$logLik, ccf_km_c3$logLik,
+                                     ccf_km_c4$logLik, ccf_km_c4$logLik, ccf_km_c4$logLik, 
+                                     ccf_km_c4$logLik, ccf_km_c5$logLik, ccf_km_c5$logLik,
+                                     ccf_km_c5$logLik, ccf_km_c5$logLik, ccf_km_c5$logLik),
+                          BIC  = c(bic1, bic2, bic2, bic3, bic3, bic3, bic7, bic7, bic7, bic7, bic8, bic8, bic8, bic8, bic8))
 names(table1_data) <- c("Model", "Prior Probability", "$\\mu$", "$\\phi$",
                         "LogLik", "BIC")
 
@@ -1327,27 +1517,58 @@ kbl(table1_data, booktabs = T, align = "l", escape = F, caption = 'Parameter est
 <!-- Parameter estimations for the Beta distribution (1-component beta mixture distribution), 2-component and 3-component distributions for the KM CCF. "2-comp" refers to the 2-component beta mixture distribution, and the same for "3-comp". Column "logLik" is the maximized log likelihood for each distribution. Column "p-value" is the p-value for asymptotic likelihood ratio tests between the current model and one-step more complex model, where 0 indicates that we would reject the hypothesis that the current one is sufficient to decribe the data -->
 
 ```{r knmestimation}
-table2_data <- data.frame(Model = c("Beta", "2-comp", "2-comp", rep("3-comp", 3)),
+
+table2_data <- data.frame(Model = c("Beta", "2-comp", "2-comp", rep("3-comp", 3), rep("4-comp", 4), rep("5-comp", 5)),
                           `Prior Probability` = c("1", 
                                                   as.character(round(param_knm_c2$p1, digits = 2)),
                                                   as.character(round(1-param_knm_c2$p1, digits =2)),
                                                   as.character(round(param_knm_c3$p1, digits = 2)),
-                                                  as.character(round(param_knm_c3$p2, digits =2)),                                                as.character(round(1-param_knm_c3$p1-param_knm_c3$p2, digits = 2))),
+                                                  as.character(round(param_knm_c3$p2, digits =2)),                                                as.character(round(1-param_knm_c3$p1-param_knm_c3$p2, digits = 2)),
+                                                  as.character(round(param_knm_c4$p1, digits = 2)),
+                                                  as.character(round(param_knm_c4$p2, digits = 2)),
+                                                  as.character(round(param_knm_c4$p3, digits = 2)),
+                                                  as.character(round(1-param_knm_c4$p1 - param_knm_c4$p2 - param_knm_c4$p3, digits = 2)),
+                                                  as.character(round(param_knm_c5$p1, digits = 2)),
+                                                  as.character(round(param_knm_c5$p2, digits = 2)),
+                                                  as.character(round(param_knm_c5$p3, digits = 2)),
+                                                  as.character(round(param_knm_c5$p4, digits = 2)),
+                                                  as.character(round(1-param_knm_c5$p1 - param_knm_c5$p2 - param_knm_c5$p3 - param_knm_c5$p4, digits = 2))),
                           mu = c(round(param_knm_c1$mu, digits = 2), 
                                  round(param_knm_c2$mu1, digits = 2),
                                  round(param_knm_c2$mu2, digits = 2),
                                  round(param_knm_c3$mu1, digits = 2), 
                                  round(param_knm_c3$mu2, digits = 2),
-                                 round(param_knm_c3$mu3, digits = 2)),
+                                 round(param_knm_c3$mu3, digits = 2),
+                                 round(param_knm_c4$mu1, digits = 2), 
+                                 round(param_knm_c4$mu2, digits = 2),
+                                 round(param_knm_c4$mu3, digits = 2),
+                                 round(param_knm_c4$mu4, digits = 2),
+                                 round(param_knm_c5$mu1, digits = 2), 
+                                 round(param_knm_c5$mu2, digits = 2),
+                                 round(param_knm_c5$mu3, digits = 2),
+                                 round(param_knm_c5$mu4, digits = 2),
+                                 round(param_knm_c5$mu5, digits = 2)),
                           phi = c(round(param_knm_c1$phi, digits = 2), 
                                  round(param_knm_c2$phi1, digits = 2),
                                  round(param_knm_c2$phi2, digits = 2),
                                  round(param_knm_c3$phi1, digits = 2), 
                                  round(param_knm_c3$phi2, digits = 2),
-                                 round(param_knm_c3$phi3, digits = 2)),
+                                 round(param_knm_c3$phi3, digits = 2),
+                                 round(param_knm_c4$phi1, digits = 2), 
+                                 round(param_knm_c4$phi2, digits = 2),
+                                 round(param_knm_c4$phi3, digits = 2),
+                                 round(param_knm_c4$phi4, digits = 2),
+                                 round(param_knm_c5$phi1, digits = 2), 
+                                 round(param_knm_c5$phi2, digits = 2),
+                                 round(param_knm_c5$phi3, digits = 2),
+                                 round(param_knm_c5$phi4, digits = 2),
+                                 round(param_knm_c5$phi5, digits = 2)),
                           LogLik = c(ccf_knm_c1$logLik, ccf_knm_c2$logLik, ccf_knm_c2$logLik,
-                                     ccf_knm_c3$logLik, ccf_knm_c3$logLik, ccf_knm_c3$logLik),
-                          BIC  = c(bic4, bic5, bic5, bic6, bic6, bic6))
+                                     ccf_knm_c3$logLik, ccf_knm_c3$logLik, ccf_knm_c3$logLik,
+                                     ccf_knm_c4$logLik, ccf_knm_c4$logLik, ccf_knm_c4$logLik, 
+                                     ccf_knm_c4$logLik, ccf_knm_c5$logLik, ccf_knm_c5$logLik,
+                                     ccf_knm_c5$logLik, ccf_knm_c5$logLik, ccf_knm_c5$logLik),
+                          BIC  = c(bic4, bic5, bic5, bic6, bic6, bic6, bic9, bic9, bic9, bic9, bic10, bic10, bic10, bic10, bic10))
 names(table2_data) <- c("Model", "Prior Probability", "$\\mu$", "$\\phi$",
                         "LogLik", "BIC")
 
