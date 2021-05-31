@@ -22,3 +22,6 @@ The changing size/sample size/sensitivity section in the writeup
 
 # 8. generate-ccf-from-knm-bullets-comp.R is to extract CCFs from non-matching bullets comparisons
 
+# bind-ccvs-to-csv.R
+To get ccf_data.csv, the final data we will use directly
+
