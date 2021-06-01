@@ -516,17 +516,23 @@ dbetamix2 <- function(x, model){
   pdf
 }
 
-find_cross <- function(m1, m2, start = 0.4){
+find_cross <- function(m1, m2, start = 0.4, end = 0.9, step = 0.0001, tolerance = 0.001, outboundDefault = NULL){
   a <- 1
   b <- 2
   x <- start
-  while(abs(a - b)>=0.001) {
-    x <- x + 0.0001
+  while(abs(a - b)>=tolerance) {
+    x <- x + step
     a <- dbetamix2(x, m1)
     b <- dbetamix2(x, m2)
     
-    if (x > 0.7){
-      stop("the cutoff exceeds 0.7, try smaller steps")
+    if (x > end){
+      if (is.null(outboundDefault)){
+        stop("the cutoff exceeds end point, try smaller steps, larger range or set default")
+      } else {
+        if (!is.numeric(outboundDefault)) stop("outboundDefault needs a numeric input")
+        x <- outboundDefault
+        return(x)
+      }
     }
   }
   x
@@ -566,6 +572,7 @@ ccf_knm_full_data <- ccf_knm_full_data %>%
          FAU2 = as.numeric(str_extract(land2, pattern = "(?<=LAPD - (FAU )?)\\d+")))
 
 # split out the test set (from the database set), FAU1 = FAU2 here. The list is listed in numeric order.
+# not all good, some not 36 because of the bad names: FAU 245, known minority, fixed by update of data later
 test_km_sets <- ccf_km_full_data %>%
   filter(as.character(FAU1) %in% as.character(test_index)) %>%
   split(f = .$FAU1)
@@ -574,10 +581,17 @@ test_knm_sets <- ccf_knm_full_data %>%
   filter(as.character(FAU1) %in% as.character(test_index)) %>%
   split(f = .$FAU1)
 
-if (any(names(test_km_sets) != names(test_knm_sets))) stop("FAUs not matched in application section")
+if (any(names(test_km_sets) != names(test_knm_sets))) stop("FAUs not matched in application section, node1")
+
+# find out and deal with the unincluded data and exclude the index correspondingly
+unincludedFAU <- setdiff(as.character(test_index), names(test_km_sets))
+# update the two vectors
+test_index <- test_quesetioned_pairs_data$FAU1[!as.character(test_quesetioned_pairs_data$FAU1) %in% unincludedFAU]
+questioned_bullet_index <- test_quesetioned_pairs_data$bullet1[!as.character(test_quesetioned_pairs_data$FAU1) %in% unincludedFAU]
+
+if (any(names(test_km_sets) != as.character(test_index))) stop("FAUs not matched in application section, node2")
 
 # split the questioned bullet out in each set
-# for now, the 2 barrels not in the data. This will be solved after updating the data later
 test_questioned_sets <- Map(function(x, y, z) {
   
   test_km <- x %>% filter(bullet1 != z, bullet2 != z)
@@ -587,23 +601,23 @@ test_questioned_sets <- Map(function(x, y, z) {
   output <- list(test_km = test_km, test_knm = test_knm,
                  questioned_km = questioned_km)
   
-}, test_km_sets, test_knm_sets, questioned_bullet_index[1:98])
+}, test_km_sets, test_knm_sets, questioned_bullet_index)
 
 # fit the distributions for each set (three test fires)
 case_by_case_models <- lapply(test_questioned_sets, FUN = function(x) {
   # the starting values are those from the full data models
   km_model <- mine_betamix(data = x$test_km$ccf, 
-                           par = c(0.419, 7.37, 8.45, 14.03, 4.45),
+                           par = ccf_km_c2$par,
                            k = 2,
                            control = list(maxit = 3000),
                            hessian = FALSE)
   knm_model <- mine_betamix(data = x$test_knm$ccf, 
-                            par = c(0.666, 11.23, 20.33, 7.06, 7.22),
+                            par = ccf_knm_c2$par,
                             k = 2,
                             control = list(maxit = 3000),
                             hessian = FALSE)
-  
-  threshold_equal_pdf <- find_cross(km_model, knm_model,start = 0.2,end = 0.9, step = 0.0001)
+  # cutoff1 is the all data threshold in the estimation section
+  threshold_equal_pdf <- find_cross(km_model, knm_model,start = 0.1,end = 0.9, step = 0.0001, outboundDefault = cutoff1)
   
   output <- list(km_model = km_model, knm_model = knm_model, threshold_equal_pdf = threshold_equal_pdf)
   output
@@ -633,30 +647,104 @@ case_by_case_classifcation_converged %>% unlist() %>% length
 ccf_nonmatched_km_data <- ccf_data_part2 %>% filter(source == "KM")
 ccf_nonmatched_knm_data <- ccf_data_part2 %>% filter(source == "KNM")
 
+ccf_nonmatched_km_data <- ccf_nonmatched_km_data %>% 
+  mutate(FAU1 = as.numeric(str_extract(land1, pattern = "(?<=LAPD - (FAU )?)\\d+")),
+         FAU2 = as.numeric(str_extract(land2, pattern = "(?<=LAPD - (FAU )?)\\d+"))) %>%
+  mutate(uniqueIndex = ifelse(FAU1 < FAU2, yes = paste(FAU1, FAU2), no = paste(FAU2, FAU1)))
+
+ccf_nonmatched_knm_data <- ccf_nonmatched_knm_data %>% 
+  mutate(FAU1 = as.numeric(str_extract(land1, pattern = "(?<=LAPD - (FAU )?)\\d+")),
+         FAU2 = as.numeric(str_extract(land2, pattern = "(?<=LAPD - (FAU )?)\\d+"))) %>%
+  mutate(uniqueIndex = ifelse(FAU1 < FAU2, yes = paste(FAU1, FAU2), no = paste(FAU2, FAU1)))
+
 # For the current coding method, it's not available to get all FAU1 and FAU2 (It is now, but this is still a good way)
 # but the following would work for the purpose of split (the following step) (to get list forms)
 
-# The fau 246 is used, however, it is labeled as 245 in the land names, so we took care of that by using the current way to split.
+if (nrow(ccf_nonmatched_km_data)%%36 != 0 | nrow(ccf_nonmatched_knm_data)%%240 != 0) stop("Incorrect dimension in application section for part2 data, node1")
+if (nrow(ccf_nonmatched_km_data)/36 != nrow(ccf_nonmatched_knm_data)/240) stop("Incorrect dimension in application section for part2 data, node3")
 
-# ccf_nonmatched_km_data <- ccf_nonmatched_km_data %>%
-#   mutate(FAU1toSplit = str_extract(land1, pattern = "(?<=LAPD - (FAU )?)\\d+"),
-#          FAU2toSplit = str_extract(land2, pattern = "(?<=LAPD - (FAU )?)\\d+"),
-#          FAUtoSplit = ifelse(is.na(FAU1toSplit), yes = FAU2toSplit, no = FAU1toSplit),
-#          FAUtoSplit = ifelse(is.na(FAU1toSplit), yes = FAU2toSplit, no = FAU1toSplit))
-# 
-# ccf_nonmatched_knm_data <- ccf_nonmatched_knm_data %>%
-#   mutate(FAU1toSplit = str_extract(land1, pattern = "(?<=LAPD - (FAU )?)\\d+"),
-#          FAU2toSplit = str_extract(land2, pattern = "(?<=LAPD - (FAU )?)\\d+"),
-#          FAUtoSplit = ifelse(is.na(FAU1toSplit), yes = FAU2toSplit, no = FAU1toSplit))
-
-if (nrow(ccf_nonmatched_km_data)%%36 != 0 | nrow(ccf_nonmatched_knm_data)%%240 != 0) stop("Incorrect dimension in application section for part2 data")
-
+# less sets than included FAUs, since when interchange the questioned bullets, this cause more missing coparisons
+# actually reversed the operation to get the data.frames
 ccf_nonmatched_km <- ccf_nonmatched_km_data %>%
-  split(f = rep(1:nrow(ccf_nonmatched_km_data)/36, each = 36))
+  split(f = rep(1:(nrow(ccf_nonmatched_km_data)/36), each = 36))
 
 ccf_nonmatched_knm <- ccf_nonmatched_knm_data %>%
-  split(f = rep(1:nrow(ccf_nonmatched_knm_data)/240, each = 240))
+  split(f = rep(1:(nrow(ccf_nonmatched_knm_data)/240), each = 240))
 
+# check if the split is making sense
+lapply(ccf_nonmatched_km, FUN = function(x){
+  x <- x %>%
+    mutate(FAU1 = as.numeric(str_extract(land1, pattern = "(?<=LAPD - (FAU )?)\\d+")),
+           FAU2 = as.numeric(str_extract(land2, pattern = "(?<=LAPD - (FAU )?)\\d+")))
+  output <- ""
+  if(length(unique(c(x$FAU1, x$FAU2))) != 2){
+    print("error1")
+    print(unique(c(x$FAU1, x$FAU2)))
+    print(length(unique(c(x$FAU1, x$FAU2))))
+    print(dim(x))
+    #stop("more than 2 barrels used in application section part2 data, node2")
+    output <- paste(output, "error1")
+  } else {
+    xfau1fau2 <- paste(min(x$FAU1, x$FAU2), max(x$FAU1, x$FAU2))
+    if(!xfau1fau2 %in% paste(pmin(test_quesetioned_pairs_data$FAU1, test_quesetioned_pairs_data$FAU2),
+                             pmax(test_quesetioned_pairs_data$FAU1, test_quesetioned_pairs_data$FAU2))) {
+      print("error2")
+      print(xfau1fau2)
+      #stop("split in application section part2 data, not as expected")
+      output <- paste(output, "error2")
+    } 
+  }
+  output
+}) %>% unlist()
+# should be no errors (since we excluded all problematic data)
+
+# to form the included cases, this again needs some manual work due to bad names (correct the names)
+# use the information from the last step
+# note there is no simple exchange of bullets since we excluded that case initially
+# includedTestPairs <- lapply(ccf_nonmatched_km, FUN = function(x) {
+#     x <- x %>%
+#     mutate(FAU1 = as.numeric(str_extract(land1, pattern = "(?<=LAPD - (FAU )?)\\d+")),
+#            FAU2 = as.numeric(str_extract(land2, pattern = "(?<=LAPD - (FAU )?)\\d+")))
+#     output <- paste(min(x$FAU1, x$FAU2), max(x$FAU1, x$FAU2))
+#     output
+# }) %>% unlist()
+# 
+# includedTestPairsKNM <- lapply(ccf_nonmatched_knm, FUN = function(x) {
+#     x <- x %>%
+#     mutate(FAU1 = as.numeric(str_extract(land1, pattern = "(?<=LAPD - (FAU )?)\\d+")),
+#            FAU2 = as.numeric(str_extract(land2, pattern = "(?<=LAPD - (FAU )?)\\d+")))
+#     output <- paste(min(x$FAU1, x$FAU2), max(x$FAU1, x$FAU2))
+#     output
+# }) %>% unlist()
+# 
+# if(!identical(includedTestPairs, includedTestPairsKNM)) stop("unexpected order in application part2, node3") 
+
+# the first one doesn't change it actually
+# includedTestPairs[33] <- "14 608"
+# includedTestPairs[132] <- "246 337"
+# includedTestPairs[133] <- "247 398"
+# includedTestPairs[205] <- "324 602"
+# includedTestPairs[242] <- "246 368"
+# includedTestPairs[386] <- "247 525"
+# includedTestPairs[392] <- "531 571"
+# includedTestPairs[426] <- "321 571"
+
+test_quesetioned_pairs_data <- test_quesetioned_pairs_data %>%
+  mutate(uniqueIndex = ifelse(FAU1 < FAU2, yes = paste(FAU1, FAU2), no = paste(FAU2, FAU1)))
+# unincludedTest <- setdiff(test_quesetioned_pairs_data$uniqueIndex, includedTestPairs)
+# setdiff(includedTestPairs, test_quesetioned_pairs_data$uniqueIndex)
+# not sure why some of them not included
+# unincludedTest
+# unincludedFAU
+
+# I think it is so bad experience to deal with the bad data at this level, I will just exclude all of them
+# gooddata1 <- c(1:32, 0, 34:131, 0, 0, 134:204, 0, 206:241, 0, 243:385, 0, 387:391, 0, 393:425, 0, 427:510) != 0
+# 
+# ccf_nonmatched_km2 <- ccf_nonmatched_km[gooddata1]
+# ccf_nonmatched_knm2 <- ccf_nonmatched_knm[gooddata1]
+# 
+# test_quesetioned_pairs_data2 <- test_quesetioned_pairs_data %>%
+#   filter(uniqueIndex %in% includedTestPairs)
 
 # nonmatched_km_fau_names <- lapply(ccf_nonmatched_km, FUN = function(x){
 #   output <- unique(x$FAUtoSplit[!is.na(x$FAUtoSplit)])
@@ -692,10 +780,25 @@ ccf_nonmatched_knm <- ccf_nonmatched_knm_data %>%
 
 # To fit the models
 nonmatched_test_questioned_sets <- Map(function(x, y) {
+  xIndex <- unique(x[x$FAU1 != x$FAU2, ]$uniqueIndex)
+  yIndex <- unique(y[y$FAU1 != y$FAU2, ]$uniqueIndex)
+  if ((length(xIndex) != 1)|(length(yIndex) != 1)) stop("unexpected uniqueIndex")
+  if (xIndex != yIndex) stop("unexpected non-matching uniqueIndex")
+  TheuniqueIndex <- xIndex
   
-  test_km <- x %>% filter(bullet1 != "Q", bullet2 != "Q")
-  test_knm <- y %>% filter(bullet1 != "Q", bullet2 != "Q")
-  questioned_km <- x %>% filter(bullet1 == "Q"|bullet2 == "Q")
+  if (sum(test_quesetioned_pairs_data$uniqueIndex == TheuniqueIndex) != 1) stop("comparisons not existed")
+  theComparison <- test_quesetioned_pairs_data[test_quesetioned_pairs_data$uniqueIndex == TheuniqueIndex,]
+  test_km <- x %>% filter(FAU1 != theComparison$FAU1,
+                          FAU2 != theComparison$FAU1)
+  
+  test_knm <- y %>% filter(FAU1 != theComparison$FAU1,
+                           FAU2 != theComparison$FAU1)
+  
+  questioned_km <- x %>% filter(FAU1 == theComparison$FAU1|FAU2 == theComparison$FAU1)
+  
+  # test_km <- x %>% filter(bullet1 != "Q", bullet2 != "Q")
+  # test_knm <- y %>% filter(bullet1 != "Q", bullet2 != "Q")
+  # questioned_km <- x %>% filter(bullet1 == "Q"|bullet2 == "Q")
   
   output <- list(test_km = test_km, test_knm = test_knm,
                  questioned_km = questioned_km)
@@ -706,18 +809,21 @@ nonmatched_test_questioned_sets[[1]]
 
 nonmatched_case_by_case_models <- lapply(nonmatched_test_questioned_sets, FUN = function(x) {
   # the starting values are those from the full data models
-  km_model <- mine_betamix(data = x$test_km$ccf, 
+  test_km_ccf <- x$test_km$ccf
+  test_knm_ccf <- x$test_knm$ccf
+  if (any(test_knm_ccf>=0.95)) test_knm_ccf  <- test_knm_ccf [test_knm_ccf < 0.95]
+  km_model <- mine_betamix(data = test_km_ccf, 
                            par = c(0.419, 7.37, 8.45, 14.03, 4.45),
                            k = 2,
                            control = list(maxit = 3000),
                            hessian = FALSE)
-  knm_model <- mine_betamix(data = x$test_knm$ccf, 
+  knm_model <- mine_betamix(data = test_knm_ccf, 
                             par = c(0.666, 11.23, 20.33, 7.06, 7.22),
                             k = 2,
                             control = list(maxit = 3000),
                             hessian = FALSE)
   
-  threshold_equal_pdf <- find_cross(km_model, knm_model,start = 0.2,end = 0.9, step = 0.0001)
+  threshold_equal_pdf <- find_cross(km_model, knm_model,start = 0.1,end = 0.9, step = 0.0001, outboundDefault = cutoff1)
   output <- list(km_model = km_model, knm_model = knm_model, threshold_equal_pdf = threshold_equal_pdf)
   output
 })
@@ -750,7 +856,7 @@ database_matchedB_km <- mine_betamix(data = ccf_km_full_data %>%
                                      par = c(0.419, 7.36, 8.45, 14, 4.45),
                                      k = 2,
                                      hessian = FALSE,
-                                     control = list(maxit = 1000))
+                                     control = list(maxit = 3000))
 database_matchedB_km$converge 
 database_matchedB_km
 
@@ -761,7 +867,7 @@ database_matchedB_knm <- mine_betamix(data = ccf_knm_full_data %>%
                                       par = c(0.666, 11.23, 20.33, 7.065, 7.22),
                                       k = 2,
                                       hessian = FALSE,
-                                      control = list(maxit = 1000))
+                                      control = list(maxit = 3000))
 
 
 database_matchedB_knm$converge 
@@ -787,6 +893,12 @@ ccf_km_full_data <- ccf_km_full_data %>%
 
 ccf_knm_full_data <- ccf_knm_full_data %>%
   select(-FAU1, -FAU2)
+
+# save the results
+# saveRDS(case_by_case_classifcation, file = "../data/case-by-case-classification.rds")
+# saveRDS(nonmatched_case_by_case_classifcation, file = "../data/nonmatched-case-by-case-classification.rds")
+# saveRDS(database_matchedB_km_result, file = "../data/database-matchedB-km-result.rds")
+# saveRDS(database_nonmatchedB_result, file = "../data/database-nonmatchedB-result.rds")
 ```
 
 ```{r sample-size-section, include=FALSE,eval=FALSE}
