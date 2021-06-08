@@ -41,7 +41,7 @@ header-includes:
 \newcommand{\hh}[1]{{\textcolor{orange}{#1}}}
 \newcommand{\yg}[1]{{\textcolor{blue}{#1}}}
 
-
+\thanks{This work was partially funded by the Center for Statistics and Applications in Forensic Evidence (CSAFE) through Cooperative Agreement 70NANB20H019 between NIST and Iowa State University, which includes activities carried out at Carnegie Mellon University, Duke University, University of California Irvine, University of Virginia, West Virginia University, University of Pennsylvania, Swarthmore College and University of Nebraska, Lincoln.}
 
 _Text based on elsarticle sample manuscript, see [http://www.elsevier.com/author-schemas/latex-instructions#elsarticle](http://www.elsevier.com/author-schemas/latex-instructions#elsarticle)_
 
@@ -1399,10 +1399,10 @@ ccfplus <- ccfplus %>%
   )
 
 small <- ccfplus %>% 
-  filter((br1==20 & br2 == 20 & b2=="BA"& b1=="BB") | (br1==20 & br2 == 622 & b1 == "BB"))
+  filter((br1==20 & br2 == 20 & b2=="BA"& b1=="BB") | (br1==20 & br2 == 522 & b1 == "BA" & b2=="BA"))
 ```
 
-```{r tileplot, fig.cap="Overview of all 36 land-to-land comparisons of two pairs of bullets. Left: the bullets are known to be from the same source. Right: the bullets were fired from two different bullets.", out.width=".8\\textwidth", fig.align="center", fig.height = 4}
+```{r tileplot, fig.cap="Overview of all 36 land-to-land comparisons of two pairs of bullets. Left: the bullets are known to be from the same source. Right: the bullets were fired from two different barrels.", out.width=".8\\textwidth", fig.align="center", fig.height = 4}
 km <- small %>% 
   filter(usage=="part1") %>%
   mutate(l2 = factor(l2, level=paste0("L",c(5:6, 1:4)))) %>%
@@ -1422,8 +1422,8 @@ knm <- small %>%
   scale_fill_gradient2(low="darkgrey", high="darkorange", 
                        midpoint = 0.5, limit=c(0,1)) + 
   ggtitle("Known non-match") +
-  xlab("Lands of Bullet B, Barrel FAU 020") +
-  ylab("Lands of Bullet B, Barrel FAU 622") +
+  xlab("Lands of Bullet A, Barrel FAU 020") +
+  ylab("Lands of Bullet A, Barrel FAU 522") +
   theme(legend.position = "bottom",
         aspect.ratio = 1)
 
@@ -1468,7 +1468,8 @@ We distinguish between two scenarios depending on the reference used for compari
 \item {\bf Scenario II} (reference database): use scores with known provenance from a database of similar ammunition and firearms to estimate densities. 
 \end{enumerate}
 
-In either of the two scenarios, we derive scores by comparing test fires and the questioned bullet. 
+For either of the two scenarios, we will assume that a suspected firearm is available. \hh{In case a firearm is not available, deriving reliable scores and associated densities becomes more complicated. We touch on this scenario and its limitations in the discussion.} 
+Scores are derived by comparing test fires and the questioned bullet. 
 
 \hh{Under scenario I}, the pipeline of the process is as follows: 
 
