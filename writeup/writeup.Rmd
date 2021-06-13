@@ -55,6 +55,7 @@ library(kableExtra)
 library(xtable)
 library(tables)
 library(gridExtra)
+library(tidyr)
 theme_set(theme_bw())
 knitr::opts_chunk$set(echo = FALSE, cache = TRUE)
 ```
@@ -901,7 +902,7 @@ ccf_knm_full_data <- ccf_knm_full_data %>%
 # saveRDS(database_nonmatchedB_result, file = "../data/database-nonmatchedB-result.rds")
 ```
 
-```{r sample-size-section, include=FALSE,eval=FALSE}
+```{r sample-size-section, include=FALSE}
 # make use of different starting values (this actually has no significant effect, and only part of it is shown in the final report)
 # the full model one:
 starting_1 <- matrix(c(param_km_c2$p1,  param_km_c2$a1,  param_km_c2$b1, param_km_c2$a2, param_km_c2$b2,
@@ -949,7 +950,7 @@ change_size_sequence_fit <- function(data, seq, start = c(0.3, 5, 6, 5, 5), k = 
 
 
 # The run=================================================
-km_st1_sq1to10_100 <- lapply(1:10, FUN = function(x) {
+km_st1_sq1to10_100 <- lapply(1:10, FUN = function(i) {
   output <- change_size_sequence_fit(ccf_km_full_data, 
                                      seq = change_size_sequences[,i][1:100], 
                                      start = starting_1[1,], 
@@ -1004,7 +1005,7 @@ threshold_newcol <- lapply(1:1000, FUN = function(i){
   fakeknmmodel <- list(par = c(knmrow[3:7]) %>% unlist)
   
   threshold <- find_cross(m1 = fakekmmodel, m2 = fakeknmmodel,
-                          start = 0.2, end =  0.9, step = 0.0001)
+                          start = 0.2, end =  0.9, step = 0.0001, outboundDefault = cutoff1)
   threshold
 }) %>% unlist
 
@@ -1916,9 +1917,7 @@ Database model v.s. case specific model result
 <!-- Following the above procedure, we have 100 questioned bullets (same bullets in same and different source cases), 100 same source question-test pairs, 100 different source question-test pairs. For each questioned bullet in either case (same or different source), we have 18 questioned land comparisons. For the database scenario, we have 342x36 = 12312 known matched land comparisons, and 342x240 = 82080 known non-matched land comparisons. For the individual case scenario, we have 18 known matched land comparisons (among test bullets), and 125 known non-matched land comparisons. [may be summarized in a table, and for the specific counts, we will provide details of that when introducing the LAPD data] -->
 
 The results of the experiment show us how the database scenario with well established density estimations improve the over-all accuracy. As shown in \autoref{fig:application-result1}, the left boxplot represents the case-specific scenario where everything is calculated and predicted based on one questioned bullet and three test fired bullets. The right boxplot represents the database scenario where the similarity scores between one questioned bullet and three test fired bullets are evaluated based on a relevant database. \autoref{fig:application-result1} is based on the matching bullets, in which case all the comparisons of lands are actually matches. For each boxplot, there are one hundred data points (number of questioned bullets), and each point represents the proportion of correct predictions (i.e. matching lands) of one questioned bullet and the corresponding three test fired bullets based on total eighteen land-land comparisons.
-\yg{XXXneed to change to predefined error rates}
 \autoref{fig:application-result1} is formed similar to \autoref{fig:application-result1}, but all the land-land comparisons are non-matching comparisons based on non-matching bullets. The y-axis in \autoref{fig:application-result1} is the proportion of correctly predicted non-matched lands. 
-\yg{XXXneed to change to predefined error rates}
 The results of the experiments are very strong support of making use of a relevant database for automated algorithms. In \autoref{fig:application-result1}, the evaluation based on an individual set are slightly better than using of the database because of its more aggressive and case specific way of calculating likelihood ratio and selecting thresholds. But that improvement is little compared with the significant loss of the accuracy in correctly identifying the non-matching land-land comparisons. \autoref{fig:application-result1} implies that it makes no sense of using only the individual case calculation to do prediction for non-matching bullet comparisons in SLR, while the database scenario works much better and even better than the two results of the matching bullet case, which meets our expectation of a more concentrated KNM distribution than the KM distribution.
 
 ```{r application-result1,  out.width="70%", fig.align="center", fig.cap="Land classification error rates in different settings", fig.keep="hold", fig.pos="h"}
@@ -1986,30 +1985,76 @@ Sample size effect and convergence result
 
 <!-- We design a study to evaluate the effect of data sizes. As in the previous sections, we are using the LAPD datas. And set the unit of data size as a set of four same source bullets as in the case of LAPD and in general, the way of forming a data base. It's worth noting that any meaningful statistical results rely on replications. But we must be careful that as the used sample size in a single trial increases, the replications can require very large data sets. Otherwise, the heavy reuse of data could cause high dependence among the results and lead to false conclusions. We are using a approach that is adopted in machine learning field of dealing with this issue. Instead of using different samples at each fixed sample size to achieve replications, we are adding new data to the existing pool of used data to achieve replications by sequentially fitting the model. This also meets the sequential convergence pattern in a statistical sense perfectly. When the addition of new data doesn't significantly change some adopted measurements of our goal, then we find the minimum number of sample size reaching that stage. And additionally, we also repeat the above process with ten randomly selected sequences, which further investigates the data specific effect in the process and it is harder to see all the sequences converged uniformly to a same reasonable small interval. So we also introduce different levels of convergence to formulate the conclusions. -->
 
-\autoref{fig:bd} shows the Bhattacharyya distance between each estimated distribution and the full data distribution in both KM and KNM cases for the ten sequence of randomly selected data. Bhattacharyya distance is associated with the the amount of overlap of two distributions. The lower it is, the more overlapped under-curve area there is for the two distributions. From \autoref{fig:bd}, the Bhattacharyya distance decreases rapidly with the increase of the size of the used data at the beginning, and it also reveals that those distributional estimations with one or two sets of data just don't make sense in producing a stable results. But as the sample size increases to about 5 sets of data, the estimations are pretty stable and close the theoretical distributions, and when it increases to about 40 sets of data, the the estimations essentially converged.
+\autoref{fig:bd1} shows the Bhattacharyya distance between each estimated distribution and the full data distribution in both KM and KNM cases for the ten sequence of randomly selected data. Bhattacharyya distance is associated with the the amount of overlap of two distributions. The lower it is, the more overlapped under-curve area there is for the two distributions. From \autoref{fig:bd1}, the Bhattacharyya distance decreases rapidly with the increase of the size of the used data at the beginning, and it also reveals that those distributional estimations with one or two sets of data just don't make sense in producing a stable results. But as the sample size increases to about 5 sets of data, the estimations are pretty stable and close the theoretical distributions, and when it increases to about 40 sets of data, the the estimations essentially converged.
 <!-- It's worth noting that the KNM distribution estimations do have outliers in the early stage, which could be the result of the using of the two-component distributions since the two-component distributions are better with large data as in the previous analysis but with less data, this improvement could be less the cost of estimating a more complex model.(So we will also need to check the single beta)  -->
 For the KNM distribution, we might need more data to achieve stable estimations of the two-components distributions since the two components are not so clearly separable as the KM distribution, but we do have smaller distance for KNM than KM for estimations with more than 40 sets of data even though both of them are small.
 
-\autoref{fig:threshold} shows the thresholds calculated from using the pair of KM and KM distributions with increasing sample size and the red line is the threshold calculated with the full data distributions. Similar to the case of Bhattacharyya distance, the thresholds are restricted to a small interval after the extreme variation in the first couple of estimations. This is good since we can quickly reach the point to get reasonable thresholds. But it also reveals that the further convergence of the thresholds are difficult. Unlike the Bhattacharyya distance, the thresholds will converge to a smaller interval approximately from 0.52 to 0.55 but not a point. However, if we focus on each sequence (line), we can find that after 60 sets of data, they all almost converged to a point. This reveals the different level of convergence, i.e. the convergence of estimations for a particular data base and the convergence of estimations of different databases. The latter is obviously more demanding. But finally, these are all in a reasonable small interval. Another point worth pointing out is that the thresholds seem to require more data than the Bhattacharyya distance. It is expected that the statistical convergence (Bhattacharyya distance) is more strict than the practical convergence (the thresholds), but it is not the case. Since the thresholds are calculated based on both distributions, the convergence of the thresholds depends on the convergence of both KM and KNM distributions.
+\autoref{fig:threshold1} shows the thresholds calculated from using the pair of KM and KM distributions with increasing sample size and the red line is the threshold calculated with the full data distributions. Similar to the case of Bhattacharyya distance, the thresholds are restricted to a small interval after the extreme variation in the first couple of estimations. This is good since we can quickly reach the point to get reasonable thresholds. But it also reveals that the further convergence of the thresholds are difficult. Unlike the Bhattacharyya distance, the thresholds will converge to a smaller interval approximately from 0.52 to 0.55 but not a point. However, if we focus on each sequence (line), we can find that after 60 sets of data, they all almost converged to a point. This reveals the different level of convergence, i.e. the convergence of estimations for a particular data base and the convergence of estimations of different databases. The latter is obviously more demanding. But finally, these are all in a reasonable small interval. Another point worth pointing out is that the thresholds seem to require more data than the Bhattacharyya distance. It is expected that the statistical convergence (Bhattacharyya distance) is more strict than the practical convergence (the thresholds), but it is not the case. Since the thresholds are calculated based on both distributions, the convergence of the thresholds depends on the convergence of both KM and KNM distributions.
 
-\yg{XXXwhat is the "error rates" in this section}
-
-\autoref{fig:error} shows the false negative error rates and the false positive error rates.
+\autoref{fig:error1} shows the false negative error rates and the false positive error rates.
 Similar to the thresholds behavior, the error rate has two stages of converges at about 5 sets and 60 sets of data. In this figure, the y-axis has the exact practical meaning of error rates and we can quantify how large that variation related to the sample sizes means to us. After 60 sets of data used, the error rates are in reasonably small intervals and the cost of further improvement is high. We also emphasis the point of different levels of convergence, a database with 60 sets of data can give predictions almost converged to a number and tens of sets of additional data won't change that significantly. The further convergence of different databases to a same number is more demanding and pretty slow. The range of the interval after 60 sets of data is about 0.045 which means that the most extreme difference of the error rates achieved with different database is 0.045 (larger in false positive and smaller in false negative error rates) for each land to land comparison.
 
 
-```{r bd, out.width="70%", fig.align="center", fig.cap="Bhattacharyya Distance", fig.keep="hold", fig.pos="h"}
+```{r bd, out.width="70%", fig.align="center", fig.cap="Bhattacharyya Distance", fig.keep="hold", fig.pos="h", eval=FALSE}
 knitr::include_graphics("../code/generated figures/bd.png")
 ```
 
 
-```{r threshold, out.width="70%", fig.align="center", fig.cap="Threshold", fig.keep="hold", fig.pos="h"}
+```{r threshold, out.width="70%", fig.align="center", fig.cap="Threshold", fig.keep="hold", fig.pos="h", eval=FALSE}
 knitr::include_graphics("../code/generated figures/threshold.png")
 ```
 
 
-```{r error, out.width="70%", fig.align="center", fig.cap="Error", fig.keep="hold", fig.pos="h"}
+```{r error, out.width="70%", fig.align="center", fig.cap="Error", fig.keep="hold", fig.pos="h", eval=FALSE}
 knitr::include_graphics("../code/generated figures/error.png")
+```
+
+```{r bd1, out.width="70%", fig.align="center", fig.cap="Bhattacharyya Distance", fig.keep="hold", fig.pos="h"}
+change_size_sequence_data %>%
+  ggplot(aes(x = as.numeric(sets), y = bd, group = seq)) + 
+  geom_line() + 
+  facet_wrap(~class) + 
+  xlab("Number of sets") + 
+  ylab("Bhattacharyya Distance")
+```
+
+```{r threshold1, out.width="70%", fig.align="center", fig.cap="Threshold", fig.keep="hold", fig.pos="h"}
+change_size_sequence_data[1:1000,] %>%
+  ggplot(aes(x = as.numeric(sets), y = threshold, group = seq)) + 
+  geom_line() + 
+  geom_hline(yintercept = cutoff1, color = "red") +
+  ylim(0,1) +
+  xlab("Number of sets") + 
+  ylab("Threshold")
+```
+
+```{r error1, out.width="70%", fig.align="center", fig.cap="Error", fig.keep="hold", fig.pos="h"}
+change_size_sequence_data$fn <- lapply(change_size_sequence_data$threshold[1:1000], FUN = function(t) {
+  output <- 1 - mean(ccf_km_full_data$ccf > t)
+  output
+}) %>% unlist
+
+change_size_sequence_data$fp <- lapply(change_size_sequence_data$threshold[1:1000], FUN = function(t) {
+  output <- mean(ccf_knm_full_data$ccf > t)
+  output
+}) %>% unlist
+
+totalerror <- c(mean(ccf_knm_full_data$ccf > cutoff1),
+                1 - mean(ccf_km_full_data$ccf > cutoff1))
+totalerror <- data.frame(error = totalerror,
+                         key = c("False Positive", "False Negative"))
+
+change_size_sequence_data %>%
+  rename(`False Positive` = fp,
+         `False Negative` = fn) %>%
+  tidyr::gather(key = "key", value = "value", `False Negative`, `False Positive`) %>%
+  ggplot(aes(x = as.numeric(sets), y = value, group = seq)) + 
+  geom_line() + 
+  geom_hline(mapping = aes(yintercept = error), data = totalerror, color = "red") +
+  ylim(0, 1) +
+  ylab("Error Rate") +
+  xlab("Number of sets") +
+  facet_wrap(~key)
 ```
 
 To conclude the section, we might ask for 5 sets of bullets as the minimum requirement of a meaningful database. Further, 60 sets of bullets could significantly improve the performance. But further improvement can be very expensive.
