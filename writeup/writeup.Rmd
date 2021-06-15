@@ -2059,6 +2059,36 @@ change_size_sequence_data %>%
 
 To conclude the section, we might ask for 5 sets of bullets as the minimum requirement of a meaningful database. Further, 60 sets of bullets could significantly improve the performance. But further improvement can be very expensive.
 
+```{r bulletlevel-error, include=FALSE}
+# introduce FAU and bullet in ccf_km_full_data, ccf_knm_full_data
+ccf_km_full_data_temp2 <- ccf_km_full_data %>% 
+  mutate(FAU1 = as.numeric(str_extract(land1, pattern = "(?<=LAPD - (FAU )?)\\d+")),
+         FAU2 = as.numeric(str_extract(land2, pattern = "(?<=LAPD - (FAU )?)\\d+")))
+
+change_size_sequence_data$bulletfn <- lapply(change_size_sequence_data$threshold[1:1000], FUN = function(t) {
+  data2_sum <- ccf_km_full_data_temp2 %>%
+    group_by(bullet1, bullet2, FAU1) %>%
+    summarise(bulletmean = mean(ccf > t)) %>%
+    ungroup %>%
+    mutate(pred = as.numeric(bulletmean >= 0.5))
+  
+  output <- 1 - mean(data2_sum$pred)
+  output
+}) %>% unlist
+
+```
+
+```{r error2, out.width="70%", fig.align="center", fig.cap="Bullet Error (need to be decided)", fig.keep="hold", fig.pos="h"}
+
+change_size_sequence_data[1:1000,] %>%
+  ggplot(aes(x = as.numeric(sets), y = bulletfn, group = seq)) + 
+  geom_line() + 
+#  geom_hline(yintercept = totalerror$error[2], color = "red") +
+  ylim(0, 1) +
+  ylab("False Negative Error Rate") +
+  xlab("Number of sets")
+```
+
 
 <!-- (The convergence of thresholds depends on the convergence of both curves, more demanding) -->
 
