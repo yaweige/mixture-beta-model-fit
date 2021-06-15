@@ -1476,20 +1476,19 @@ The pipeline of the process is as follows:
 
 1. conduct test fires with the suspected firearm and collect three test fired bullets, 
 <!-- 2. calculate reference distributions of KMs and KNMs by  -->
-2. compare all lands from pairs of test fires for reference distributions. In our example, six land-to-land comparisons correspond to known matches, the other 30 correspond to known non-matches for each pair of test fired bullets. \hh{XXX the test fires are NOT in the database usually. We need to distinguish between our use scenario and the database scenario} Note, we can assume that all comparisons involving test fires are already included in the reference database.
+2. compare all lands from pairs of test fires for reference distributions: in our example, six land-to-land comparisons correspond to known matches, the other 30 correspond to known non-matches for each pair of test fired bullets.  \hh{XXX the test fires are NOT in the database usually. We need to distinguish between our use scenario and the database scenario} Note, we can assume that all comparisons involving test fires are already included in the reference database.
+The KM and KNM distributions are then estimated based on KM and KNM similarity scores  derived from the test fired bullets, respectively. 
+
 
 3. get comparison scores for the questioned bullet compared to each one of the test-fired bullets. We designate the six scores identified by SAM as the best possible phase-match as 'candidate KM'. 
 \hh{XXX we discard the remaining scores - we should add a discussion item at the end on this. }
-
-
-The KM and KNM distributions are then estimated based on KM and KNM similarity scores  derived from the test fired bullets, respectively. 
 
 
 
 
 While for the second scenario, the distributions are estimated with a database of the similarity scores from similar firearms and ammunition where all four bullets in each set are considered as test fired with a known source to fit the above pipeline.
 
-\yg{We estimate the reference distributions of KM and KNM based on the reference data. Denote the questioned comparison score as} $y$, the estimated KM and KNM distributions as $f_{KM}(.) = f_{KM}(.; p_{KM}, \mu_{KM}, \phi_{KM})$ and $f_{KM}(.) = f_{KNM}(.; p_{KNM}, \mu_{KNM}, \phi_{KNM})$ respectively. The score-based likelihood ratios (SLR) are then calculated as:
+We estimate the reference distributions of KM and KNM based on the reference data. Denote the questioned comparison score \hh{XXX singular? shouldn't we have more than one comparison score?} as $y$, the estimated KM and KNM distributions as $f_{KM}(.) = f_{KM}(.; p_{KM}, \mu_{KM}, \phi_{KM})$ and $f_{KNM}(.) = f_{KNM}(.; p_{KNM}, \mu_{KNM}, \phi_{KNM})$ respectively. The score-based likelihood ratios \hh{XXX plural here, but they are all called SLR. This should probably be an SLR(y) } (SLR) are then calculated as:
 
 $$SLR = \frac{f_{KM}(y)}{f_{KNM}(y)}$$
 
