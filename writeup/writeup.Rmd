@@ -1543,38 +1543,31 @@ Database model v.s. case specific model
 \hh{The approach in this paper investigates two scenarios. Scenario I is modelled after current practice when a suspected firearm is available:}
 
 In current practice, FTEs  fire two or three test bullets from a suspected firearm using ammunition that  matches the evidence found on the crime scene as closely as possible.
-Test fires are checked for consistency of striation marks between fires. Generally, the bullet with the better expressed striation marks is used to compare to the evidence. 
-In an automated algorithm, we can make use of all available test bullets and lands to assess similarity. Similarity scores (CCF) are used to get score-based likelihood ratios which quantify the strength of evidence supporting either hypothesis from the prosecution side or the defendant side. The critical step of producing these likelihood ratios is to estimate the distributions for KM and KNM similarity scores.
+Test fires are checked for consistency of striation marks between fires. Generally, the bullet with the best striation marks is used to compare to the evidence. 
 
-\hh{For Scenario II we assume, that a reference database of scores is available for comparison. This approach is similar to what has been described by Zheng et al in their presentation at AAFS 2019 (A Pathway Toward Firearm Population Statistics). Zheng et al (2019) described the identification of breech faces. Here, we are investigating an assessment of similarities of bullets based on 3d LEA scans. When dealing with reference databases, the FTE would, similar to current work in labs, include all known information into the system, such as ammunition and type of the firearm. }
+
+
+\hh{For Scenario II we assume, that a reference database  is available for comparison. This approach is similar to what has been described by Zheng et al in their presentation at AAFS 2019 (A Pathway Toward Firearm Population Statistics). Zheng et al (2019) described the identification of breech faces. Here, we are investigating an assessment of similarities of bullets based on 3d LEA scans. When dealing with reference databases, the FTE would, similar to current work in labs, include all known information into the system, such as ammunition and type of the firearm. Scores from the evidence are then compared to the most relevant scores in the database. }
+
+
+For either scenario, we will assume that we can generate scores from an automated matching algorithm to assess similarity.  These similarity scores are then used to get score-based likelihood ratios which quantify the strength of evidence supporting either the prosecution's or the defense's hypothesis. The critical step of producing these likelihood ratios lies in the estimation of the distributions for the similarity scores of known matches and known non-matches.
+
+We will also assume that a suspected firearm is available. \hh{In case a firearm is not available, deriving reliable scores and associated densities becomes more complicated. We touch on this scenario and its limitations in the discussion.} 
+
+
+\hh{There are three sets of scores we are interested in: 
+scores corresponding to known matches that the distribution of $f_\text{KM}$ is based on; scores from known non-matches that enable an estimation of $f_\text{KNM}$; and comparison scores of the questioned bullet with the test fires.} 
+
+Under Scenario I, the distributions of known matches and known non-matches are based on the scores from pair-wise comparisons of the test fired bullets: assuming that we are able to access three test-fired bullets with six land engraved areas each, $f_\text{KM}$ is based on 18 scores of matching land-to-land signatures, while $f_\text{KNM}$ is based on 45 scores of non-matching land-to-land signatures from  pair-wise comparisons. \hh{XXX ccf should be symmetric for sig 1 to sig 2 and sig 2 to sig 1.}
+Under Scenario II, these distributions are estimated from the scores of the closest matching reference fires (same firearm, same ammunition).
+
+Comparison scores are gained in the same way under both scenarios: the questioned bullet is compared to each of the test fires.
+We designate the six scores identified by SAM as the best possible phase-match as 'candidate KM'. 
+
 
 \hh{For the remainder of the paper, we  investigate the difference in algorithmic scores between scenarios I and II. We also address the question on how big the reference sample has to be to enable valid inference.}
 
 
-We distinguish between two scenarios depending on the reference used for comparisons:
-\begin{enumerate}
-\item {\bf Scenario I} (case-specific): use scores from comparisons of test fires to estimate densities for the same source and the different source scores, and 
-\item {\bf Scenario II} (reference database): use scores with known provenance from a database of similar ammunition and firearms to estimate densities. 
-\end{enumerate}
-
-For either of the two scenarios, we will assume that a suspected firearm is available. \hh{In case a firearm is not available, deriving reliable scores and associated densities becomes more complicated. We touch on this scenario and its limitations in the discussion.} 
-Scores are derived by comparing test fires and the questioned bullet. 
-
-The pipeline of the process is as follows: 
-
-1. conduct test fires with the suspected firearm and collect three test fired bullets, 
-<!-- 2. calculate reference distributions of KMs and KNMs by  -->
-2. compare all lands from pairs of test fires for reference distributions: in our example, six land-to-land comparisons correspond to known matches, the other 30 correspond to known non-matches for each pair of test fired bullets.  \hh{XXX the test fires are NOT in the database usually. We need to distinguish between our use scenario and the database scenario} Note, we can assume that all comparisons involving test fires are already included in the reference database.
-The KM and KNM distributions are then estimated based on KM and KNM similarity scores  derived from the test fired bullets, respectively. 
-
-
-3. get comparison scores for the questioned bullet compared to each one of the test-fired bullets. We designate the six scores identified by SAM as the best possible phase-match as 'candidate KM'. 
-\hh{XXX we discard the remaining scores - we should add a discussion item at the end on this. }
-
-
-
-
-While for the second scenario, the distributions are estimated with a database of the similarity scores from similar firearms and ammunition where all four bullets in each set are considered as test fired with a known source to fit the above pipeline.
 
 We estimate the reference distributions of KM and KNM based on the reference data. Denote the questioned comparison score \hh{XXX singular? shouldn't we have more than one comparison score?} as $y$, the estimated KM and KNM distributions as $f_{KM}(.) = f_{KM}(.; p_{KM}, \mu_{KM}, \phi_{KM})$ and $f_{KNM}(.) = f_{KNM}(.; p_{KNM}, \mu_{KNM}, \phi_{KNM})$ respectively. The score-based likelihood ratios \hh{XXX plural here, but they are all called SLR. This should probably be an SLR(y) } (SLR) are then calculated as:
 
