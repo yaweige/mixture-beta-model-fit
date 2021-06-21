@@ -1043,6 +1043,94 @@ bd_part2 <- lapply(1001:2000, FUN = function(i) {
 change_size_sequence_data$bd <- c(bd_part1, bd_part2)
 ```
 
+```{r app-scenario3, include=FALSE}
+permutation_scenario3 <- function(one_of_test_questioned_sets, times = 10000) {
+  test_km <- one_of_test_questioned_sets$test_km
+  test_knm <- one_of_test_questioned_sets$test_knm
+  questioned_km <- one_of_test_questioned_sets$questioned_km
+  
+  if (nrow(test_km) != 18 | nrow(test_knm) != 135 | nrow(questioned_km) != 18) return(999)
+  
+  test_km$pair <- paste(test_km$bullet1, test_km$bullet2, sep = "-")
+  test_knm$pair <- paste(test_knm$bullet1, test_knm$bullet2, sep = "-")
+  
+  pairid <- unique(test_km$pair)
+  
+  # define the data structure: every 6 rows are one phase, first 6 first phase and so on
+  # first phase is the selected candidate km
+  
+  comparison1 <- bind_rows(test_km %>% filter(pair == pairid[1]),
+                           test_knm %>% filter(pair == pairid[1])) %>%
+    mutate(rank = rank(ccf))
+  
+  comparison2 <- bind_rows(test_km %>% filter(pair == pairid[2]),
+                           test_knm %>% filter(pair == pairid[2])) %>%
+    mutate(rank = rank(ccf))
+  
+  comparison3 <- bind_rows(test_km %>% filter(pair == pairid[3]),
+                           test_knm %>% filter(pair == pairid[3])) %>%
+    mutate(rank = rank(ccf))
+  
+  if(nrow(comparison1) != 36 | nrow(comparison2) != 36 | nrow(comparison3) != 36) return(999)
+  
+  observed_sum <- sum(comparison1$rank[1:6]) + sum(comparison2$rank[1:6]) + sum(comparison3$rank[1:6])
+  
+  get_permutation <- lapply(1:times, FUN = function(i) {
+    perm1 <- sample(1:36, 36, replace = TRUE)
+    perm2 <- sample(1:36, 36, replace = TRUE)
+    perm3 <- sample(1:36, 36, replace = TRUE)
+    
+    perm1_com <- comparison1[perm1,]
+    perm2_com <- comparison2[perm2,]
+    perm3_com <- comparison3[perm3,]
+    
+    perm1_com$phase <- rep(1:6, each = 6)
+    perm2_com$phase <- rep(1:6, each = 6)
+    perm3_com$phase <- rep(1:6, each = 6)
+    
+    maxphase1 <- perm1_com %>%
+      group_by(phase) %>%
+      summarise(sumrank = sum(rank)) %>%
+      pull(sumrank) %>%
+      max()
+    
+    maxphase2 <- perm2_com %>%
+      group_by(phase) %>%
+      summarise(sumrank = sum(rank)) %>%
+      pull(sumrank) %>%
+      max()
+    
+    maxphase3 <- perm3_com %>%
+      group_by(phase) %>%
+      summarise(sumrank = sum(rank)) %>%
+      pull(sumrank) %>%
+      max()
+    
+    perm_sum <- sum(maxphase1, maxphase2, maxphase3)
+    perm_sum
+  }) %>% unlist
+  
+  pvalue <- sum(get_permutation > observed_sum)/times
+  
+  # output <- list(observed_sum = observed_sum,
+  #                pvalue = pvalue,
+  #                permutation = get_permutation)
+  
+  output <- pvalue
+  output
+}
+
+test_questioned_sets_pvalue <- lapply(test_questioned_sets, FUN = function(x) {
+  output <- permutation_scenario3(x, times = 1000)
+}) %>% unlist
+
+nonmatched_test_questioned_sets_pvalue <- lapply(nonmatched_test_questioned_sets, FUN = function(x) {
+  output <- permutation_scenario3(x, times = 1000)
+}) %>% unlist
+
+```
+
+
 ```{r generated-values-calculation, include=FALSE}
 # to get those values needed in text, but avoid the rerun of the core sections
 # quick and easy changes here
@@ -1975,6 +2063,53 @@ app_combined_data2 %>%
   ggplot() + 
   geom_bar(aes(y = error, x = group), stat = "identity", alpha = 0.5) +
   ylim(0, 1)
+```
+
+```{r application-result3,  out.width="70%", fig.align="center", fig.cap="Bullet classification error rates in different settings based on majority vote (with screening p-value 0.005)", fig.keep="hold", fig.pos="h"}
+# use 1 to count 1 error, 0 indicates correct prediction
+pvaluecufoff <- 0.005
+nonmatch_casebycase3 <- lapply(nonmatched_case_by_case_classifcation, 
+                               FUN = function(x) ifelse(mean(x)>0.5, yes = 1, no = 0)) %>% unlist
+nonmatch_casebycase3 <- nonmatch_casebycase3[nonmatched_test_questioned_sets_pvalue < pvaluecufoff]
+
+nonmatch_database3 <- lapply(database_nonmatchedB_result, 
+                               FUN = function(x) ifelse(mean(x)>0.5, yes = 1, no = 0)) %>% unlist
+nonmatch_database3 <- nonmatch_database3[nonmatched_test_questioned_sets_pvalue < pvaluecufoff]
+
+match_casebycase3 <- lapply(case_by_case_classifcation, 
+                               FUN = function(x) ifelse(mean(x)>0.5, yes = 0, no = 1)) %>% unlist
+match_casebycase3 <- match_casebycase3[test_questioned_sets_pvalue < pvaluecufoff]
+
+match_database3 <- lapply(database_matchedB_km_result, 
+                               FUN = function(x) ifelse(mean(x)>0.5, yes = 0, no = 1)) %>% unlist
+match_database3 <- match_database3[test_questioned_sets_pvalue < pvaluecufoff]
+
+app_combined_data3 <- data.frame(error = c(mean(nonmatch_casebycase3),
+                                           mean(nonmatch_database3),
+                                           mean(match_casebycase3),
+                                           mean(match_database3)),
+                                 match = c("nonmatch","nonmatch","match","match"),
+                                 type = c("specific", "database", "specific", "database")) %>%
+  mutate(group = paste(match, type, sep = "\n"))
+
+app_combined_data3 %>%
+  ggplot() + 
+  geom_bar(aes(y = error, x = group), stat = "identity", alpha = 0.5) +
+  ylim(0, 1)
+```
+
+```{r application-result4}
+# use 1 to count 1 error, 0 indicates correct prediction
+
+table4_data <- data.frame(`total sample` = c(length(match_casebycase2),
+                                             length(nonmatch_casebycase2)),
+                          `used sample` = c(sum(test_questioned_sets_pvalue < pvaluecufoff),
+                                            sum(nonmatched_test_questioned_sets_pvalue < pvaluecufoff)))
+row.names(table4_data) <- c("Match", "Non-match")
+
+table4_data %>%
+  kbl(caption = "Screening of the data") %>%
+  kable_classic(full_width = F)
 ```
 
 
