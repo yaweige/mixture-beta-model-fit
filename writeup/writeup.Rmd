@@ -1201,6 +1201,11 @@ Following the process described in @Hare2016, we extract **signatures** \hh{XXX 
 Here, we  employ the cross-correlation function (CCF) to measure similarity.
 The cross-correlation function (CCF) is calculated by maximizing the  correlation of two  signatures under a vertical shift.
 
+```{r signature-fig, out.width="70%", fig.align="center",  fig.cap="Pipeline of the pre-processing", fig.keep="hold", fig.pos="h"}
+
+knitr::include_graphics("../code/figures/threeinone2.png")
+```
+
 Mathematically, CCF is  a value between -1 and 1, with larger values indicating higher similarity between pairs of signatures. Deciding between identifications and eliminations based on pairs of signatures is based on a cutoff value of the corresponding maximized CCF value. Naively, one could assign positive CCF values to indicate same-source pairs and, similarly, negative values to different-source pairs. However, in practice it turns out that values of CCF based on pairs of bullet land signatures are not symmetric around the origin, but mostly positive regardless of source. Negative values are rarely observed for LEA comparisons in practice (and in none of the more than 100k comparisons considered in this paper).
 Moreover, different pairings of firearm and ammunition result in different distributions of values, therefore no single CCF value is sufficient to distinguish between same-source and different-source pairs. Alternatively to using scores directly, @RIVA2020110363 suggests the use of score-based log-likelihood ratios to evaluate the strength of forensic evidence. 
 
