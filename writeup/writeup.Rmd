@@ -2110,6 +2110,54 @@ table4_data %>%
   kable_classic(full_width = F)
 ```
 
+```{r application-result5}
+# use 1 to count 1 error, 0 indicates correct prediction
+
+prepare_scenario3 <- function(pvaluecufoff) {
+  
+  output <- lapply(pvaluecufoff, FUN = function(pvaluecufoff1) {
+    nonmatch_casebycase3 <- lapply(nonmatched_case_by_case_classifcation, 
+                                   FUN = function(x) ifelse(mean(x)>0.5, yes = 1, no = 0)) %>% unlist
+    nonmatch_casebycase3 <- nonmatch_casebycase3[nonmatched_test_questioned_sets_pvalue < pvaluecufoff1]
+    
+    nonmatch_database3 <- lapply(database_nonmatchedB_result, 
+                                 FUN = function(x) ifelse(mean(x)>0.5, yes = 1, no = 0)) %>% unlist
+    nonmatch_database3 <- nonmatch_database3[nonmatched_test_questioned_sets_pvalue < pvaluecufoff1]
+    
+    match_casebycase3 <- lapply(case_by_case_classifcation, 
+                                FUN = function(x) ifelse(mean(x)>0.5, yes = 0, no = 1)) %>% unlist
+    match_casebycase3 <- match_casebycase3[test_questioned_sets_pvalue < pvaluecufoff1]
+    
+    match_database3 <- lapply(database_matchedB_km_result, 
+                              FUN = function(x) ifelse(mean(x)>0.5, yes = 0, no = 1)) %>% unlist
+    match_database3 <- match_database3[test_questioned_sets_pvalue < pvaluecufoff1]
+    
+    app_combined_data3 <- data.frame(MatchDatabase = mean(match_database3),
+                                     MatchSpecific = mean(match_casebycase3),
+                                     NonmatchDatabase = mean(nonmatch_database3),
+                                     NonmatchSpecific = mean(nonmatch_casebycase3),
+                                     pvaluecufoff = pvaluecufoff1,
+                                     matchkept = sum(test_questioned_sets_pvalue < pvaluecufoff1)/length(test_questioned_sets_pvalue),
+                                     nonmatchkept = sum(nonmatched_test_questioned_sets_pvalue < pvaluecufoff1)/length(nonmatched_test_questioned_sets_pvalue))
+    
+    app_combined_data3
+  }) %>% dplyr::bind_rows()
+  
+  output
+}
+
+app_sc3_summary <- prepare_scenario3((500:5)/1000)
+
+```
+
+```{r application-result6,  out.width="70%", fig.align="center", fig.cap="Bullet classification error rates in different settings based on majority vote (with changing p-value cutoff)", fig.keep="hold", fig.pos="h"}
+app_sc3_summary %>%
+  tidyr::gather(key = "key", value = "value", -pvaluecufoff) %>%
+  ggplot() + 
+  geom_line(aes(y = value, x = pvaluecufoff, color = key)) +
+  ylim(0, 1)
+
+```
 
 Sample size effect and convergence result
 ------------------------------------------------
