@@ -36,14 +36,14 @@ header-includes:
 
 
 \theoremstyle{definition}
-\newtheorem{definition}{Definition}[section]
+\newtheorem{definition}{Definition}
 
 \newcommand{\hh}[1]{{\textcolor{orange}{#1}}}
 \newcommand{\yg}[1]{{\textcolor{blue}{#1}}}
 
 \thanks{This work was partially funded by the Center for Statistics and Applications in Forensic Evidence (CSAFE) through Cooperative Agreement 70NANB20H019 between NIST and Iowa State University, which includes activities carried out at Carnegie Mellon University, Duke University, University of California Irvine, University of Virginia, West Virginia University, University of Pennsylvania, Swarthmore College and University of Nebraska, Lincoln.}
 
-_Text based on elsarticle sample manuscript, see [http://www.elsevier.com/author-schemas/latex-instructions#elsarticle](http://www.elsevier.com/author-schemas/latex-instructions#elsarticle)_
+<!-- _Text based on elsarticle sample manuscript, see [http://www.elsevier.com/author-schemas/latex-instructions#elsarticle](http://www.elsevier.com/author-schemas/latex-instructions#elsarticle)_ -->
 
 ```{r setup, warning=FALSE,message=FALSE, echo=FALSE}
 library(dplyr)
@@ -1137,25 +1137,6 @@ nonmatched_test_questioned_sets_pvalue <- lapply(nonmatched_test_questioned_sets
 123
 ```
 
-\hh{Next steps:}
-
-1.  for any image that you include with include_graphics("image.png") write a ggsave("image.png") in the code
-2. Let's use darkgrey for different source and darkorange for same source comparisons
-3. Switch from known match and known non-match to (known) same source and (known) different source
-4. Whenever you show results - number estimates or figures, make sure to include in the description what bullets/barrels these results are based on. 
-5. in the section on the LAPD data define what you mean by 'full data' and what sampling schemes you use later on.
-
-
-
-
-Test to show some result
-
-`r param_km_c1$a` `r param_km_c1`
-
-
-
-
-
 
 Introduction
 ====================================
@@ -1174,9 +1155,10 @@ Due to  limitations of sample sizes and study designs, sound distributional assu
 To estimate the theoretical error rates of any automatic algorithm, it is important to understand the underlying distributions of the similarity scores. These distributions also play a key role in an analysis of  score-based likelihood ratios (SLR) \yg{which becomes more and more prevalent in forensic science to quantify the strength of  similarities and unify the measurement of strength of evidence.} @eu2016 \yg{endorsed likelihood methods to evaluate the forensic evidence in their published guidelines for evaluatetion, interpretation and reporting of scientific evidence. @ommen18 formally set up the framework of the likelihood ratios in forensic science}. @Nate2020 \yg{showed the implementation of score based likelihood with good performance in practice}. @RIVA2020110363 and @HEPLER2012129 \yg{showed the importance of the proper estimation of the denominator distributions in score based likelihood analysis in cartridge case and handwriting evidence respectively}. 
 <!-- used to quantify the strength of  similarities and unify the measurement of strength of evidence.  -->
 \hh{XXX the following description needs to get away from a descriptive mode 'this is what we have done' to a description of results 'this is what we have found'.}
-In this paper, we build beta mixture distribution models for the cross-correlation function (CCF) to provide a framework for error rate estimations and score-based likelihood ratio analysis of the output of automatic algorithms. We also evaluate the size of data needed to reach good estimations for the distributions. 
-We show the size of the data is crucial in applying score-based likelihood ratios and thus, relevant reference databases are needed and required to exceed the minimal number of specimens.
-
+<!-- In this paper, we build beta mixture distribution models for the cross-correlation function (CCF) to provide a framework for error rate estimations and score-based likelihood ratio analysis of the output of automatic algorithms. We also evaluate the size of data needed to reach good estimations for the distributions.  -->
+<!-- We show the size of the data is crucial in applying score-based likelihood ratios and thus, relevant reference databases are needed and required to exceed the minimal number of specimens. -->
+\yg{In this paper, we propose beta mixture distribution models for the cross-correlation function (CCF) to provide a framework for error rate estimations and score-based likelihood ratio analysis of the output of automatic algorithms. We also make suggestions on the size of data needed to reach good estimations for the distributions. 
+We show the size of the data is crucial in applying score-based likelihood ratios and thus, relevant reference databases are needed and required to exceed the minimal number of specimens.}
 
 <!-- \hh{Don't start sentences with `And`. I am also not sure, what you refer to by `that`. }
 And that also helps later \hh{in this paper?} to choose proper thresholds for the methods to reduce the overall error rates instead of simply choosing a threshold to distinguish between same and different sources. \hh{first define thresholds and the need to get from scores to actionable conclusions.}
@@ -1545,34 +1527,21 @@ Database model v.s. case specific model
 
 
 
-\hh{The approach in this paper investigates two scenarios. Scenario I is modelled after current practice when a suspected firearm is available:}
+The approach in this paper investigates two scenarios. Scenario I is modelled after current practice when a suspected firearm is available: In current practice, FTEs  fire two or three test bullets from a suspected firearm using ammunition that  matches the evidence found on the crime scene as closely as possible. Test fires are checked for consistency of striation marks between fires. Generally, the bullet with the best striation marks is used to compare to the evidence. 
 
-In current practice, FTEs  fire two or three test bullets from a suspected firearm using ammunition that  matches the evidence found on the crime scene as closely as possible.
-Test fires are checked for consistency of striation marks between fires. Generally, the bullet with the best striation marks is used to compare to the evidence. 
-
-
-
-\hh{For Scenario II we assume, that a reference database  is available for comparison. This approach is similar to what has been described by Zheng et al in their presentation at AAFS 2019 (A Pathway Toward Firearm Population Statistics). Zheng et al (2019) described the identification of breech faces. Here, we are investigating an assessment of similarities of bullets based on 3d LEA scans. When dealing with reference databases, the FTE would, similar to current work in labs, include all known information into the system, such as ammunition and type of the firearm. Scores from the evidence are then compared to the most relevant scores in the database. }
-
+For Scenario II we assume, that a reference database  is available for comparison. This approach is similar to what has been described by Zheng et al in their presentation at AAFS 2019 (A Pathway Toward Firearm Population Statistics). Zheng et al (2019) described the identification of breech faces. Here, we are investigating an assessment of similarities of bullets based on 3d LEA scans. When dealing with reference databases, the FTE would, similar to current work in labs, include all known information into the system, such as ammunition and type of the firearm. Scores from the evidence are then compared to the most relevant scores in the database.
 
 For either scenario, we will assume that we can generate scores from an automated matching algorithm to assess similarity.  These similarity scores are then used to get score-based likelihood ratios which quantify the strength of evidence supporting either the prosecution's or the defense's hypothesis. The critical step of producing these likelihood ratios lies in the estimation of the distributions for the similarity scores of known matches and known non-matches.
+We will also assume that a suspected firearm is available. In case a firearm is not available, deriving reliable scores and associated densities becomes more complicated. We touch on this scenario and its limitations in the discussion.
 
-We will also assume that a suspected firearm is available. \hh{In case a firearm is not available, deriving reliable scores and associated densities becomes more complicated. We touch on this scenario and its limitations in the discussion.} 
-
-
-\hh{There are three sets of scores we are interested in: 
-scores corresponding to known matches that the distribution of $f_\text{KM}$ is based on; scores from known non-matches that enable an estimation of $f_\text{KNM}$; and comparison scores of the questioned bullet with the test fires.} 
-
-Under Scenario I, the distributions of known matches and known non-matches are based on the scores from pair-wise comparisons of the test fired bullets: assuming that we are able to access three test-fired bullets with six land engraved areas each, $f_\text{KM}$ is based on 18 scores of matching land-to-land signatures, while $f_\text{KNM}$ is based on 45 scores of non-matching land-to-land signatures from  pair-wise comparisons. \hh{XXX ccf should be symmetric for sig 1 to sig 2 and sig 2 to sig 1.}
+There are three sets of scores we are interested in: 
+scores corresponding to known matches that the distribution of $f_\text{KM}$ is based on; scores from known non-matches that enable an estimation of $f_\text{KNM}$; and comparison scores of the questioned bullet with the test fires.
+Under Scenario I, the distributions of known matches and known non-matches are based on the scores from pair-wise comparisons of the test fired bullets: assuming that we are able to access three test-fired bullets with six land engraved areas each, $f_\text{KM}$ is based on 18 scores of matching land-to-land signatures, while $f_\text{KNM}$ is based on 135 scores of non-matching land-to-land signatures from  pair-wise comparisons.
 Under Scenario II, these distributions are estimated from the scores of the closest matching reference fires (same firearm, same ammunition).
-
 Comparison scores are gained in the same way under both scenarios: the questioned bullet is compared to each of the test fires.
 We designate the six scores identified by SAM as the best possible phase-match as 'candidate KM'. 
 
-
-\hh{For the remainder of the paper, we  investigate the difference in algorithmic scores between scenarios I and II. We also address the question on how big the reference sample has to be to enable valid inference.}
-
-
+For the remainder of the paper, we  investigate the difference in algorithmic scores between scenarios I and II. We also address the question on how big the reference sample has to be to enable valid inference.
 
 We estimate the reference distributions of KM and KNM based on the reference data. Denote the questioned comparison score \hh{XXX singular? shouldn't we have more than one comparison score?} as $y$, the estimated KM and KNM distributions as $f_{KM}(.) = f_{KM}(.; p_{KM}, \mu_{KM}, \phi_{KM})$ and $f_{KNM}(.) = f_{KNM}(.; p_{KNM}, \mu_{KNM}, \phi_{KNM})$ respectively. The score-based likelihood ratios \hh{XXX plural here, but they are all called SLR. This should probably be an SLR(y) } (SLR) are then calculated as:
 
