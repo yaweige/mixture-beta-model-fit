@@ -1506,6 +1506,8 @@ knm <- small %>%
 grid.arrange(km, knm, ncol=2)
 ```
 
+
+
 For each pair of bullets from the same source, there are six land-to-land scores corresponding to matching lands, and 30 scores from non-matching lands. For a set of four bullets from a single barrel there are six pairs of bullets yielding a total of 36 scores from same-source land-to-land comparisons. 
 For  different-source land-to-land comparisons, we have many more cases. If we limit the scope of different-source comparisons to within a single barrel, there are  $\underbrace{30\times 6}_{\text{different bullets}} + \underbrace{15 \times 4}_{\text{same bullet}} = 240$ scores from land-to-land comparisons.
 
@@ -1527,11 +1529,13 @@ Database model v.s. case specific model
 
 
 
-The approach in this paper investigates two scenarios. Scenario I is modelled after current practice when a suspected firearm is available: In current practice, FTEs  fire two or three test bullets from a suspected firearm using ammunition that  matches the evidence found on the crime scene as closely as possible. Test fires are checked for consistency of striation marks between fires. Generally, the bullet with the best striation marks is used to compare to the evidence. 
+The approach in this paper investigates \yg{three} scenarios. Scenario I is modelled after current practice when a suspected firearm is available: In current practice, FTEs  fire two or three test bullets from a suspected firearm using ammunition that  matches the evidence found on the crime scene as closely as possible. Test fires are checked for consistency of striation marks between fires. Generally, the bullet with the best striation marks is used to compare to the evidence. 
 
 For Scenario II we assume, that a reference database  is available for comparison. This approach is similar to what has been described by Zheng et al in their presentation at AAFS 2019 (A Pathway Toward Firearm Population Statistics). Zheng et al (2019) described the identification of breech faces. Here, we are investigating an assessment of similarities of bullets based on 3d LEA scans. When dealing with reference databases, the FTE would, similar to current work in labs, include all known information into the system, such as ammunition and type of the firearm. Scores from the evidence are then compared to the most relevant scores in the database.
 
-For either scenario, we will assume that we can generate scores from an automated matching algorithm to assess similarity.  These similarity scores are then used to get score-based likelihood ratios which quantify the strength of evidence supporting either the prosecution's or the defense's hypothesis. The critical step of producing these likelihood ratios lies in the estimation of the distributions for the similarity scores of known matches and known non-matches.
+\yg{For Scenario III, we add an additional pre-screening procedure to exclude those barrels which don't leave well expressed marks on bullets and review the results from the first two scenarios. We achieve this by doing a permutation test for those comparison scores (i.e. CCFs) among test fires. If we reject the null hypothesis that the barrel doesn't mark, then it implies that the barrel leaves well expressed marks. Thus, we have higher confidence to conduct analysis on the questioned bullets. Otherwise, we conclude that we can't even distinguish the matches and non-matches within the test fires and the analysis on the questioned bullets is not reliable. This responds to the observed fact that some barrels don't mark well as in [figure]. Intuitively, this will significantly improve the classification performance but with some tradeoff on the other side. The tradeoff is that for some cases, we failed to do classications.}
+
+For either \yg{of the first two scenarios}, we will assume that we can generate scores from an automated matching algorithm to assess similarity.  These similarity scores are then used to get score-based likelihood ratios which quantify the strength of evidence supporting either the prosecution's or the defense's hypothesis. The critical step of producing these likelihood ratios lies in the estimation of the distributions for the similarity scores of known matches and known non-matches.
 We will also assume that a suspected firearm is available. In case a firearm is not available, deriving reliable scores and associated densities becomes more complicated. We touch on this scenario and its limitations in the discussion.
 
 There are three sets of scores we are interested in: 
@@ -2133,6 +2137,45 @@ app_sc3_summary %>%
   geom_line(aes(y = value, x = pvaluecufoff, color = key)) +
   ylim(0, 1)
 
+```
+
+```{r tileplot2, fig.cap="Same source bullet comparisons from different barrels. From left to right, barrels mark increasingly better.", out.width="\\textwidth", fig.align="center", fig.height = 3}
+# rank1: FAU66 bullet A&B
+# rank2: FAU569 bullet A&C
+# rank3: FAU268 bullet A&D
+# rank4: FAU300 bullet B&D
+
+tiledata2 <- ccf_data_part1 %>%
+  mutate(FAU1 = as.numeric(str_extract(land1, pattern = "(?<=LAPD - (FAU )?)\\d+")),
+         FAU2 = as.numeric(str_extract(land2, pattern = "(?<=LAPD - (FAU )?)\\d+")),
+         landA = str_extract(land1, pattern = "(?<=Land )[1-6]"),
+         landB = str_extract(land2, pattern = "(?<=Land )[1-6]")) %>%
+  filter((FAU1 == 66 & bullet1 == "B" & bullet2 == "A")|
+         (FAU1 == 569 & bullet1 == "C" & bullet2 == "A")|
+         (FAU1 == 268 & bullet1 == "D" & bullet2 == "A")|
+         (FAU1 == 300 & bullet1 == "D" & bullet2 == "B"))
+
+tiledata2 %>%
+  mutate(landA = paste0("L", landA),
+         landB = paste0("L", landB),
+         FAU1 = as.character(FAU1)) %>%
+  mutate(FAU1 = ifelse(FAU1 == "66", yes = "FAU 66 Bullet A&B", no = FAU1),
+         FAU1 = ifelse(FAU1 == "569", yes = "FAU 569 Bullet A&C", no = FAU1),
+         FAU1 = ifelse(FAU1 == "268", yes = "FAU 268 Bullet A&D", no = FAU1),
+         FAU1 = ifelse(FAU1 == "300", yes = "FAU 300 Bullet B&D", no = FAU1)) %>%
+  mutate(FAU1 = factor(FAU1, levels = c("FAU 300 Bullet B&D",
+                                        "FAU 268 Bullet A&D",
+                                        "FAU 569 Bullet A&C",
+                                        "FAU 66 Bullet A&B"))) %>%
+  ggplot(aes(x = landA, y = landB, fill=ccf)) + 
+  geom_tile() + 
+  scale_fill_gradient2(low="darkgrey", high="darkorange", 
+                       midpoint = 0.5, limit=c(0,1)) + 
+  xlab("Land1") +
+  ylab("Land2") +
+  theme(legend.position = "bottom",
+        aspect.ratio = 1) + 
+  facet_grid(.~FAU1)
 ```
 
 Sample size effect and convergence result
